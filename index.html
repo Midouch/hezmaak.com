@@ -1,144 +1,504 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Waselni — Italia ↔ Tunisia</title>
-  <link rel="stylesheet" href="style.css">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Waselni - Connetti persone tra Italia e Tunisia per viaggi, acquisti e trasporti."
+  >
+
+  <title>Waselni 🇮🇹 🇹🇳</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
 </head>
 
 <body>
 
-  <header>
-    <div class="logo">
-      <span>↔</span> Waselni
+<header class="header">
+
+  <div class="container nav">
+
+    <a
+      href="#"
+      class="logo"
+      onclick="goHome()"
+    >
+      <span>Waselni</span>
+      <small>وصلني</small>
+    </a>
+
+    <button
+      class="mobile-menu"
+      onclick="toggleMenu()"
+      aria-label="Menu"
+    >
+      ☰
+    </button>
+
+    <nav id="mainNav">
+
+      <a href="#viaggi">
+        Viaggi
+      </a>
+
+      <a href="#richieste">
+        Richieste
+      </a>
+
+      <a href="#come">
+        Come funziona
+      </a>
+
+      <button
+        id="languageButton"
+        class="language-button"
+        onclick="cycleLanguage()"
+      >
+        🇮🇹 IT
+      </button>
+
+      <button
+        id="darkButton"
+        class="icon-button"
+        onclick="toggleDarkMode()"
+      >
+        🌙
+      </button>
+
+      <button
+        id="authButton"
+        class="primary"
+        onclick="openAuth('login')"
+      >
+        Accedi / Registrati
+      </button>
+
+    </nav>
+
+  </div>
+
+</header>
+
+
+<main>
+
+<section class="hero">
+
+  <div class="container hero-grid">
+
+    <div class="hero-content">
+
+      <div class="badge">
+        🇮🇹 Italia ↔ 🇹🇳 Tunisia
+      </div>
+
+      <h1 id="heroTitle">
+        Porta ciò che serve.
+        <span>Connettiti.</span>
+        Guadagna.
+      </h1>
+
+      <p id="heroText">
+        Waselni mette in contatto persone che devono
+        ricevere oggetti tra Italia e Tunisia con
+        viaggiatori e trasportatori che hanno spazio
+        disponibile.
+      </p>
+
+      <div class="hero-buttons">
+
+        <button
+          class="primary large"
+          data-action="publish-trip"
+        >
+          ✈️ Sto viaggiando
+        </button>
+
+        <button
+          class="secondary large"
+          data-action="publish-request"
+        >
+          📦 Cerco qualcuno
+        </button>
+
+      </div>
+
+      <div class="trust">
+
+        <div>
+          <strong>✓</strong>
+          Utenti verificati
+        </div>
+
+        <div>
+          <strong>⭐</strong>
+          Recensioni
+        </div>
+
+        <div>
+          <strong>🔐</strong>
+          Pagamenti sicuri
+        </div>
+
+      </div>
+
     </div>
 
-    <nav>
-      <a href="#home">Home</a>
-      <a href="#marketplace">Marketplace</a>
-      <a href="#come-funziona">Come funziona</a>
-      <button id="darkMode">🌙</button>
-    </nav>
-  </header>
 
-  <main id="home">
+    <div class="hero-card">
 
-    <section class="hero">
-      <div class="hero-content">
-        <span class="badge">✓ Comunità Italia ↔ Tunisia</span>
+      <div class="route-card">
 
-        <h1>
-          Porta ciò che serve.<br>
-          <span>Italia ↔ Tunisia.</span>
-        </h1>
-
-        <p>
-          Waselni mette in contatto persone, viaggiatori e trasportatori
-          per trasportare oggetti tra Italia e Tunisia.
-        </p>
-
-        <div class="hero-buttons">
-          <button class="primary">📦 Devo ricevere qualcosa</button>
-          <button class="secondary">✈️ Sto viaggiando</button>
+        <div class="route-title">
+          ✈️ Un viaggio, un'opportunità
         </div>
-      </div>
-
-      <div class="hero-card">
-        <h2>🇮🇹 ↔ 🇹🇳</h2>
-        <p>Connettiamo le due sponde del Mediterraneo.</p>
 
         <div class="route">
-          <span>🇮🇹 Italia</span>
-          <strong>→</strong>
-          <span>🇹🇳 Tunisia</span>
+
+          <div>
+            <span>🇮🇹</span>
+            <strong>Italia</strong>
+          </div>
+
+          <div class="route-line">
+            ━━━━━ ✈️ ━━━━━
+          </div>
+
+          <div>
+            <span>🇹🇳</span>
+            <strong>Tunisia</strong>
+          </div>
+
         </div>
 
-        <button class="primary full-button">
-          Cerca un trasportatore
-        </button>
-      </div>
-    </section>
-
-    <section id="marketplace" class="section">
-      <h2>Viaggi disponibili</h2>
-
-      <div class="cards">
-
-        <article class="card">
-          <div class="avatar">👨🏻</div>
-          <h3>Ahmed Ben Ali ✓</h3>
-          <p>🇮🇹 Milano → 🇹🇳 Tunisi</p>
-          <p>📅 15 Settembre</p>
-          <p>📦 10 kg disponibili</p>
-          <strong>€5 / kg</strong>
-          <button class="primary">Contatta</button>
-        </article>
-
-        <article class="card">
-          <div class="avatar">👩🏻</div>
-          <h3>Sara Mansouri ✓</h3>
-          <p>🇹🇳 Sousse → 🇮🇹 Bologna</p>
-          <p>📅 21 Settembre</p>
-          <p>📦 8 kg disponibili</p>
-          <strong>€6 / kg</strong>
-          <button class="primary">Contatta</button>
-        </article>
-
-        <article class="card">
-          <div class="avatar">🚚</div>
-          <h3>Tunis Express ✓</h3>
-          <p>🇮🇹 Italia ↔ 🇹🇳 Tunisia</p>
-          <p>🚚 Trasportatore professionale</p>
-          <p>📦 Fino a 500 kg</p>
-          <strong>Preventivo</strong>
-          <button class="primary">Contatta</button>
-        </article>
+        <p>
+          Hai spazio in valigia?
+          Puoi aiutare qualcuno e
+          guadagnare.
+        </p>
 
       </div>
-    </section>
 
-    <section id="come-funziona" class="section alt">
-      <h2>Come funziona?</h2>
+    </div>
 
-      <div class="steps">
-        <div>
-          <span>1</span>
-          <h3>Registrati</h3>
-          <p>Crea il tuo profilo.</p>
+  </div>
+
+</section>
+
+
+<section
+  id="come"
+  class="how"
+>
+
+  <div class="container">
+
+    <div class="section-title">
+
+      <span>COME FUNZIONA</span>
+
+      <h2>
+        Semplice, sicuro, umano.
+      </h2>
+
+    </div>
+
+
+    <div class="steps">
+
+      <div class="step">
+
+        <div class="step-number">
+          1
         </div>
 
-        <div>
-          <span>2</span>
-          <h3>Pubblica</h3>
-          <p>Pubblica una richiesta o un viaggio.</p>
-        </div>
+        <h3>
+          Pubblica
+        </h3>
 
-        <div>
-          <span>3</span>
-          <h3>Trova un match</h3>
-          <p>Contatta la persona giusta.</p>
-        </div>
+        <p>
+          Pubblica il tuo viaggio
+          oppure indica cosa vuoi
+          far trasportare.
+        </p>
 
-        <div>
-          <span>4</span>
-          <h3>Consegna</h3>
-          <p>Completa il servizio e lascia una recensione.</p>
-        </div>
       </div>
-    </section>
 
-  </main>
 
-  <footer>
-    <h3>↔ Waselni</h3>
-    <p>Italia ↔ Tunisia</p>
-    <small>© 2026 Waselni</small>
-  </footer>
+      <div class="step">
 
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <div class="step-number">
+          2
+        </div>
+
+        <h3>
+          Connettiti
+        </h3>
+
+        <p>
+          Trova una persona che
+          percorre la tua stessa
+          tratta.
+        </p>
+
+      </div>
+
+
+      <div class="step">
+
+        <div class="step-number">
+          3
+        </div>
+
+        <h3>
+          Organizza
+        </h3>
+
+        <p>
+          Contatta l'altra persona
+          e concordate i dettagli.
+        </p>
+
+      </div>
+
+
+      <div class="step">
+
+        <div class="step-number">
+          4
+        </div>
+
+        <h3>
+          Recensisci
+        </h3>
+
+        <p>
+          Dopo il servizio lascia
+          una recensione.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section
+  id="viaggi"
+  class="marketplace"
+>
+
+  <div class="container">
+
+    <div class="section-header">
+
+      <div>
+
+        <span class="section-label">
+          VIAGGI DISPONIBILI
+        </span>
+
+        <h2>
+          Trova un viaggiatore
+        </h2>
+
+      </div>
+
+      <button
+        class="secondary"
+        data-action="publish-trip"
+      >
+        + Pubblica viaggio
+      </button>
+
+    </div>
+
+
+    <div
+      id="tripsContainer"
+      class="cards"
+    >
+
+      <div class="loading">
+        Caricamento...
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section
+  id="richieste"
+  class="requests-section"
+>
+
+  <div class="container">
+
+    <div class="section-header">
+
+      <div>
+
+        <span class="section-label">
+          RICHIESTE
+        </span>
+
+        <h2>
+          Cosa cercano le persone?
+        </h2>
+
+      </div>
+
+      <button
+        class="secondary"
+        data-action="publish-request"
+      >
+        + Pubblica richiesta
+      </button>
+
+    </div>
+
+
+    <div
+      id="requestsContainer"
+      class="cards"
+    >
+
+      <div class="loading">
+        Caricamento...
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section class="cta">
+
+  <div class="container">
+
+    <h2>
+      Hai un viaggio in programma?
+    </h2>
+
+    <p>
+      Trasforma lo spazio inutilizzato
+      nel tuo bagaglio in un'opportunità.
+    </p>
+
+    <button
+      class="primary large"
+      data-action="publish-trip"
+    >
+      Pubblica il tuo viaggio
+    </button>
+
+  </div>
+
+</section>
+
+</main>
+
+
+<footer>
+
+  <div class="container footer-grid">
+
+    <div>
+
+      <div class="logo">
+        Waselni
+        <small>وصلني</small>
+      </div>
+
+      <p>
+        Italia 🇮🇹 ↔ Tunisia 🇹🇳
+      </p>
+
+    </div>
+
+
+    <div>
+
+      <h4>
+        Waselni
+      </h4>
+
+      <a href="#come">
+        Come funziona
+      </a>
+
+      <a href="#viaggi">
+        Viaggi
+      </a>
+
+      <a href="#richieste">
+        Richieste
+      </a>
+
+    </div>
+
+
+    <div>
+
+      <h4>
+        Sicurezza
+      </h4>
+
+      <a href="#">
+        Verifica identità
+      </a>
+
+      <a href="#">
+        Recensioni
+      </a>
+
+      <a href="#">
+        Assistenza
+      </a>
+
+    </div>
+
+  </div>
+
+  <div class="copyright">
+
+    © 2026 Waselni
+
+  </div>
+
+</footer>
+
+
+<!-- SUPABASE -->
+
+<script
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
+
 <script src="config.js"></script>
+
 <script src="app.js"></script>
 
 </body>
+
 </html>
