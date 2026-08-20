@@ -2394,10 +2394,482 @@ function showMyReviews() {
 }
 
 
-function openVerification() {
+async function openVerification() {
 
-  alert(
-    "Modulo verifica identità: prossimo step."
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const {
+    data: existing,
+    error
+  } = await supabaseClient
+    .from("verification_requests")
+    .select("*")
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    )
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+
+    alert(
+      "Errore: " +
+      error.message
+    );
+
+    return;
+  }
+
+
+  const modal =
+    document.createElement("div");
+
+  modal.id =
+    "verificationModal";
+
+
+  let statusHtml = "";
+
+
+  if (existing) {
+
+    if (existing.status === "pending") {
+
+      statusHtml = `
+
+        <div class="verification-pending">
+
+          ⏳
+
+          <strong>
+            Verifica in revisione
+          </strong>
+
+          <p>
+            Abbiamo ricevuto il tuo documento.
+            Un amministratore lo controllerà.
+          </p>
+
+        </div>
+
+      `;
+
+    }
+
+
+    if (existing.status === "approved") {
+
+      statusHtml = `
+
+        <div class="verification-approved">
+
+          ✓
+
+          <strong>
+            Identità verificata
+          </strong>
+
+          <p>
+            Il tuo profilo possiede il badge verificato.
+          </p>
+
+        </div>
+
+      `;
+
+    }
+
+
+    if (existing.status === "rejected") {
+
+      statusHtml = `
+
+        <div class="verification-rejected">
+
+          ⚠️
+
+          <strong>
+            Verifica rifiutata
+          </strong>
+
+          <p>
+            ${
+              escapeHtml(
+                existing.rejection_reason ||
+                "Il documento non è stato approvato."
+              )
+            }
+          </p>
+
+        </div>
+
+      `;
+
+    }
+
+  }
+
+
+  modal.innerHTML = `
+
+    <div class="auth-overlay">
+
+      <div class="auth-box verification-modal">
+
+        <button
+          class="auth-close"
+          onclick="closeVerification()">
+
+          ×
+
+        </button>
+
+
+        <div class="verification-icon">
+          🪪
+        </div>
+
+
+        <h2>
+          Verifica la tua identità
+        </h2>
+
+
+        <p>
+          Per garantire maggiore sicurezza alla
+          comunità Waselni, chiediamo a tutti gli
+          utenti di verificare la propria identità.
+        </p>
+
+
+        ${statusHtml}
+
+
+        ${
+          !existing ||
+          existing.status === "rejected"
+
+          ? `
+
+            <div class="verification-form">
+
+              <label>
+                Tipo di documento
+              </label>
+
+
+              <select
+                id="documentType">
+
+                <option value="passport">
+                  🛂 Passaporto
+                </option>
+
+                <option value="identity_card">
+                  🪪 Carta d'identità
+                </option>
+
+              </select>
+
+
+              <label>
+                Documento
+              </label>
+
+
+              <input
+                id="documentFile"
+                type="file"
+                accept="
+                  image/jpeg,
+                  image/png,
+                  application/pdf
+                "
+              >
+
+
+              <small class="upload-help">
+
+                Formati accettati:
+                JPG, PNG, PDF.
+                Dimensione massima: 10 MB.
+
+              </small>
+
+
+              <div
+                id="verificationMessage">
+              </div>
+
+
+              <button
+                class="primary auth-button"
+                onclick="uploadVerificationDocument()">
+
+                🔐 Invia documento
+
+              </button>
+
+            </div>
+
+          `
+
+          : ""
+
+        }
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.body.appendChild(
+    modal
+  );
+
+}
+
+
+function closeVerification() {
+
+  const modal =
+    document.getElementById(
+      "verificationModal"
+    );
+
+  if (modal) {
+    modal.remove();
+  }
+
+}
+async function uploadVerificationDocument() {
+
+  if (!currentUser) {
+    return;
+  }
+
+
+  const type =
+    document.getElementById(
+      "documentType"
+    ).value;
+
+
+  const input =
+    document.getElementById(
+      "documentFile"
+    );
+
+
+  const message =
+    document.getElementById(
+      "verificationMessage"
+    );
+
+
+  if (
+    !input.files ||
+    !input.files.length
+  ) {
+
+    message.innerHTML = `
+      <div class="auth-error">
+        Seleziona un documento.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const file =
+    input.files[0];
+
+
+  const maxSize =
+    10 * 1024 * 1024;
+
+
+  if (file.size > maxSize) {
+
+    message.innerHTML = `
+      <div class="auth-error">
+        Il documento supera i 10 MB.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "application/pdf"
+  ];
+
+
+  if (
+    !allowedTypes.includes(
+      file.type
+    )
+  ) {
+
+    message.innerHTML = `
+      <div class="auth-error">
+        Formato non supportato.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  message.innerHTML = `
+    <div class="auth-success">
+      Upload in corso...
+    </div>
+  `;
+
+
+  const extension =
+    file.name
+      .split(".")
+      .pop()
+      .toLowerCase();
+
+
+  const fileName =
+    `${type}-${Date.now()}.${extension}`;
+
+
+  const filePath =
+    `${currentUser.id}/${fileName}`;
+
+
+  const {
+    error: uploadError
+  } =
+    await supabaseClient
+      .storage
+      .from(
+        "verification-documents"
+      )
+      .upload(
+        filePath,
+        file,
+        {
+          upsert: false
+        }
+      );
+
+
+  if (uploadError) {
+
+    console.error(
+      uploadError
+    );
+
+    message.innerHTML = `
+      <div class="auth-error">
+        Errore upload:
+        ${escapeHtml(
+          uploadError.message
+        )}
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const {
+    error: requestError
+  } =
+    await supabaseClient
+      .from(
+        "verification_requests"
+      )
+      .insert({
+
+        user_id:
+          currentUser.id,
+
+        document_type:
+          type,
+
+        document_path:
+          filePath,
+
+        status:
+          "pending"
+
+      });
+
+
+  if (requestError) {
+
+    console.error(
+      requestError
+    );
+
+    await supabaseClient
+      .storage
+      .from(
+        "verification-documents"
+      )
+      .remove([
+        filePath
+      ]);
+
+
+    message.innerHTML = `
+      <div class="auth-error">
+        Errore creazione richiesta:
+        ${escapeHtml(
+          requestError.message
+        )}
+      </div>
+    `;
+
+    return;
+  }
+
+
+  message.innerHTML = `
+    <div class="auth-success">
+
+      ✓ Documento inviato correttamente.
+
+      <br>
+
+      La verifica è ora in revisione.
+
+    </div>
+  `;
+
+
+  setTimeout(
+    () => {
+
+      closeVerification();
+
+      showProfile();
+
+    },
+    1200
   );
 
 }
