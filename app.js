@@ -2873,3 +2873,39 @@ async function uploadVerificationDocument() {
   );
 
 }
+async function openAdminPanel() {
+
+    if (!currentUser) {
+        openAuth("login");
+        return;
+    }
+
+    const {
+        data,
+        error
+    } = await supabaseClient.rpc(
+        "is_admin"
+    );
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Errore controllo amministratore."
+        );
+
+        return;
+    }
+
+    if (!data) {
+
+        alert(
+            "Accesso non autorizzato."
+        );
+
+        return;
+    }
+
+    loadAdminPanel();
+}
