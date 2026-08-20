@@ -2909,3 +2909,392 @@ async function openAdminPanel() {
 
     loadAdminPanel();
 }
+async function loadAdminPanel() {
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("verification_requests")
+        .select(`
+            id,
+            user_id,
+            document_type,
+            document_path,
+            status,
+            rejection_reason,
+            created_at
+        `)
+        .eq("status", "pending")
+        .order("created_at", {
+            ascending: true
+        });
+
+    if (error) {
+        console.error(error);
+
+        alert(
+            "Errore caricamento richieste: " +
+            error.message
+        );
+
+        return;
+    }
+
+    const old =
+        document.getElementById("adminPage");
+
+    if (old) {
+        old.remove();
+    }
+
+    const page =
+        document.createElement("div");
+
+    page.id = "adminPage";
+
+    page.innerHTML = `
+
+        <div class="profile-page">
+
+            <div class="container">
+
+                <button
+                    class="back-button"
+                    onclick="closeAdminPanel()">
+
+                    ← Torna al sito
+
+                </button>
+
+                <div class="profile-header">
+
+                    <span class="section-label">
+                        AMMINISTRAZIONE
+                    </span>
+
+                    <h1>
+                        Pannello Waselni 🔐
+                    </h1>
+
+                    <p>
+                        Gestione delle verifiche identità.
+                    </p>
+
+                </div>
+
+                <div class="profile-card">
+
+                    <div class="profile-card-title">
+
+                        <h3>
+                            Richieste in attesa
+                        </h3>
+
+                        <strong>
+                            ${data.length}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <div id="adminRequests">
+
+                    ${
+                        data.length
+                        ? data.map(
+                            request =>
+                                adminRequestHTML(request)
+                          ).join("")
+                        : `
+                            <div class="profile-card">
+
+                                <h3>
+                                    ✓ Tutto in ordine
+                                </h3>
+
+                                <p>
+                                    Non ci sono verifiche
+                                    in attesa.
+                                </p>
+
+                            </div>
+                        `
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(page);
+
+    document.body.style.overflow = "hidden";
+}
+function adminRequestHTML(request) {
+
+    const type =
+        request.document_type === "passport"
+            ? "🛂 Passaporto"
+            : "🪪 Carta d'identità";
+
+    const date =
+        new Date(
+            request.created_at
+        ).toLocaleString("it-IT");
+
+    return `
+
+        <div
+            class="profile-card admin-request"
+            id="request-${request.id}">
+
+            <div>
+
+                <span class="section-label">
+                    RICHIESTA VERIFICA
+                </span>
+
+                <h3>
+                    ${type}
+                </h3>
+
+                <p>
+                    Utente:
+                    <br>
+
+                    <code>
+                        ${escapeHtml(request.user_id)}
+                    </code>
+                </p>
+
+                <p>
+                    Inviata: ${date}
+                </p>
+
+            </div>
+
+            <div class="admin-actions">
+
+                <button
+                    class="secondary"
+                    onclick="viewVerificationDocument('${request.document_path}')">
+
+                    👁 Visualizza documento
+
+                </button>
+
+                <button
+                    class="primary"
+                    onclick="approveVerification('${request.id}', '${request.user_id}')">
+
+                    ✓ Approva
+
+                </button>
+
+                <button
+                    class="danger-button"
+                    onclick="rejectVerification('${request.id}')">
+
+                    ✕ Rifiuta
+
+                </button>
+
+            </div>
+
+        </div>
+    `;
+}
+async function viewVerificationDocument(
+    path
+) {
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .storage
+        .from(
+            "verification-documents"
+        )
+        .createSignedUrl(
+            path,
+            300
+        );
+
+    if (error) {
+
+        alert(
+            "Impossibile aprire il documento: " +
+            error.message
+        );
+
+        return;
+    }
+
+    window.open(
+        data.signedUrl,
+        "_blank",
+        "noopener,noreferrer"
+    );
+}
+async function approveVerification(
+    requestId,
+    userId
+) {
+
+    if (
+        !confirm(
+            "Confermi di aver verificato il documento?"
+        )
+    ) {
+        return;
+    }
+
+
+    const {
+        error: requestError
+    } = await supabaseClient
+        .from(
+            "verification_requests"
+        )
+        .update({
+
+            status:
+                "approved",
+
+            reviewed_at:
+                new Date().toISOString(),
+
+            reviewed_by:
+                currentUser.id
+
+        })
+        .eq(
+            "id",
+            requestId
+        );
+
+
+    if (requestError) {
+
+        alert(
+            "Errore: " +
+            requestError.message
+        );
+
+        return;
+    }
+
+
+    const {
+        error: profileError
+    } = await supabaseClient
+        .from("profiles")
+        .update({
+
+            is_verified:
+                true
+
+        })
+        .eq(
+            "id",
+            userId
+        );
+
+
+    if (profileError) {
+
+        alert(
+            "Richiesta approvata, ma errore aggiornamento profilo: " +
+            profileError.message
+        );
+
+        return;
+    }
+
+
+    alert(
+        "✓ Utente verificato."
+    );
+
+
+    loadAdminPanel();
+}
+async function rejectVerification(
+    requestId
+) {
+
+    const reason =
+        prompt(
+            "Perché stai rifiutando il documento?"
+        );
+
+
+    if (!reason) {
+        return;
+    }
+
+
+    const {
+        error
+    } = await supabaseClient
+        .from(
+            "verification_requests"
+        )
+        .update({
+
+            status:
+                "rejected",
+
+            rejection_reason:
+                reason,
+
+            reviewed_at:
+                new Date().toISOString(),
+
+            reviewed_by:
+                currentUser.id
+
+        })
+        .eq(
+            "id",
+            requestId
+        );
+
+
+    if (error) {
+
+        alert(
+            "Errore: " +
+            error.message
+        );
+
+        return;
+    }
+
+
+    alert(
+        "Richiesta rifiutata."
+    );
+
+
+    loadAdminPanel();
+}
+function closeAdminPanel() {
+
+    const page =
+        document.getElementById(
+            "adminPage"
+        );
+
+    if (page) {
+        page.remove();
+    }
+
+    document.body.style.overflow =
+        "";
+}
