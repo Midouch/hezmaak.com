@@ -2282,3 +2282,122 @@ function escapeHtml(value) {
     );
 
 }
+/* =====================================================
+   PROFILE PLACEHOLDERS
+===================================================== */
+
+function editProfile() {
+
+  alert(
+    "La modifica del profilo sarà disponibile nel prossimo modulo."
+  );
+
+}
+
+
+async function showMyTrips() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("trips")
+    .select("*")
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .order(
+      "travel_date",
+      {
+        ascending: false
+      }
+    );
+
+  if (error) {
+
+    alert(
+      "Errore: " +
+      error.message
+    );
+
+    return;
+  }
+
+  if (!data.length) {
+
+    alert(
+      "Non hai ancora pubblicato nessun viaggio."
+    );
+
+    return;
+  }
+
+  alert(
+    `Hai pubblicato ${data.length} viaggio/i.`
+  );
+
+}
+
+
+async function showMyRequests() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("requests")
+    .select("*")
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    );
+
+  if (error) {
+
+    alert(
+      "Errore: " +
+      error.message
+    );
+
+    return;
+  }
+
+  if (!data.length) {
+
+    alert(
+      "Non hai ancora pubblicato nessuna richiesta."
+    );
+
+    return;
+  }
+
+  alert(
+    `Hai pubblicato ${data.length} richiesta/e.`
+  );
+
+}
+
+
+function showMyReviews() {
+
+  alert(
+    "Il sistema di recensioni verrà collegato al database nel prossimo modulo."
+  );
+
+}
+
+
+function openVerification() {
+
+  alert(
+    "Modulo verifica identità: prossimo step."
+  );
+
+}
