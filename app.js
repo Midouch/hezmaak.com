@@ -1,34 +1,38 @@
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
 
 let currentUser = null;
 
+
 /* =====================================================
-   INIT
+   START
 ===================================================== */
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await loadUser();
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
 
-  createAuthModal();
-  createTripModal();
+    await loadUser();
 
-  updateHeader();
-  updateButtons();
+    createAuthModal();
 
-  loadTrips();
+    createTripModal();
 
-  setupDarkMode();
-
-  supabaseClient.auth.onAuthStateChange((_event, session) => {
-    currentUser = session?.user || null;
+    createRequestModal();
 
     updateHeader();
-    updateButtons();
-  });
-});
+
+    setupActions();
+
+    loadTrips();
+
+    loadRequests();
+
+  }
+);
 
 
 /* =====================================================
@@ -43,47 +47,160 @@ async function loadUser() {
 
   currentUser = user || null;
 
-  return currentUser;
 }
 
 
 /* =====================================================
-   AUTH MODAL
+   HEADER
+===================================================== */
+
+function updateHeader() {
+
+  const button =
+    document.getElementById(
+      "authButton"
+    );
+
+  if (!button) return;
+
+
+  if (currentUser) {
+
+    button.textContent =
+      "👤 Il mio profilo";
+
+    button.onclick =
+      showProfile;
+
+  } else {
+
+    button.textContent =
+      "Accedi / Registrati";
+
+    button.onclick =
+      () => openAuth("login");
+
+  }
+
+}
+
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+function setupActions() {
+
+  document
+    .querySelectorAll(
+      '[data-action="publish-trip"]'
+    )
+    .forEach(button => {
+
+      button.onclick = event => {
+
+        event.preventDefault();
+
+        if (!currentUser) {
+
+          openAuth("login");
+
+          return;
+        }
+
+        openTripModal();
+
+      };
+
+    });
+
+
+  document
+    .querySelectorAll(
+      '[data-action="publish-request"]'
+    )
+    .forEach(button => {
+
+      button.onclick = event => {
+
+        event.preventDefault();
+
+        if (!currentUser) {
+
+          openAuth("login");
+
+          return;
+        }
+
+        openRequestModal();
+
+      };
+
+    });
+
+}
+
+
+/* =====================================================
+   AUTH
 ===================================================== */
 
 function createAuthModal() {
 
-  if (document.getElementById("authModal")) return;
+  if (
+    document.getElementById(
+      "authModal"
+    )
+  ) return;
 
-  const modal = document.createElement("div");
+
+  const modal =
+    document.createElement(
+      "div"
+    );
 
   modal.id = "authModal";
 
+
   modal.innerHTML = `
+
     <div class="auth-overlay">
 
       <div class="auth-box">
 
-        <button class="auth-close"
-          onclick="closeAuth()">×</button>
+        <button
+          class="auth-close"
+          onclick="closeAuth()">
+
+          ×
+
+        </button>
+
 
         <div id="loginView">
 
-          <h2>Accedi a Waselni</h2>
+          <h2>
+            Accedi a Waselni
+          </h2>
 
           <p>
-            Accedi per pubblicare viaggi e richieste.
+            Accedi al tuo account.
           </p>
+
 
           <input
             id="loginEmail"
             type="email"
-            placeholder="Email">
+            placeholder="Email"
+          >
+
 
           <input
             id="loginPassword"
             type="password"
-            placeholder="Password">
+            placeholder="Password"
+          >
+
 
           <button
             class="primary auth-button"
@@ -93,56 +210,74 @@ function createAuthModal() {
 
           </button>
 
+
           <p class="auth-switch">
+
             Non hai un account?
 
-            <button onclick="showRegister()">
+            <button
+              onclick="showRegister()">
+
               Registrati
+
             </button>
+
           </p>
 
         </div>
 
 
-        <div id="registerView"
-             style="display:none">
+        <div
+          id="registerView"
+          style="display:none"
+        >
 
-          <h2>Crea il tuo account</h2>
+          <h2>
+            Crea account
+          </h2>
 
           <p>
-            Unisciti alla comunità Waselni.
+            Entra nella comunità Waselni.
           </p>
+
 
           <input
             id="registerName"
             type="text"
-            placeholder="Nome e cognome">
+            placeholder="Nome e cognome"
+          >
+
 
           <input
             id="registerEmail"
             type="email"
-            placeholder="Email">
+            placeholder="Email"
+          >
+
 
           <input
             id="registerPassword"
             type="password"
-            placeholder="Password">
+            placeholder="Password"
+          >
+
 
           <select id="registerType">
 
             <option value="private">
-              Privato
+              👤 Privato
             </option>
 
             <option value="traveler">
-              Viaggiatore
+              ✈️ Viaggiatore
             </option>
 
             <option value="company">
-              Azienda / Trasportatore
+              🚚 Azienda / Trasportatore
             </option>
 
           </select>
+
 
           <select id="registerCountry">
 
@@ -156,25 +291,31 @@ function createAuthModal() {
 
           </select>
 
+
           <button
             class="primary auth-button"
             onclick="register()">
 
-            Crea account
+            Registrati
 
           </button>
+
 
           <p class="auth-switch">
 
             Hai già un account?
 
-            <button onclick="showLogin()">
+            <button
+              onclick="showLogin()">
+
               Accedi
+
             </button>
 
           </p>
 
         </div>
+
 
         <div id="authMessage"></div>
 
@@ -183,82 +324,106 @@ function createAuthModal() {
     </div>
   `;
 
-  document.body.appendChild(modal);
+
+  document.body.appendChild(
+    modal
+  );
+
 }
 
 
-function openAuth(mode = "login") {
+function openAuth(
+  mode = "login"
+) {
 
-  createAuthModal();
+  document
+    .getElementById("authModal")
+    .style.display = "block";
 
-  document.getElementById("authModal").style.display = "block";
 
   if (mode === "register") {
+
     showRegister();
+
   } else {
+
     showLogin();
+
   }
+
 }
 
 
 function closeAuth() {
 
-  const modal =
-    document.getElementById("authModal");
+  document
+    .getElementById("authModal")
+    .style.display = "none";
 
-  if (modal) {
-    modal.style.display = "none";
-  }
 }
 
 
 function showLogin() {
 
-  document.getElementById("loginView")
+  document
+    .getElementById("loginView")
     .style.display = "block";
 
-  document.getElementById("registerView")
+  document
+    .getElementById("registerView")
     .style.display = "none";
 
-  clearAuthMessage();
+  clearMessage();
+
 }
 
 
 function showRegister() {
 
-  document.getElementById("loginView")
+  document
+    .getElementById("loginView")
     .style.display = "none";
 
-  document.getElementById("registerView")
+  document
+    .getElementById("registerView")
     .style.display = "block";
 
-  clearAuthMessage();
+  clearMessage();
+
 }
 
 
-function showAuthMessage(message, error = false) {
+function showMessage(
+  text,
+  error = false
+) {
 
   const element =
-    document.getElementById("authMessage");
+    document.getElementById(
+      "authMessage"
+    );
 
-  if (!element) return;
-
-  element.textContent = message;
+  element.textContent = text;
 
   element.className =
-    error ? "auth-error" : "auth-success";
+    error
+      ? "auth-error"
+      : "auth-success";
+
 }
 
 
-function clearAuthMessage() {
+function clearMessage() {
 
   const element =
-    document.getElementById("authMessage");
+    document.getElementById(
+      "authMessage"
+    );
 
-  if (element) {
-    element.textContent = "";
-    element.className = "";
-  }
+  element.textContent = "";
+
+  element.className = "";
+
 }
 
 
@@ -269,40 +434,45 @@ function clearAuthMessage() {
 async function register() {
 
   const name =
-    document.getElementById("registerName")
-      .value.trim();
+    document.getElementById(
+      "registerName"
+    ).value.trim();
 
   const email =
-    document.getElementById("registerEmail")
-      .value.trim();
+    document.getElementById(
+      "registerEmail"
+    ).value.trim();
 
   const password =
-    document.getElementById("registerPassword")
-      .value;
+    document.getElementById(
+      "registerPassword"
+    ).value;
 
-  const userType =
-    document.getElementById("registerType")
-      .value;
+  const type =
+    document.getElementById(
+      "registerType"
+    ).value;
 
   const country =
-    document.getElementById("registerCountry")
-      .value;
+    document.getElementById(
+      "registerCountry"
+    ).value;
 
 
-  if (!name || !email || !password) {
+  if (
+    !name ||
+    !email ||
+    !password
+  ) {
 
-    showAuthMessage(
+    showMessage(
       "Compila tutti i campi.",
       true
     );
 
     return;
+
   }
-
-
-  showAuthMessage(
-    "Creazione account..."
-  );
 
 
   const {
@@ -312,13 +482,14 @@ async function register() {
     await supabaseClient.auth.signUp({
 
       email,
+
       password,
 
       options: {
 
         data: {
           full_name: name,
-          user_type: userType,
+          user_type: type,
           country: country
         }
 
@@ -329,55 +500,39 @@ async function register() {
 
   if (error) {
 
-    showAuthMessage(
+    showMessage(
       error.message,
       true
     );
 
     return;
+
   }
 
-
-  /*
-    Creiamo il profilo solo se
-    abbiamo effettivamente un utente.
-  */
 
   if (data.user) {
 
-    const {
-      error: profileError
-    } =
-      await supabaseClient
-        .from("profiles")
-        .upsert({
+    await supabaseClient
+      .from("profiles")
+      .upsert({
 
-          id: data.user.id,
+        id: data.user.id,
 
-          full_name: name,
+        full_name: name,
 
-          country: country,
+        country: country,
 
-          user_type: userType
+        user_type: type
 
-        });
-
-
-    if (profileError) {
-
-      console.error(
-        "Profile error:",
-        profileError
-      );
-
-    }
+      });
 
   }
 
 
-  showAuthMessage(
+  showMessage(
     "Account creato. Controlla la tua email per confermare l'account."
   );
+
 }
 
 
@@ -388,28 +543,14 @@ async function register() {
 async function login() {
 
   const email =
-    document.getElementById("loginEmail")
-      .value.trim();
+    document.getElementById(
+      "loginEmail"
+    ).value.trim();
 
   const password =
-    document.getElementById("loginPassword")
-      .value;
-
-
-  if (!email || !password) {
-
-    showAuthMessage(
-      "Inserisci email e password.",
-      true
-    );
-
-    return;
-  }
-
-
-  showAuthMessage(
-    "Accesso in corso..."
-  );
+    document.getElementById(
+      "loginPassword"
+    ).value;
 
 
   const {
@@ -426,12 +567,13 @@ async function login() {
 
   if (error) {
 
-    showAuthMessage(
+    showMessage(
       error.message,
       true
     );
 
     return;
+
   }
 
 
@@ -441,107 +583,72 @@ async function login() {
 
   updateHeader();
 
-  updateButtons();
-
   loadTrips();
+
+  loadRequests();
+
 }
 
 
 /* =====================================================
-   LOGOUT
+   PROFILE
 ===================================================== */
 
-async function logout() {
+async function showProfile() {
 
-  await supabaseClient.auth.signOut();
+  if (!currentUser) {
 
-  currentUser = null;
+    openAuth();
 
-  updateHeader();
-
-  updateButtons();
-
-  loadTrips();
-}
-
-
-/* =====================================================
-   HEADER
-===================================================== */
-
-function updateHeader() {
-
-  const nav =
-    document.querySelector("nav");
-
-  if (!nav) return;
-
-
-  const existing =
-    document.getElementById("authButton");
-
-  if (existing) {
-    existing.remove();
-  }
-
-
-  const button =
-    document.createElement("button");
-
-  button.id = "authButton";
-
-  button.className = "primary";
-
-
-  if (currentUser) {
-
-    button.textContent =
-      "👤 Il mio account";
-
-    button.onclick =
-      showProfile;
-
-  } else {
-
-    button.textContent =
-      "Accedi / Registrati";
-
-    button.onclick =
-      () => openAuth("login");
+    return;
 
   }
 
 
-  nav.appendChild(button);
-}
+  const {
+    data
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .single();
 
 
-/* =====================================================
-   BUTTONS
-===================================================== */
-function updateButtons() {
+  if (!data) {
 
-  /*
-   * NON apriamo mai il modulo automaticamente.
-   * Il modulo viene aperto solamente quando
-   * l'utente clicca un pulsante.
-   */
+    alert(
+      "Profilo non trovato."
+    );
 
-  const publishButtons = document.querySelectorAll(
-    '[data-action="publish-trip"]'
+    return;
+
+  }
+
+
+  const verified =
+    data.is_verified
+      ? "✓ Verificato"
+      : "○ Non verificato";
+
+
+  alert(
+
+    `👤 ${data.full_name}\n\n` +
+
+    `Tipo: ${data.user_type}\n` +
+
+    `Paese: ${data.country}\n` +
+
+    `Stato: ${verified}\n` +
+
+    `⭐ ${data.rating || 0}`
+
   );
 
-  publishButtons.forEach(button => {
-
-    button.onclick = function(event) {
-
-      event.preventDefault();
-
-      openTripModal();
-
-    };
-
-  });
 }
 
 
@@ -551,14 +658,13 @@ function updateButtons() {
 
 function createTripModal() {
 
-  if (document.getElementById("tripModal"))
-    return;
-
-
   const modal =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
-  modal.id = "tripModal";
+  modal.id =
+    "tripModal";
 
 
   modal.innerHTML = `
@@ -576,17 +682,21 @@ function createTripModal() {
         </button>
 
 
-        <h2>✈️ Pubblica un viaggio</h2>
+        <h2>
+          ✈️ Pubblica viaggio
+        </h2>
 
         <p>
-          Indica lo spazio disponibile
-          nel tuo viaggio.
+          Indica il tuo viaggio.
         </p>
 
 
-        <label>Paese di partenza</label>
+        <label>
+          Partenza
+        </label>
 
-        <select id="tripDepartureCountry">
+        <select
+          id="tripDepartureCountry">
 
           <option value="italy">
             🇮🇹 Italia
@@ -599,9 +709,12 @@ function createTripModal() {
         </select>
 
 
-        <label>Paese di arrivo</label>
+        <label>
+          Arrivo
+        </label>
 
-        <select id="tripArrivalCountry">
+        <select
+          id="tripArrivalCountry">
 
           <option value="tunisia">
             🇹🇳 Tunisia
@@ -616,21 +729,20 @@ function createTripModal() {
 
         <input
           id="tripDepartureCity"
-          type="text"
-          placeholder="Città di partenza">
+          placeholder="Città di partenza"
+        >
 
 
         <input
           id="tripArrivalCity"
-          type="text"
-          placeholder="Città di arrivo">
+          placeholder="Città di arrivo"
+        >
 
-
-        <label>Data del viaggio</label>
 
         <input
           id="tripDate"
-          type="date">
+          type="date"
+        >
 
 
         <input
@@ -638,7 +750,8 @@ function createTripModal() {
           type="number"
           min="0.1"
           step="0.1"
-          placeholder="Kg disponibili">
+          placeholder="Kg disponibili"
+        >
 
 
         <input
@@ -646,14 +759,15 @@ function createTripModal() {
           type="number"
           min="0"
           step="0.01"
-          placeholder="Prezzo € / kg">
+          placeholder="Prezzo €/kg"
+        >
 
 
         <textarea
           id="tripDescription"
           rows="4"
-          placeholder="Descrizione del viaggio">
-        </textarea>
+          placeholder="Descrizione"
+        ></textarea>
 
 
         <button
@@ -673,34 +787,28 @@ function createTripModal() {
   `;
 
 
-  document.body.appendChild(modal);
+  document.body.appendChild(
+    modal
+  );
+
 }
 
 
 function openTripModal() {
 
-  if (!currentUser) {
-
-    openAuth("login");
-
-    return;
-  }
-
-
   document
     .getElementById("tripModal")
     .style.display = "block";
+
 }
 
 
 function closeTripModal() {
 
-  const modal =
-    document.getElementById("tripModal");
+  document
+    .getElementById("tripModal")
+    .style.display = "none";
 
-  if (modal) {
-    modal.style.display = "none";
-  }
 }
 
 
@@ -712,9 +820,10 @@ async function publishTrip() {
 
   if (!currentUser) {
 
-    openAuth("login");
+    openAuth();
 
     return;
+
   }
 
 
@@ -723,30 +832,25 @@ async function publishTrip() {
       "tripDepartureCountry"
     ).value;
 
-
   const arrivalCountry =
     document.getElementById(
       "tripArrivalCountry"
     ).value;
-
 
   const departureCity =
     document.getElementById(
       "tripDepartureCity"
     ).value.trim();
 
-
   const arrivalCity =
     document.getElementById(
       "tripArrivalCity"
     ).value.trim();
 
-
-  const travelDate =
+  const date =
     document.getElementById(
       "tripDate"
     ).value;
-
 
   const kg =
     parseFloat(
@@ -755,14 +859,12 @@ async function publishTrip() {
       ).value
     );
 
-
   const price =
     parseFloat(
       document.getElementById(
         "tripPrice"
       ).value
-    );
-
+    ) || null;
 
   const description =
     document.getElementById(
@@ -779,17 +881,18 @@ async function publishTrip() {
   if (
     !departureCity ||
     !arrivalCity ||
-    !travelDate ||
+    !date ||
     !kg
   ) {
 
     message.textContent =
-      "Compila tutti i campi obbligatori.";
+      "Compila i campi obbligatori.";
 
     message.className =
       "auth-error";
 
     return;
+
   }
 
 
@@ -805,11 +908,8 @@ async function publishTrip() {
       "auth-error";
 
     return;
+
   }
-
-
-  message.textContent =
-    "Pubblicazione in corso...";
 
 
   const {
@@ -835,13 +935,13 @@ async function publishTrip() {
           arrivalCity,
 
         travel_date:
-          travelDate,
+          date,
 
         available_kg:
           kg,
 
         price_per_kg:
-          price || null,
+          price,
 
         description:
           description,
@@ -863,24 +963,28 @@ async function publishTrip() {
       "auth-error";
 
     return;
+
   }
 
 
   message.textContent =
     "✓ Viaggio pubblicato!";
 
-
   message.className =
     "auth-success";
 
 
-  setTimeout(() => {
+  setTimeout(
+    () => {
 
-    closeTripModal();
+      closeTripModal();
 
-    loadTrips();
+      loadTrips();
 
-  }, 1000);
+    },
+    800
+  );
+
 }
 
 
@@ -891,16 +995,11 @@ async function publishTrip() {
 async function loadTrips() {
 
   const container =
-    document.querySelector(".cards");
+    document.getElementById(
+      "tripsContainer"
+    );
 
   if (!container) return;
-
-
-  container.innerHTML = `
-    <div class="loading">
-      Caricamento viaggi...
-    </div>
-  `;
 
 
   const {
@@ -911,18 +1010,22 @@ async function loadTrips() {
       .from("trips")
       .select(`
         *,
-        profiles (
+        profiles(
           full_name,
           is_verified,
           rating,
-          reviews_count,
           user_type
         )
       `)
-      .eq("status", "active")
+      .eq(
+        "status",
+        "active"
+      )
       .order(
         "travel_date",
-        { ascending: true }
+        {
+          ascending: true
+        }
       );
 
 
@@ -930,111 +1033,59 @@ async function loadTrips() {
 
     console.error(error);
 
-    container.innerHTML = `
-      <div class="loading">
-        Impossibile caricare i viaggi.
-      </div>
-    `;
+    container.innerHTML =
+      `<div class="loading">
+        Errore nel caricamento.
+      </div>`;
 
     return;
+
   }
 
 
-  if (!data || data.length === 0) {
+  if (!data.length) {
 
-    container.innerHTML = `
-      <div class="empty-state">
-
-        <div class="empty-icon">
-          ✈️
-        </div>
+    container.innerHTML =
+      `<div class="empty-state">
 
         <h3>
-          Nessun viaggio disponibile
+          ✈️ Nessun viaggio disponibile
         </h3>
 
         <p>
-          Sii il primo a pubblicare
-          un viaggio.
+          Pubblica il primo viaggio.
         </p>
 
-        <button
-          class="primary"
-          onclick="openTripModal()">
-
-          Pubblica un viaggio
-
-        </button>
-
-      </div>
-    `;
+      </div>`;
 
     return;
+
   }
 
 
   container.innerHTML =
-    data.map(
-      createTripCard
-    ).join("");
+    data
+      .map(
+        tripCard
+      )
+      .join("");
 
-
-  document
-    .querySelectorAll(
-      ".trip-contact"
-    )
-    .forEach(button => {
-
-      button.onclick = () => {
-
-        const userId =
-          button.dataset.user;
-
-        contactTraveler(userId);
-
-      };
-
-    });
 }
 
 
-/* =====================================================
-   TRIP CARD
-===================================================== */
-
-function createTripCard(trip) {
+function tripCard(trip) {
 
   const profile =
     trip.profiles || {};
-
-
-  const verified =
-    profile.is_verified
-      ? "✓"
-      : "";
-
-
-  const type =
-    profile.user_type ===
-    "company"
-      ? "🚚 Azienda"
-      : profile.user_type ===
-        "traveler"
-        ? "✈️ Viaggiatore"
-        : "👤 Privato";
 
 
   const date =
     new Date(
       trip.travel_date +
       "T12:00:00"
-    ).toLocaleDateString(
-      "it-IT",
-      {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      }
+    )
+    .toLocaleDateString(
+      "it-IT"
     );
 
 
@@ -1048,15 +1099,16 @@ function createTripCard(trip) {
 
 
       <h3>
+
         ${escapeHtml(
           profile.full_name ||
           "Utente Waselni"
         )}
 
         ${
-          verified
+          profile.is_verified
             ? `<span class="verified">
-                ${verified}
+                ✓ Verificato
                </span>`
             : ""
         }
@@ -1064,28 +1116,26 @@ function createTripCard(trip) {
       </h3>
 
 
-      <small>
-        ${type}
-      </small>
-
-
       <p>
-        🇮🇹
-        ${countryFlag(
+
+        ${flag(
           trip.departure_country
         )}
+
         ${escapeHtml(
           trip.departure_city
         )}
 
         →
 
-        ${countryFlag(
+        ${flag(
           trip.arrival_country
         )}
+
         ${escapeHtml(
           trip.arrival_city
         )}
+
       </p>
 
 
@@ -1095,24 +1145,22 @@ function createTripCard(trip) {
 
 
       <p>
-        📦 ${trip.available_kg} kg disponibili
+        📦 ${trip.available_kg} kg
       </p>
 
 
       ${
         trip.price_per_kg
           ? `<strong>
-              €${trip.price_per_kg} / kg
+              €${trip.price_per_kg}/kg
              </strong>`
-          : `<strong>
-              Prezzo da concordare
-             </strong>`
+          : ""
       }
 
 
       ${
         trip.description
-          ? `<p class="trip-description">
+          ? `<p>
               ${escapeHtml(
                 trip.description
               )}
@@ -1125,37 +1173,486 @@ function createTripCard(trip) {
         currentUser &&
         currentUser.id !== trip.user_id
 
-          ? `<button
-              class="primary trip-contact"
-              data-user="${trip.user_id}">
+        ? `<button
+            class="primary"
+            onclick="contactUser('${trip.user_id}')">
 
-              Contatta
+            Contatta
 
-             </button>`
+           </button>`
 
-          : currentUser &&
-            currentUser.id === trip.user_id
+        : ""
 
-            ? `<button
-                class="secondary"
-                disabled>
-
-                Il tuo viaggio
-
-               </button>`
-
-            : `<button
-                class="primary"
-                onclick="openAuth()">
-
-                Accedi per contattare
-
-               </button>`
       }
 
     </article>
 
   `;
+
+}
+
+
+/* =====================================================
+   REQUEST MODAL
+===================================================== */
+
+function createRequestModal() {
+
+  const modal =
+    document.createElement(
+      "div"
+    );
+
+  modal.id =
+    "requestModal";
+
+
+  modal.innerHTML = `
+
+    <div class="auth-overlay">
+
+      <div class="auth-box">
+
+        <button
+          class="auth-close"
+          onclick="closeRequestModal()">
+
+          ×
+
+        </button>
+
+
+        <h2>
+          📦 Pubblica richiesta
+        </h2>
+
+
+        <select
+          id="requestDeparture">
+
+          <option value="tunisia">
+            🇹🇳 Tunisia
+          </option>
+
+          <option value="italy">
+            🇮🇹 Italia
+          </option>
+
+        </select>
+
+
+        <select
+          id="requestArrival">
+
+          <option value="italy">
+            🇮🇹 Italia
+          </option>
+
+          <option value="tunisia">
+            🇹🇳 Tunisia
+          </option>
+
+        </select>
+
+
+        <input
+          id="requestDepartureCity"
+          placeholder="Città di partenza"
+        >
+
+
+        <input
+          id="requestArrivalCity"
+          placeholder="Città di arrivo"
+        >
+
+
+        <input
+          id="requestDate"
+          type="date"
+        >
+
+
+        <textarea
+          id="requestDescription"
+          rows="4"
+          placeholder="Cosa vuoi trasportare?"
+        ></textarea>
+
+
+        <input
+          id="requestWeight"
+          type="number"
+          placeholder="Peso kg"
+        >
+
+
+        <input
+          id="requestBudget"
+          type="number"
+          placeholder="Budget €"
+        >
+
+
+        <button
+          class="primary auth-button"
+          onclick="publishRequest()">
+
+          Pubblica richiesta
+
+        </button>
+
+
+        <div id="requestMessage"></div>
+
+      </div>
+
+    </div>
+  `;
+
+
+  document.body.appendChild(
+    modal
+  );
+
+}
+
+
+function openRequestModal() {
+
+  document
+    .getElementById(
+      "requestModal"
+    )
+    .style.display =
+    "block";
+
+}
+
+
+function closeRequestModal() {
+
+  document
+    .getElementById(
+      "requestModal"
+    )
+    .style.display =
+    "none";
+
+}
+
+
+/* =====================================================
+   PUBLISH REQUEST
+===================================================== */
+
+async function publishRequest() {
+
+  const departure =
+    document.getElementById(
+      "requestDeparture"
+    ).value;
+
+  const arrival =
+    document.getElementById(
+      "requestArrival"
+    ).value;
+
+  const departureCity =
+    document.getElementById(
+      "requestDepartureCity"
+    ).value.trim();
+
+  const arrivalCity =
+    document.getElementById(
+      "requestArrivalCity"
+    ).value.trim();
+
+  const date =
+    document.getElementById(
+      "requestDate"
+    ).value || null;
+
+  const description =
+    document.getElementById(
+      "requestDescription"
+    ).value.trim();
+
+  const weight =
+    parseFloat(
+      document.getElementById(
+        "requestWeight"
+      ).value
+    ) || null;
+
+  const budget =
+    parseFloat(
+      document.getElementById(
+        "requestBudget"
+      ).value
+    ) || null;
+
+
+  const message =
+    document.getElementById(
+      "requestMessage"
+    );
+
+
+  if (
+    !departureCity ||
+    !arrivalCity ||
+    !description
+  ) {
+
+    message.textContent =
+      "Compila i campi obbligatori.";
+
+    message.className =
+      "auth-error";
+
+    return;
+
+  }
+
+
+  if (
+    departure === arrival
+  ) {
+
+    message.textContent =
+      "I paesi devono essere diversi.";
+
+    message.className =
+      "auth-error";
+
+    return;
+
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("requests")
+      .insert({
+
+        user_id:
+          currentUser.id,
+
+        departure_country:
+          departure,
+
+        arrival_country:
+          arrival,
+
+        departure_city:
+          departureCity,
+
+        arrival_city:
+          arrivalCity,
+
+        needed_date:
+          date,
+
+        item_description:
+          description,
+
+        weight_kg:
+          weight,
+
+        budget:
+          budget,
+
+        status:
+          "open"
+
+      });
+
+
+  if (error) {
+
+    message.textContent =
+      error.message;
+
+    message.className =
+      "auth-error";
+
+    return;
+
+  }
+
+
+  message.textContent =
+    "✓ Richiesta pubblicata!";
+
+  message.className =
+    "auth-success";
+
+
+  setTimeout(
+    () => {
+
+      closeRequestModal();
+
+      loadRequests();
+
+    },
+    800
+  );
+
+}
+
+
+/* =====================================================
+   LOAD REQUESTS
+===================================================== */
+
+async function loadRequests() {
+
+  const container =
+    document.getElementById(
+      "requestsContainer"
+    );
+
+  if (!container) return;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("requests")
+      .select(`
+        *,
+        profiles(
+          full_name,
+          is_verified
+        )
+      `)
+      .eq(
+        "status",
+        "open"
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    container.innerHTML =
+      `<div class="loading">
+        Errore nel caricamento.
+      </div>`;
+
+    return;
+
+  }
+
+
+  if (!data.length) {
+
+    container.innerHTML =
+      `<div class="empty-state">
+
+        <h3>
+          📦 Nessuna richiesta
+        </h3>
+
+        <p>
+          Pubblica una richiesta.
+        </p>
+
+      </div>`;
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    data
+      .map(
+        requestCard
+      )
+      .join("");
+
+}
+
+
+function requestCard(request) {
+
+  return `
+
+    <article class="card">
+
+      <div class="avatar">
+        📦
+      </div>
+
+      <h3>
+
+        ${escapeHtml(
+          request.profiles?.full_name ||
+          "Utente Waselni"
+        )}
+
+      </h3>
+
+      <p>
+
+        ${flag(
+          request.departure_country
+        )}
+
+        ${escapeHtml(
+          request.departure_city
+        )}
+
+        →
+
+        ${flag(
+          request.arrival_country
+        )}
+
+        ${escapeHtml(
+          request.arrival_city
+        )}
+
+      </p>
+
+      <p>
+        ${escapeHtml(
+          request.item_description
+        )}
+      </p>
+
+      ${
+        request.weight_kg
+          ? `<p>
+              📦 ${request.weight_kg} kg
+             </p>`
+          : ""
+      }
+
+      ${
+        request.budget
+          ? `<strong>
+              Budget €${request.budget}
+             </strong>`
+          : ""
+      }
+
+    </article>
+
+  `;
+
 }
 
 
@@ -1163,50 +1660,123 @@ function createTripCard(trip) {
    CONTACT
 ===================================================== */
 
-function contactTraveler(userId) {
+function contactUser(userId) {
 
   if (!currentUser) {
 
     openAuth();
 
     return;
+
   }
 
 
   alert(
-    "La chat sarà attivata nel prossimo modulo. " +
-    "Abbiamo già identificato il viaggiatore: " +
-    userId
+    "La messaggistica sarà collegata alla tabella messages nel prossimo modulo."
   );
+
 }
 
 
 /* =====================================================
-   HELPERS
+   LANGUAGE
 ===================================================== */
 
-function countryFlag(country) {
+const languages = [
+  {
+    code: "it",
+    label: "🇮🇹 IT"
+  },
+  {
+    code: "fr",
+    label: "🇫🇷 FR"
+  },
+  {
+    code: "tn",
+    label: "🇹🇳 TN"
+  }
+];
 
-  if (country === "italy")
-    return "🇮🇹";
+let currentLanguage = 0;
 
-  if (country === "tunisia")
-    return "🇹🇳";
 
-  return "🌍";
+function cycleLanguage() {
+
+  currentLanguage++;
+
+  if (
+    currentLanguage >=
+    languages.length
+  ) {
+    currentLanguage = 0;
+  }
+
+
+  document.getElementById(
+    "languageButton"
+  ).textContent =
+    languages[
+      currentLanguage
+    ].label;
+
+
+  const lang =
+    languages[
+      currentLanguage
+    ].code;
+
+
+  translatePage(lang);
+
 }
 
 
-function escapeHtml(value) {
+function translatePage(lang) {
 
-  if (!value) return "";
+  const translations = {
 
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+    it: {
+      heroTitle:
+        "Porta ciò che serve. Connettiti. Guadagna.",
+
+      heroText:
+        "Waselni mette in contatto persone che devono ricevere oggetti tra Italia e Tunisia con viaggiatori e trasportatori che hanno spazio disponibile."
+    },
+
+    fr: {
+      heroTitle:
+        "Transportez ce dont les autres ont besoin. Connectez-vous. Gagnez.",
+
+      heroText:
+        "Waselni met en relation les personnes qui souhaitent envoyer des objets entre l'Italie et la Tunisie avec des voyageurs et transporteurs."
+    },
+
+    tn: {
+      heroTitle:
+        "وصّل الحاجة. تواصل. واربح.",
+
+      heroText:
+        "Waselni تربط بين الناس في إيطاليا وتونس لإرسال و نقل الأغراض مع المسافرين والناقلين."
+    }
+
+  };
+
+
+  const t =
+    translations[lang];
+
+
+  document.getElementById(
+    "heroTitle"
+  ).textContent =
+    t.heroTitle;
+
+
+  document.getElementById(
+    "heroText"
+  ).textContent =
+    t.heroText;
+
 }
 
 
@@ -1214,41 +1784,83 @@ function escapeHtml(value) {
    DARK MODE
 ===================================================== */
 
-function setupDarkMode() {
+function toggleDarkMode() {
 
-  const button =
-    document.getElementById(
-      "darkMode"
+  document.body
+    .classList
+    .toggle("dark");
+
+}
+
+
+/* =====================================================
+   MOBILE MENU
+===================================================== */
+
+function toggleMenu() {
+
+  document
+    .getElementById(
+      "mainNav"
+    )
+    .classList
+    .toggle("open");
+
+}
+
+
+/* =====================================================
+   HOME
+===================================================== */
+
+function goHome() {
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function flag(country) {
+
+  return country === "italy"
+    ? "🇮🇹"
+    : "🇹🇳";
+
+}
+
+
+function escapeHtml(value) {
+
+  if (!value)
+    return "";
+
+  return String(value)
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
     );
 
-  if (!button) return;
-
-
-  if (
-    localStorage.getItem(
-      "darkMode"
-    ) === "true"
-  ) {
-
-    document.body
-      .classList
-      .add("dark");
-
-  }
-
-
-  button.onclick = () => {
-
-    document.body
-      .classList
-      .toggle("dark");
-
-
-    localStorage.setItem(
-      "darkMode",
-      document.body.classList
-        .contains("dark")
-    );
-
-  };
 }
