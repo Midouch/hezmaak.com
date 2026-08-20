@@ -1070,3 +1070,74 @@ body.dark .profile-menu-grid button {
   }
 
 }
+/* =====================================================
+   IDENTITY VERIFICATION
+===================================================== */
+
+.verification-modal {
+  max-width: 500px;
+}
+
+.verification-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 18px;
+  background: #fff1f2;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+  margin-bottom: 20px;
+}
+
+.verification-form {
+  margin-top: 25px;
+}
+
+.upload-help {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: -5px;
+  margin-bottom: 15px;
+}
+
+.verification-pending,
+.verification-approved,
+.verification-rejected {
+  padding: 18px;
+  border-radius: 14px;
+  margin: 20px 0;
+}
+
+.verification-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.verification-approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.verification-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.verification-pending strong,
+.verification-approved strong,
+.verification-rejected strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.verification-pending p,
+.verification-approved p,
+.verification-rejected p {
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+body.dark .verification-icon {
+  background: #3f1724;
+}
