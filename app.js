@@ -519,36 +519,29 @@ function updateHeader() {
 /* =====================================================
    BUTTONS
 ===================================================== */
-
 function updateButtons() {
 
-  const buttons =
-    document.querySelectorAll(
-      ".hero-buttons button"
-    );
+  /*
+   * NON apriamo mai il modulo automaticamente.
+   * Il modulo viene aperto solamente quando
+   * l'utente clicca un pulsante.
+   */
 
+  const publishButtons = document.querySelectorAll(
+    '[data-action="publish-trip"]'
+  );
 
-  if (buttons.length >= 2) {
+  publishButtons.forEach(button => {
 
-    buttons[0].onclick =
-      () => openTripModal();
+    button.onclick = function(event) {
 
-    buttons[1].onclick =
-      () => openTripModal();
+      event.preventDefault();
 
-  }
+      openTripModal();
 
+    };
 
-  document
-    .querySelectorAll(
-      ".full-button"
-    )
-    .forEach(button => {
-
-      button.onclick =
-        () => openTripModal();
-
-    });
+  });
 }
 
 
