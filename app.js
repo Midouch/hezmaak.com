@@ -603,7 +603,7 @@ async function showProfile() {
   }
 
   const {
-    data,
+    data: profile,
     error
   } = await supabaseClient
     .from("profiles")
@@ -615,109 +615,400 @@ async function showProfile() {
     console.error(error);
 
     alert(
-      "Non riesco a caricare il profilo: " +
+      "Errore caricamento profilo: " +
       error.message
     );
 
     return;
   }
 
-  const verified =
-    data.is_verified
-      ? "✓ Verificato"
-      : "○ Profilo non verificato";
+  const existing =
+    document.getElementById("profilePage");
 
-  const modal =
+  if (existing) {
+    existing.remove();
+  }
+
+  const name =
+    profile.full_name ||
+    "Utente Waselni";
+
+  const country =
+    profile.country === "tunisia"
+      ? "🇹🇳 Tunisia"
+      : "🇮🇹 Italia";
+
+  const type =
+    profile.user_type === "company"
+      ? "🚚 Azienda / Trasportatore"
+      : profile.user_type === "traveler"
+      ? "✈️ Viaggiatore"
+      : "👤 Privato";
+
+  const verified =
+    profile.is_verified === true;
+
+  const rating =
+    Number(profile.rating || 0).toFixed(1);
+
+  const reviews =
+    profile.reviews_count || 0;
+
+  const page =
     document.createElement("div");
 
-  modal.id = "profileModal";
+  page.id = "profilePage";
 
-  modal.innerHTML = `
+  page.innerHTML = `
 
-    <div class="auth-overlay">
+    <div class="profile-page">
 
-      <div class="auth-box">
+      <div class="container">
 
         <button
-          class="auth-close"
-          onclick="closeProfile()">
+          class="back-button"
+          onclick="closeProfilePage()">
 
-          ×
+          ← Torna a Waselni
 
         </button>
 
-        <div class="avatar">
-          👤
+
+        <div class="profile-layout">
+
+
+          <!-- SIDEBAR -->
+
+          <aside class="profile-sidebar">
+
+            <div class="profile-avatar">
+              👤
+            </div>
+
+            <h2>
+              ${escapeHtml(name)}
+            </h2>
+
+            <p class="profile-email">
+              ${escapeHtml(
+                currentUser.email || ""
+              )}
+            </p>
+
+            <div class="profile-badge
+              ${verified
+                ? "verified-profile"
+                : "not-verified"}">
+
+              ${
+                verified
+                  ? "✓ Profilo verificato"
+                  : "○ Profilo non verificato"
+              }
+
+            </div>
+
+            <div class="profile-rating">
+
+              <strong>
+                ⭐ ${rating}
+              </strong>
+
+              <span>
+                ${reviews} recensioni
+              </span>
+
+            </div>
+
+
+            <button
+              class="primary profile-action"
+              onclick="closeProfilePage(); openTripModal();">
+
+              ✈️ Pubblica viaggio
+
+            </button>
+
+
+            <button
+              class="secondary profile-action"
+              onclick="closeProfilePage(); openRequestModal();">
+
+              📦 Pubblica richiesta
+
+            </button>
+
+
+            <button
+              class="logout-button"
+              onclick="logout();">
+
+              🚪 Esci
+
+            </button>
+
+          </aside>
+
+
+          <!-- MAIN -->
+
+          <main class="profile-main">
+
+            <div class="profile-header">
+
+              <div>
+
+                <span class="section-label">
+                  IL MIO PROFILO
+                </span>
+
+                <h1>
+                  Ciao, ${escapeHtml(name)} 👋
+                </h1>
+
+                <p>
+                  Gestisci il tuo account Waselni.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <!-- INFO -->
+
+            <section class="profile-card">
+
+              <div class="profile-card-title">
+
+                <h3>
+                  Informazioni personali
+                </h3>
+
+                <button
+                  class="small-button"
+                  onclick="editProfile()">
+
+                  Modifica
+
+                </button>
+
+              </div>
+
+
+              <div class="profile-info-grid">
+
+                <div>
+
+                  <span>
+                    Nome
+                  </span>
+
+                  <strong>
+                    ${escapeHtml(name)}
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    Email
+                  </span>
+
+                  <strong>
+                    ${escapeHtml(
+                      currentUser.email || "-"
+                    )}
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    Paese
+                  </span>
+
+                  <strong>
+                    ${country}
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    Tipo account
+                  </span>
+
+                  <strong>
+                    ${type}
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </section>
+
+
+            <!-- VERIFICATION -->
+
+            <section class="profile-card verification-card">
+
+              <div>
+
+                <span class="section-label">
+                  SICUREZZA
+                </span>
+
+                <h3>
+                  🪪 Verifica la tua identità
+                </h3>
+
+                ${
+                  verified
+
+                    ? `
+
+                      <p class="success-text">
+
+                        ✓ La tua identità è stata verificata.
+
+                      </p>
+
+                    `
+
+                    : `
+
+                      <p>
+
+                        Verifica la tua identità per ottenere
+                        il badge ✓ e aumentare la fiducia
+                        degli altri utenti.
+
+                      </p>
+
+                    `
+                }
+
+              </div>
+
+
+              ${
+                verified
+
+                  ? `
+
+                    <div class="verification-status">
+
+                      ✓ VERIFICATO
+
+                    </div>
+
+                  `
+
+                  : `
+
+                    <button
+                      class="primary"
+                      onclick="openVerification()">
+
+                      🪪 Verifica identità
+
+                    </button>
+
+                  `
+              }
+
+            </section>
+
+
+            <!-- MY ACTIVITY -->
+
+            <section class="profile-card">
+
+              <h3>
+                La mia attività
+              </h3>
+
+
+              <div class="profile-menu-grid">
+
+                <button
+                  onclick="showMyTrips()">
+
+                  <span>✈️</span>
+
+                  <strong>
+                    I miei viaggi
+                  </strong>
+
+                  <small>
+                    Gestisci i tuoi viaggi
+                  </small>
+
+                </button>
+
+
+                <button
+                  onclick="showMyRequests()">
+
+                  <span>📦</span>
+
+                  <strong>
+                    Le mie richieste
+                  </strong>
+
+                  <small>
+                    Gestisci le tue richieste
+                  </small>
+
+                </button>
+
+
+                <button
+                  onclick="showMyReviews()">
+
+                  <span>⭐</span>
+
+                  <strong>
+                    Le mie recensioni
+                  </strong>
+
+                  <small>
+                    Visualizza le valutazioni
+                  </small>
+
+                </button>
+
+
+                <button
+                  onclick="openVerification()">
+
+                  <span>🪪</span>
+
+                  <strong>
+                    Verifica identità
+                  </strong>
+
+                  <small>
+                    Stato della verifica
+                  </small>
+
+                </button>
+
+              </div>
+
+            </section>
+
+          </main>
+
         </div>
-
-        <h2>
-          ${escapeHtml(
-            data.full_name || "Utente"
-          )}
-        </h2>
-
-        <p>
-          ${escapeHtml(
-            currentUser.email || ""
-          )}
-        </p>
-
-        <hr style="
-          margin:20px 0;
-          border:0;
-          border-top:1px solid #e2e8f0;
-        ">
-
-        <p>
-          <strong>Paese:</strong>
-          ${
-            data.country === "italy"
-              ? "🇮🇹 Italia"
-              : "🇹🇳 Tunisia"
-          }
-        </p>
-
-        <p>
-          <strong>Tipo:</strong>
-          ${
-            data.user_type === "company"
-              ? "🚚 Azienda / Trasportatore"
-              : data.user_type === "traveler"
-              ? "✈️ Viaggiatore"
-              : "👤 Privato"
-          }
-        </p>
-
-        <p>
-          <strong>Stato:</strong>
-          ${verified}
-        </p>
-
-        <p>
-          <strong>Valutazione:</strong>
-          ⭐ ${data.rating || "0"}
-        </p>
-
-        <p>
-          <strong>Recensioni:</strong>
-          ${data.reviews_count || "0"}
-        </p>
-
-        <button
-          class="primary auth-button"
-          onclick="closeProfile(); openTripModal();">
-
-          ✈️ Pubblica un viaggio
-
-        </button>
-
-        <button
-          class="secondary auth-button"
-          onclick="logout();">
-
-          🚪 Esci
-
-        </button>
 
       </div>
 
@@ -725,23 +1016,27 @@ async function showProfile() {
 
   `;
 
-  document.body.appendChild(modal);
+  document.body.appendChild(page);
+
+  document.body.style.overflow = "hidden";
+
 }
 
 
-function closeProfile() {
+function closeProfilePage() {
 
-  const modal =
+  const page =
     document.getElementById(
-      "profileModal"
+      "profilePage"
     );
 
-  if (modal) {
-    modal.remove();
+  if (page) {
+    page.remove();
   }
 
-}
+  document.body.style.overflow = "";
 
+}
 /*==========================LOG OUT ==================================
 async function logout() {
 
