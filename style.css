@@ -435,3 +435,98 @@ body.dark .auth-box select {
   }
 
 }
+/* =====================================================
+   WASSELNI MARKETPLACE
+===================================================== */
+
+.trip-card {
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.trip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(0,0,0,.08);
+}
+
+.trip-card small {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #64748b;
+}
+
+.trip-card p {
+  line-height: 1.5;
+}
+
+.trip-description {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.verified {
+  display: inline-block;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 12px;
+  padding: 3px 7px;
+  border-radius: 20px;
+  vertical-align: middle;
+}
+
+.loading,
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 50px 20px;
+  color: #64748b;
+}
+
+.empty-state h3 {
+  color: #0f172a;
+  margin: 12px 0;
+}
+
+.empty-icon {
+  font-size: 45px;
+  margin-bottom: 10px;
+}
+
+.empty-state .primary {
+  margin-top: 20px;
+}
+
+.auth-box label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 10px 0 6px;
+  color: #334155;
+}
+
+.auth-box textarea {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+body.dark .trip-description {
+  background: #020617;
+}
+
+body.dark .empty-state h3,
+body.dark .auth-box label {
+  color: #f8fafc;
+}
+
+body.dark .auth-box textarea {
+  background: #020617;
+  color: white;
+  border-color: #334155;
+}
