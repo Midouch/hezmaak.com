@@ -1190,3 +1190,29 @@ body.dark .verification-icon {
     }
 
 }
+.admin-header-button {
+    border: 0;
+    background: #111827;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: .2s;
+}
+
+.admin-header-button:hover {
+    transform: translateY(-1px);
+    opacity: .9;
+}
+
+@media (max-width: 600px) {
+
+    .admin-header-button {
+        padding: 8px 10px;
+        font-size: 12px;
+        margin-left: 4px;
+    }
+
+}
