@@ -46,7 +46,7 @@ async function loadUser() {
   } = await supabaseClient.auth.getUser();
 
   currentUser = user || null;
-
+  updateAdminButton();
 }
 
 
@@ -3297,4 +3297,117 @@ function closeAdminPanel() {
 
     document.body.style.overflow =
         "";
+}
+async function updateAdminButton() {
+
+    if (!currentUser) {
+        removeAdminButton();
+        return;
+    }
+
+    try {
+
+        const { data, error } =
+            await supabaseClient.rpc("is_admin");
+
+        if (error) {
+            console.error(
+                "Errore controllo admin:",
+                error
+            );
+
+            removeAdminButton();
+            return;
+        }
+
+        if (data === true) {
+            showAdminButton();
+        } else {
+            removeAdminButton();
+        }
+
+    } catch (error) {
+
+        console.error(error);
+        removeAdminButton();
+
+    }
+}
+
+
+function showAdminButton() {
+
+    let button =
+        document.getElementById(
+            "adminHeaderButton"
+        );
+
+    if (button) {
+        return;
+    }
+
+    button =
+        document.createElement("button");
+
+    button.id =
+        "adminHeaderButton";
+
+    button.type =
+        "button";
+
+    button.className =
+        "admin-header-button";
+
+    button.innerHTML =
+        "🔐 Admin";
+
+    button.onclick =
+        openAdminPanel;
+
+    /*
+      Prova a inserirlo vicino
+      al pulsante del profilo.
+    */
+
+    const profileButton =
+        document.querySelector(
+            '[onclick*="showProfile"]'
+        );
+
+    if (profileButton &&
+        profileButton.parentElement) {
+
+        profileButton.parentElement
+            .appendChild(button);
+
+    } else {
+
+        /*
+          Fallback:
+          lo mette nell'header.
+        */
+
+        const header =
+            document.querySelector(
+                "header"
+            );
+
+        if (header) {
+            header.appendChild(button);
+        }
+
+    }
+}
+
+
+function removeAdminButton() {
+
+    const button =
+        document.getElementById(
+            "adminHeaderButton"
+        );
+
+    if (button) {
+        button.remove();
+    }
 }
