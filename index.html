@@ -1,0 +1,2787 @@
+<!DOCTYPE html>
+<html lang="it" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waselni — Italia ↔ Tunisia</title>
+
+<style>
+:root{
+  --primary:#e11d48;
+  --primary2:#fb7185;
+  --teal:#0f766e;
+  --dark:#0f172a;
+  --dark2:#1e293b;
+  --text:#334155;
+  --muted:#64748b;
+  --bg:#f6f8fb;
+  --card:#fff;
+  --border:#e2e8f0;
+  --success:#16a34a;
+  --warning:#f59e0b;
+  --danger:#dc2626;
+  --shadow:0 12px 35px rgba(15,23,42,.08);
+  --radius:20px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+html{scroll-behavior:smooth}
+
+body{
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+button,input,select,textarea{font:inherit}
+
+button{cursor:pointer}
+
+a{text-decoration:none;color:inherit}
+
+.container{
+  width:min(1180px,calc(100% - 32px));
+  margin:auto;
+}
+
+/* ================= NAV ================= */
+
+.navbar{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+}
+
+.nav{
+  height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:24px;
+  font-weight:900;
+  color:var(--dark);
+}
+
+.logo-mark{
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  background:linear-gradient(135deg,var(--primary),var(--teal));
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-size:22px;
+}
+
+.nav-links{
+  display:flex;
+  gap:24px;
+  font-weight:700;
+  color:var(--muted);
+}
+
+.nav-links a:hover{color:var(--primary)}
+
+.nav-right{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+
+.lang,.icon-btn{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:11px;
+  padding:9px 11px;
+}
+
+.icon-btn{
+  width:42px;
+  height:42px;
+}
+
+.primary{
+  border:0;
+  color:#fff;
+  background:var(--primary);
+  padding:12px 18px;
+  border-radius:12px;
+  font-weight:800;
+}
+
+.primary:hover{background:#be123c}
+
+.secondary{
+  border:1px solid var(--border);
+  color:var(--dark);
+  background:#fff;
+  padding:11px 17px;
+  border-radius:12px;
+  font-weight:800;
+}
+
+.mobile-menu{display:none}
+
+/* ================= HERO ================= */
+
+.hero{
+  padding:75px 0 90px;
+  background:
+    radial-gradient(circle at 5% 10%,rgba(225,29,72,.14),transparent 28%),
+    radial-gradient(circle at 95% 15%,rgba(15,118,110,.16),transparent 30%),
+    linear-gradient(135deg,#fff,#f1f5f9);
+}
+
+.hero-grid{
+  display:grid;
+  grid-template-columns:1.08fr .92fr;
+  gap:60px;
+  align-items:center;
+}
+
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 13px;
+  border-radius:50px;
+  background:#fff1f2;
+  border:1px solid #fecdd3;
+  color:#be123c;
+  font-weight:800;
+  margin-bottom:18px;
+}
+
+.hero h1{
+  color:var(--dark);
+  font-size:clamp(44px,6vw,74px);
+  line-height:.98;
+  letter-spacing:-3px;
+  margin-bottom:25px;
+}
+
+.hero h1 span{color:var(--primary)}
+
+.hero p{
+  color:var(--muted);
+  font-size:19px;
+  line-height:1.7;
+  max-width:650px;
+  margin-bottom:30px;
+}
+
+.hero-buttons{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+/* SEARCH */
+
+.search-box{
+  background:#fff;
+  padding:22px;
+  border-radius:26px;
+  box-shadow:var(--shadow);
+  border:1px solid var(--border);
+}
+
+.search-box h3{
+  color:var(--dark);
+  font-size:21px;
+  margin-bottom:16px;
+}
+
+.direction-switch{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:15px;
+}
+
+.direction{
+  border:1px solid var(--border);
+  padding:13px;
+  border-radius:12px;
+  background:#fff;
+  font-weight:800;
+}
+
+.direction.active{
+  border-color:var(--primary);
+  background:#fff1f2;
+  color:#be123c;
+}
+
+.search-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.field{
+  margin-bottom:12px;
+}
+
+.field label{
+  display:block;
+  color:var(--dark);
+  font-weight:800;
+  margin-bottom:6px;
+  font-size:14px;
+}
+
+.input,.select,.textarea{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:12px;
+  background:#fff;
+  outline:none;
+}
+
+.input:focus,.select:focus,.textarea:focus{
+  border-color:var(--primary);
+}
+
+.full{grid-column:1/-1}
+
+/* ================= TRUST ================= */
+
+.trust{
+  margin-top:-35px;
+  position:relative;
+}
+
+.trust-box{
+  background:#fff;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  border-radius:22px;
+  padding:24px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+}
+
+.trust-item{
+  text-align:center;
+  border-right:1px solid var(--border);
+}
+
+.trust-item:last-child{border:0}
+
+.trust-item strong{
+  display:block;
+  font-size:27px;
+  color:var(--dark);
+}
+
+/* ================= SECTIONS ================= */
+
+.section{
+  padding:85px 0;
+}
+
+.section-head{
+  max-width:700px;
+  margin:0 auto 42px;
+  text-align:center;
+}
+
+.section-head h2{
+  color:var(--dark);
+  font-size:40px;
+  line-height:1.1;
+  margin-bottom:12px;
+}
+
+.section-head p{
+  color:var(--muted);
+  line-height:1.7;
+}
+
+/* ================= CARDS ================= */
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:25px;
+  box-shadow:0 4px 15px rgba(15,23,42,.03);
+}
+
+.card-icon{
+  width:52px;
+  height:52px;
+  display:grid;
+  place-items:center;
+  background:#fff1f2;
+  border-radius:15px;
+  font-size:25px;
+  margin-bottom:18px;
+}
+
+.card h3{
+  color:var(--dark);
+  margin-bottom:8px;
+}
+
+.card p{
+  color:var(--muted);
+  line-height:1.7;
+}
+
+/* ================= HOW ================= */
+
+.steps{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:20px;
+}
+
+.step{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:25px;
+}
+
+.number{
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  background:var(--primary);
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-weight:900;
+  margin-bottom:17px;
+}
+
+/* ================= MARKETPLACE ================= */
+
+.market-layout{
+  display:grid;
+  grid-template-columns:260px 1fr;
+  gap:22px;
+}
+
+.filters{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+  height:max-content;
+}
+
+.filters h3{
+  color:var(--dark);
+  margin-bottom:18px;
+}
+
+.list{
+  display:grid;
+  gap:15px;
+}
+
+.trip{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:18px;
+}
+
+.trip-top{
+  display:flex;
+  gap:13px;
+  align-items:center;
+}
+
+.avatar{
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#fecdd3,#99f6e4);
+  display:grid;
+  place-items:center;
+  font-size:24px;
+}
+
+.trip h3{
+  color:var(--dark);
+  font-size:17px;
+}
+
+.verified{
+  display:inline-flex;
+  padding:3px 8px;
+  border-radius:30px;
+  background:#dcfce7;
+  color:#15803d;
+  font-size:11px;
+  font-weight:900;
+}
+
+.business{
+  background:#dbeafe;
+  color:#1d4ed8;
+}
+
+.rating{
+  color:#f59e0b;
+  font-weight:800;
+  margin-top:4px;
+}
+
+.trip-route{
+  margin-top:15px;
+  padding:13px;
+  background:#f8fafc;
+  border-radius:12px;
+  font-weight:800;
+}
+
+.trip-meta{
+  margin-top:12px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.meta{
+  padding:6px 9px;
+  border-radius:8px;
+  background:#f1f5f9;
+  color:#475569;
+  font-size:13px;
+}
+
+.trip-price{
+  text-align:right;
+}
+
+.trip-price strong{
+  display:block;
+  color:var(--dark);
+  font-size:22px;
+}
+
+/* ================= PROFILE ================= */
+
+.profile-grid{
+  display:grid;
+  grid-template-columns:330px 1fr;
+  gap:20px;
+}
+
+.profile-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:25px;
+}
+
+.profile-main{text-align:center}
+
+.big-avatar{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  margin:0 auto 14px;
+  background:linear-gradient(135deg,var(--primary),var(--teal));
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-size:35px;
+  font-weight:900;
+}
+
+.profile-name{
+  color:var(--dark);
+  font-size:22px;
+  font-weight:900;
+}
+
+.profile-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--border);
+  margin-top:20px;
+  padding-top:18px;
+}
+
+.profile-stats div{text-align:center}
+
+.profile-stats strong{
+  display:block;
+  color:var(--dark);
+}
+
+/* ================= DASHBOARD ================= */
+
+.dashboard{
+  display:grid;
+  grid-template-columns:230px 1fr;
+  gap:20px;
+}
+
+.sidebar{
+  background:var(--dark);
+  border-radius:20px;
+  padding:16px;
+  height:max-content;
+}
+
+.sidebar button{
+  display:block;
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#cbd5e1;
+  padding:12px;
+  border-radius:10px;
+  text-align:left;
+  margin-bottom:4px;
+}
+
+.sidebar button:hover,
+.sidebar button.active{
+  background:#334155;
+  color:#fff;
+}
+
+.dashboard-main{
+  display:grid;
+  gap:18px;
+}
+
+.dashboard-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:22px;
+}
+
+.dashboard-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.dashboard-title h3{color:var(--dark)}
+
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.mini-stat{
+  background:#f8fafc;
+  border-radius:15px;
+  padding:18px;
+}
+
+.mini-stat strong{
+  display:block;
+  color:var(--dark);
+  font-size:25px;
+}
+
+/* ================= CHAT ================= */
+
+.chat{
+  display:grid;
+  grid-template-columns:260px 1fr;
+  min-height:430px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:20px;
+  background:#fff;
+}
+
+.chat-users{
+  border-right:1px solid var(--border);
+}
+
+.chat-user{
+  padding:15px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+}
+
+.chat-user:hover{background:#f8fafc}
+
+.chat-window{
+  display:flex;
+  flex-direction:column;
+}
+
+.chat-header{
+  padding:15px;
+  border-bottom:1px solid var(--border);
+  font-weight:900;
+  color:var(--dark);
+}
+
+.messages{
+  flex:1;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.message{
+  max-width:70%;
+  padding:10px 14px;
+  border-radius:14px;
+  background:#f1f5f9;
+}
+
+.message.me{
+  align-self:flex-end;
+  background:#ffe4e6;
+}
+
+.chat-input{
+  display:flex;
+  gap:8px;
+  padding:12px;
+  border-top:1px solid var(--border);
+}
+
+/* ================= VERIFICATION ================= */
+
+.verify{
+  border:2px dashed #cbd5e1;
+  border-radius:18px;
+  padding:25px;
+  text-align:center;
+}
+
+.upload{
+  cursor:pointer;
+  padding:22px;
+}
+
+.upload input{display:none}
+
+.file-name{
+  color:var(--success);
+  font-weight:800;
+  margin-top:10px;
+}
+
+/* ================= CTA ================= */
+
+.cta{
+  margin:30px 0 80px;
+  border-radius:28px;
+  padding:65px 25px;
+  text-align:center;
+  color:#fff;
+  background:linear-gradient(135deg,#be123c,#0f766e);
+}
+
+.cta h2{
+  font-size:42px;
+  margin-bottom:12px;
+}
+
+.cta p{
+  opacity:.9;
+  margin-bottom:25px;
+}
+
+/* ================= FOOTER ================= */
+
+footer{
+  background:var(--dark);
+  color:#cbd5e1;
+  padding:55px 0 25px;
+}
+
+.footer-grid{
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr 1fr;
+  gap:35px;
+}
+
+.footer-logo{
+  color:#fff;
+  font-size:25px;
+  font-weight:900;
+  margin-bottom:12px;
+}
+
+footer h4{
+  color:#fff;
+  margin-bottom:13px;
+}
+
+footer a{
+  display:block;
+  margin-bottom:8px;
+}
+
+.footer-bottom{
+  border-top:1px solid #334155;
+  margin-top:35px;
+  padding-top:18px;
+  text-align:center;
+  font-size:13px;
+}
+
+/* ================= MODAL ================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:3000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(15,23,42,.7);
+  backdrop-filter:blur(5px);
+  padding:15px;
+}
+
+.modal.show{display:flex}
+
+.modal-box{
+  width:min(650px,100%);
+  max-height:92vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:23px;
+  padding:28px;
+  position:relative;
+}
+
+.close{
+  position:absolute;
+  right:17px;
+  top:17px;
+  width:35px;
+  height:35px;
+  border:0;
+  border-radius:50%;
+  background:#f1f5f9;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:13px;
+}
+
+.account-types{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.account-type{
+  border:2px solid var(--border);
+  padding:16px;
+  border-radius:14px;
+  cursor:pointer;
+}
+
+.account-type.selected{
+  border-color:var(--primary);
+  background:#fff1f2;
+}
+
+.alert{
+  padding:14px;
+  border-radius:12px;
+  margin:14px 0;
+  background:#fffbeb;
+  border:1px solid #fde68a;
+  color:#92400e;
+  font-size:14px;
+}
+
+/* ================= TOAST ================= */
+
+.toast{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  background:var(--dark);
+  color:#fff;
+  padding:15px 19px;
+  border-radius:13px;
+  box-shadow:var(--shadow);
+  z-index:5000;
+  transform:translateY(100px);
+  opacity:0;
+  transition:.3s;
+}
+
+.toast.show{
+  transform:translateY(0);
+  opacity:1;
+}
+
+/* ================= DARK ================= */
+
+body.dark{
+  --bg:#0b1120;
+  --card:#111827;
+  --dark:#f8fafc;
+  --text:#cbd5e1;
+  --muted:#94a3b8;
+  --border:#263244;
+}
+
+body.dark .navbar{
+  background:rgba(15,23,42,.94);
+}
+
+body.dark .search-box,
+body.dark .card,
+body.dark .trip,
+body.dark .filters,
+body.dark .profile-card,
+body.dark .dashboard-card,
+body.dark .chat,
+body.dark .modal-box,
+body.dark .trust-box{
+  background:#111827;
+}
+
+body.dark .input,
+body.dark .select,
+body.dark .textarea,
+body.dark .secondary,
+body.dark .lang,
+body.dark .icon-btn,
+body.dark .direction{
+  background:#0f172a;
+  color:#e2e8f0;
+  border-color:#334155;
+}
+
+/* ================= RTL ================= */
+
+[dir="rtl"] .nav-links,
+[dir="rtl"] .hero,
+[dir="rtl"] .section,
+[dir="rtl"] .search-box,
+[dir="rtl"] footer{
+  text-align:right;
+}
+
+[dir="rtl"] .sidebar button{text-align:right}
+
+[dir="rtl"] .trip-price{text-align:left}
+
+[dir="rtl"] .chat-users{
+  border-right:0;
+  border-left:1px solid var(--border);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:950px){
+
+  .nav-links{display:none}
+
+  .mobile-menu{display:block}
+
+  .hero-grid{
+    grid-template-columns:1fr;
+  }
+
+  .cards{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .steps{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .market-layout{
+    grid-template-columns:1fr;
+  }
+
+  .profile-grid{
+    grid-template-columns:1fr;
+  }
+
+  .dashboard{
+    grid-template-columns:1fr;
+  }
+
+  .sidebar{
+    display:flex;
+    overflow:auto;
+    gap:5px;
+  }
+
+  .sidebar button{
+    min-width:max-content;
+  }
+
+  .footer-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:650px){
+
+  .container{
+    width:min(100% - 24px,1180px);
+  }
+
+  .nav{
+    height:64px;
+  }
+
+  .nav-right .primary{display:none}
+
+  .hero{
+    padding:55px 0 70px;
+  }
+
+  .hero h1{
+    font-size:44px;
+    letter-spacing:-2px;
+  }
+
+  .hero p{font-size:17px}
+
+  .search-grid,
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .full{grid-column:auto}
+
+  .trust-box{
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+  }
+
+  .trust-item{
+    border:0;
+  }
+
+  .cards,
+  .steps{
+    grid-template-columns:1fr;
+  }
+
+  .trip{
+    grid-template-columns:1fr;
+  }
+
+  .trip-price{
+    text-align:left;
+  }
+
+  .stat-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .chat{
+    grid-template-columns:1fr;
+  }
+
+  .chat-users{
+    display:none;
+  }
+
+  .footer-grid{
+    grid-template-columns:1fr;
+  }
+
+  .cta h2{
+    font-size:32px;
+  }
+
+  .account-types{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="navbar">
+
+<div class="container nav">
+
+<a href="#" class="logo">
+  <span class="logo-mark">↔</span>
+  Waselni
+</a>
+
+<nav class="nav-links">
+  <a href="#how" data-i18n="how">Come funziona</a>
+  <a href="#market" data-i18n="market">Marketplace</a>
+  <a href="#transport" data-i18n="transport">Trasportatori</a>
+  <a href="#security" data-i18n="security">Sicurezza</a>
+</nav>
+
+<div class="nav-right">
+
+<select id="language" class="lang" onchange="setLanguage(this.value)">
+  <option value="it">🇮🇹 IT</option>
+  <option value="fr">🇫🇷 FR</option>
+  <option value="ar">🇹🇳 عربي</option>
+</select>
+
+<button class="icon-btn" onclick="toggleDark()">🌙</button>
+
+<button class="primary" onclick="openModal('registerModal')" data-i18n="register">
+  Registrati
+</button>
+
+<button class="icon-btn mobile-menu" onclick="mobileNav()">☰</button>
+
+</div>
+
+</div>
+
+</header>
+
+
+<!-- ================= HERO ================= -->
+
+<section class="hero">
+
+<div class="container hero-grid">
+
+<div>
+
+<div class="pill">
+  ✓ <span data-i18n="verifiedPlatform">Persone verificate</span>
+</div>
+
+<h1>
+  <span data-i18n="heroLine1">Porta ciò che serve.</span><br>
+  <span data-i18n="heroLine2">Italia ↔ Tunisia.</span>
+</h1>
+
+<p data-i18n="heroText">
+  Il marketplace che mette in contatto persone, viaggiatori e
+  trasportatori per portare oggetti tra Italia e Tunisia.
+</p>
+
+<div class="hero-buttons">
+
+<button class="primary" onclick="openModal('requestModal')" data-i18n="need">
+  📦 Devo ricevere qualcosa
+</button>
+
+<button class="secondary" onclick="openModal('tripModal')" data-i18n="travel">
+  ✈️ Sto viaggiando
+</button>
+
+</div>
+
+</div>
+
+
+<!-- SEARCH -->
+
+<div class="search-box">
+
+<h3 data-i18n="searchTitle">
+  Cosa stai cercando?
+</h3>
+
+<div class="direction-switch">
+
+<button class="direction active" onclick="direction(this)">
+  🇮🇹 → 🇹🇳
+</button>
+
+<button class="direction" onclick="direction(this)">
+  🇹🇳 → 🇮🇹
+</button>
+
+</div>
+
+<div class="search-grid">
+
+<div class="field">
+<label data-i18n="from">Da</label>
+<input class="input" placeholder="Milano">
+</div>
+
+<div class="field">
+<label data-i18n="to">A</label>
+<input class="input" placeholder="Tunisi">
+</div>
+
+<div class="field">
+<label data-i18n="date">Data</label>
+<input class="input" type="date">
+</div>
+
+<div class="field">
+<label data-i18n="weight">Peso</label>
+<input class="input" placeholder="kg">
+</div>
+
+<div class="field full">
+<label data-i18n="what">Cosa devi trasportare?</label>
+<input class="input" placeholder="Esempio: vestiti, ricambi, regalo...">
+</div>
+
+</div>
+
+<button class="primary" style="width:100%" onclick="search()" data-i18n="search">
+  Cerca trasportatori
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= TRUST ================= -->
+
+<section class="trust">
+
+<div class="container trust-box">
+
+<div class="trust-item">
+<strong>✓</strong>
+<span data-i18n="verified">Identità verificata</span>
+</div>
+
+<div class="trust-item">
+<strong>4.9/5</strong>
+<span data-i18n="rating">Rating medio</span>
+</div>
+
+<div class="trust-item">
+<strong>🇮🇹 ↔ 🇹🇳</strong>
+<span data-i18n="route">Due direzioni</span>
+</div>
+
+<div class="trust-item">
+<strong>🔐</strong>
+<span data-i18n="safe">Marketplace sicuro</span>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= HOW ================= -->
+
+<section class="section" id="how">
+
+<div class="container">
+
+<div class="section-head">
+
+<h2 data-i18n="howTitle">
+  Come funziona
+</h2>
+
+<p data-i18n="howText">
+  Quattro semplici passaggi per trovare la persona giusta.
+</p>
+
+</div>
+
+<div class="steps">
+
+<div class="step">
+<div class="number">1</div>
+<h3 data-i18n="s1">Registrati</h3>
+<p data-i18n="s1t">Crea il tuo profilo e verifica la tua identità.</p>
+</div>
+
+<div class="step">
+<div class="number">2</div>
+<h3 data-i18n="s2">Pubblica</h3>
+<p data-i18n="s2t">Pubblica una richiesta o il tuo prossimo viaggio.</p>
+</div>
+
+<div class="step">
+<div class="number">3</div>
+<h3 data-i18n="s3">Fai match</h3>
+<p data-i18n="s3t">Trova persone compatibili con tratta e data.</p>
+</div>
+
+<div class="step">
+<div class="number">4</div>
+<h3 data-i18n="s4">Consegna</h3>
+<p data-i18n="s4t">Completa il servizio e lascia una recensione.</p>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= SERVICES ================= -->
+
+<section class="section" style="padding-top:0">
+
+<div class="container">
+
+<div class="section-head">
+
+<h2 data-i18n="trustTitle">
+  La fiducia è al centro
+</h2>
+
+<p data-i18n="trustText">
+  Ogni profilo costruisce la propria reputazione nel tempo.
+</p>
+
+</div>
+
+<div class="cards">
+
+<div class="card">
+
+<div class="card-icon">🪪</div>
+
+<h3 data-i18n="identityTitle">
+  Identità verificata
+</h3>
+
+<p data-i18n="identityText">
+  Passaporto o carta d'identità per ottenere il badge verificato.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-icon">⭐</div>
+
+<h3 data-i18n="reviewTitle">
+  Recensioni
+</h3>
+
+<p data-i18n="reviewText">
+  Dopo ogni servizio cliente e trasportatore possono valutarsi.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-icon">🛡️</div>
+
+<h3 data-i18n="protectionTitle">
+  Protezione
+</h3>
+
+<p data-i18n="protectionText">
+  Segnalazioni, moderazione e pagamento protetto possono aumentare la sicurezza.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= MARKET ================= -->
+
+<section class="section" id="market">
+
+<div class="container">
+
+<div class="section-head">
+
+<h2 data-i18n="marketTitle">
+  Viaggi disponibili
+</h2>
+
+<p data-i18n="marketText">
+  Persone verificate che hanno spazio disponibile.
+</p>
+
+</div>
+
+
+<div class="market-layout">
+
+<aside class="filters">
+
+<h3 data-i18n="filters">Filtra risultati</h3>
+
+<div class="field">
+<label data-i18n="direction">Direzione</label>
+
+<select class="select">
+<option>🇮🇹 Italia → 🇹🇳 Tunisia</option>
+<option>🇹🇳 Tunisia → 🇮🇹 Italia</option>
+</select>
+</div>
+
+<div class="field">
+<label data-i18n="city">Città</label>
+
+<select class="select">
+<option>Milano</option>
+<option>Bologna</option>
+<option>Roma</option>
+<option>Torino</option>
+<option>Tunisi</option>
+<option>Sousse</option>
+<option>Sfax</option>
+</select>
+</div>
+
+<div class="field">
+<label data-i18n="date">Data</label>
+<input class="input" type="date">
+</div>
+
+<div class="field">
+<label data-i18n="minRating">Rating minimo</label>
+<select class="select">
+<option>Qualsiasi</option>
+<option>4.5+</option>
+<option>4.8+</option>
+<option>5.0</option>
+</select>
+</div>
+
+<button class="primary" style="width:100%" onclick="toastMsg('Filtri applicati ✓')" data-i18n="apply">
+  Applica
+</button>
+
+</aside>
+
+
+<div class="list">
+
+
+<!-- TRIP 1 -->
+
+<div class="trip">
+
+<div>
+
+<div class="trip-top">
+
+<div class="avatar">👨🏻</div>
+
+<div>
+
+<h3>
+Ahmed Ben Ali
+<span class="verified">✓ Verificato</span>
+</h3>
+
+<div class="rating">★★★★★ 4.9 · 37 servizi</div>
+
+</div>
+
+</div>
+
+<div class="trip-route">
+🇮🇹 Milano → 🇹🇳 Tunisi
+</div>
+
+<div class="trip-meta">
+<span class="meta">📅 15 Settembre</span>
+<span class="meta">📦 10 kg</span>
+<span class="meta">🚗 Auto</span>
+</div>
+
+</div>
+
+<div class="trip-price">
+
+<strong>€5</strong>
+<small>/ kg</small>
+
+<br><br>
+
+<button class="primary" onclick="openChat('Ahmed')" data-i18n="contact">
+Contatta
+</button>
+
+</div>
+
+</div>
+
+
+<!-- TRIP 2 -->
+
+<div class="trip">
+
+<div>
+
+<div class="trip-top">
+
+<div class="avatar">👩🏻</div>
+
+<div>
+
+<h3>
+Sara Mansouri
+<span class="verified">✓ Verificata</span>
+</h3>
+
+<div class="rating">★★★★★ 5.0 · 21 servizi</div>
+
+</div>
+
+</div>
+
+<div class="trip-route">
+🇹🇳 Sousse → 🇮🇹 Bologna
+</div>
+
+<div class="trip-meta">
+<span class="meta">📅 21 Settembre</span>
+<span class="meta">📦 8 kg</span>
+<span class="meta">✈️ Aereo</span>
+</div>
+
+</div>
+
+<div class="trip-price">
+
+<strong>€6</strong>
+<small>/ kg</small>
+
+<br><br>
+
+<button class="primary" onclick="openChat('Sara')" data-i18n="contact">
+Contatta
+</button>
+
+</div>
+
+</div>
+
+
+<!-- BUSINESS -->
+
+<div class="trip">
+
+<div>
+
+<div class="trip-top">
+
+<div class="avatar">🚚</div>
+
+<div>
+
+<h3>
+Tunis Express
+<span class="verified business">✓ Business verificato</span>
+</h3>
+
+<div class="rating">★★★★★ 4.8 · 286 servizi</div>
+
+</div>
+
+</div>
+
+<div class="trip-route">
+🇮🇹 Italia ↔ 🇹🇳 Tunisia
+</div>
+
+<div class="trip-meta">
+<span class="meta">🏢 Azienda</span>
+<span class="meta">📦 Fino a 500 kg</span>
+<span class="meta">🚚 Professionale</span>
+</div>
+
+</div>
+
+<div class="trip-price">
+
+<strong>Preventivo</strong>
+
+<br>
+
+<button class="primary" onclick="openChat('Tunis Express')" data-i18n="contact">
+Contatta
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= TRANSPORT ================= -->
+
+<section class="section" id="transport" style="padding-top:0">
+
+<div class="container">
+
+<div class="section-head">
+
+<h2 data-i18n="transportTitle">
+  Sei un trasportatore?
+</h2>
+
+<p data-i18n="transportText">
+  Trasforma i tuoi viaggi in una nuova fonte di guadagno.
+</p>
+
+</div>
+
+<div class="cards">
+
+<div class="card">
+
+<div class="card-icon">✈️</div>
+
+<h3 data-i18n="privateTransport">
+  Viaggiatore privato
+</h3>
+
+<p data-i18n="privateTransportText">
+  Hai spazio nella valigia? Pubblica il viaggio e ricevi richieste.
+</p>
+
+<br>
+
+<button class="secondary" onclick="openRegister('private')" data-i18n="join">
+  Inizia
+</button>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-icon">🚚</div>
+
+<h3 data-i18n="companyTransport">
+  Trasportatore professionale
+</h3>
+
+<p data-i18n="companyTransportText">
+  Mostra le tue rotte, crea un profilo Business e trova nuovi clienti.
+</p>
+
+<br>
+
+<button class="primary" onclick="openRegister('business')" data-i18n="business">
+  Profilo Business
+</button>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-icon">💰</div>
+
+<h3 data-i18n="earn">
+  Guadagna
+</h3>
+
+<p data-i18n="earnText">
+  Decidi prezzi e disponibilità. La piattaforma può applicare una commissione sulle transazioni.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= PROFILE ================= -->
+
+<section class="section" id="security">
+
+<div class="container">
+
+<div class="section-head">
+
+<h2 data-i18n="securityTitle">
+  Un profilo che costruisce fiducia
+</h2>
+
+</div>
+
+<div class="profile-grid">
+
+<div class="profile-card profile-main">
+
+<div class="big-avatar">A</div>
+
+<div class="profile-name">Ahmed Ben Ali</div>
+
+<div style="margin:7px 0">
+<span class="verified">✓ Identità verificata</span>
+</div>
+
+<div class="rating">★★★★★ 4.9</div>
+
+<div class="profile-stats">
+
+<div>
+<strong>37</strong>
+<small>Servizi</small>
+</div>
+
+<div>
+<strong>24</strong>
+<small>Recensioni</small>
+</div>
+
+<div>
+<strong>3</strong>
+<small>Anni</small>
+</div>
+
+</div>
+
+<br>
+
+<button class="primary" style="width:100%" onclick="openChat('Ahmed')" data-i18n="message">
+  💬 Messaggio
+</button>
+
+</div>
+
+
+<div class="profile-card">
+
+<h3 style="color:var(--dark);margin-bottom:15px" data-i18n="reviews">
+  Ultime recensioni
+</h3>
+
+<div style="padding:15px 0;border-bottom:1px solid var(--border)">
+<strong>★★★★★ · Marco</strong>
+<p style="color:var(--muted)">
+Ottimo servizio, puntuale e disponibile.
+</p>
+</div>
+
+<div style="padding:15px 0;border-bottom:1px solid var(--border)">
+<strong>★★★★★ · Yassine</strong>
+<p style="color:var(--muted)">
+Tutto perfetto. Oggetto consegnato come concordato.
+</p>
+</div>
+
+<div style="padding:15px 0">
+<strong>★★★★☆ · Giulia</strong>
+<p style="color:var(--muted)">
+Persona seria e comunicazione ottima.
+</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<section class="section" style="padding-top:0">
+
+<div class="container">
+
+<div class="section-head">
+
+<h2 data-i18n="dashboardTitle">
+  La tua area personale
+</h2>
+
+</div>
+
+<div class="dashboard">
+
+<aside class="sidebar">
+
+<button class="active">📊 Dashboard</button>
+<button>📦 Le mie richieste</button>
+<button>✈️ I miei viaggi</button>
+<button>💬 Messaggi</button>
+<button>⭐ Recensioni</button>
+<button>⚙️ Impostazioni</button>
+
+</aside>
+
+
+<div class="dashboard-main">
+
+<div class="dashboard-card">
+
+<div class="dashboard-title">
+
+<h3 data-i18n="overview">Panoramica</h3>
+
+<span class="verified">✓ Profilo verificato</span>
+
+</div>
+
+<div class="stat-grid">
+
+<div class="mini-stat">
+<strong>12</strong>
+<small>Richieste</small>
+</div>
+
+<div class="mini-stat">
+<strong>8</strong>
+<small>Viaggi</small>
+</div>
+
+<div class="mini-stat">
+<strong>4.9</strong>
+<small>Rating</small>
+</div>
+
+<div class="mini-stat">
+<strong>€420</strong>
+<small>Guadagni</small>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="dashboard-card">
+
+<div class="dashboard-title">
+
+<h3>Prossimo viaggio</h3>
+
+<button class="secondary" onclick="openModal('tripModal')">
++ Pubblica
+</button>
+
+</div>
+
+<div class="trip">
+
+<div>
+
+<strong>🇮🇹 Milano → 🇹🇳 Tunisi</strong>
+
+<p style="color:var(--muted)">
+15 Settembre · 10 kg disponibili
+</p>
+
+</div>
+
+<div>
+<span class="verified">Attivo</span>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= CHAT ================= -->
+
+<section class="section" style="padding-top:0">
+
+<div class="container">
+
+<div class="section-head">
+
+<h2 data-i18n="chatTitle">
+  Comunicazione semplice
+</h2>
+
+<p data-i18n="chatText">
+  Chatta con le persone prima di confermare il servizio.
+</p>
+
+</div>
+
+<div class="chat">
+
+<div class="chat-users">
+
+<div class="chat-user">
+<strong>Ahmed</strong>
+<br>
+<small>Milano → Tunisi</small>
+</div>
+
+<div class="chat-user">
+<strong>Sara</strong>
+<br>
+<small>Sousse → Bologna</small>
+</div>
+
+<div class="chat-user">
+<strong>Tunis Express</strong>
+<br>
+<small>Italia ↔ Tunisia</small>
+</div>
+
+</div>
+
+<div class="chat-window">
+
+<div class="chat-header">
+💬 Ahmed Ben Ali
+</div>
+
+<div class="messages" id="messages">
+
+<div class="message">
+Ciao! Ho ancora 10 kg disponibili.
+</div>
+
+<div class="message me">
+Perfetto, devo portare un piccolo pacco.
+</div>
+
+<div class="message">
+Va bene. Mandami peso e descrizione.
+</div>
+
+</div>
+
+<div class="chat-input">
+
+<input class="input" id="chatInput" placeholder="Scrivi un messaggio...">
+
+<button class="primary" onclick="sendMessage()">
+➤
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= CTA ================= -->
+
+<section class="container">
+
+<div class="cta">
+
+<h2 data-i18n="ctaTitle">
+  Il prossimo viaggio può aiutare qualcuno.
+</h2>
+
+<p data-i18n="ctaText">
+  Entra nella community Italia ↔ Tunisia.
+</p>
+
+<button class="secondary" onclick="openModal('registerModal')" data-i18n="register">
+  Crea account
+</button>
+
+</div>
+
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+<div class="container">
+
+<div class="footer-grid">
+
+<div>
+
+<div class="footer-logo">↔ Waselni</div>
+
+<p data-i18n="footerText">
+  Marketplace Italia ↔ Tunisia per persone, viaggiatori e trasportatori.
+</p>
+
+</div>
+
+<div>
+
+<h4>Piattaforma</h4>
+
+<a href="#market">Marketplace</a>
+<a href="#transport">Trasportatori</a>
+<a href="#security">Sicurezza</a>
+
+</div>
+
+<div>
+
+<h4>Legal</h4>
+
+<a href="#">Termini</a>
+<a href="#">Privacy</a>
+<a href="#">Cookie</a>
+
+</div>
+
+<div>
+
+<h4>Support</h4>
+
+<a href="#">FAQ</a>
+<a href="#">Contatti</a>
+<a href="#">Segnala</a>
+
+</div>
+
+</div>
+
+<div class="footer-bottom">
+© 2026 Waselni — Italia ↔ Tunisia
+</div>
+
+</div>
+
+</footer>
+
+
+<!-- ================= REGISTER MODAL ================= -->
+
+<div class="modal" id="registerModal">
+
+<div class="modal-box">
+
+<button class="close" onclick="closeModal('registerModal')">×</button>
+
+<h2 data-i18n="registerTitle">
+Crea il tuo account
+</h2>
+
+<p style="color:var(--muted);margin:8px 0 22px">
+Registrati gratuitamente.
+</p>
+
+
+<div class="field">
+
+<label data-i18n="accountType">
+Tipo di account
+</label>
+
+<div class="account-types">
+
+<div class="account-type selected"
+id="privateAccount"
+onclick="selectAccount('private')">
+
+<strong>👤 Privato</strong>
+
+<br>
+<small>Viaggiatore / cliente</small>
+
+</div>
+
+<div class="account-type"
+id="businessAccount"
+onclick="selectAccount('business')">
+
+<strong>🚚 Azienda</strong>
+
+<br>
+<small>Trasportatore professionale</small>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="form-grid">
+
+<div class="field">
+<label>Nome</label>
+<input class="input" placeholder="Nome">
+</div>
+
+<div class="field">
+<label>Cognome</label>
+<input class="input" placeholder="Cognome">
+</div>
+
+<div class="field">
+<label>Email</label>
+<input class="input" type="email">
+</div>
+
+<div class="field">
+<label>Telefono</label>
+<input class="input" placeholder="+39 / +216">
+</div>
+
+<div class="field full" id="companyField" style="display:none">
+<label>Nome azienda</label>
+<input class="input">
+</div>
+
+</div>
+
+
+<h3 style="color:var(--dark);margin:15px 0 10px">
+🪪 Verifica identità
+</h3>
+
+<div class="verify">
+
+<label class="upload">
+
+<div style="font-size:40px">📄</div>
+
+<strong>
+Carica passaporto o carta d'identità
+</strong>
+
+<br>
+
+<small>
+JPG, PNG o PDF
+</small>
+
+<input type="file"
+id="document"
+accept="image/*,.pdf"
+onchange="fileUploaded(this)">
+
+<div class="file-name" id="fileName"></div>
+
+</label>
+
+</div>
+
+
+<div class="alert">
+⚠️ La verifica reale dei documenti deve essere gestita da un backend
+sicuro e da un servizio specializzato di verifica dell'identità.
+</div>
+
+<label style="display:flex;gap:8px;margin:15px 0">
+
+<input type="checkbox" id="terms">
+
+<span>
+Accetto Termini e Privacy.
+</span>
+
+</label>
+
+
+<button class="primary"
+style="width:100%"
+onclick="register()">
+
+Crea account
+
+</button>
+
+</div>
+
+</div>
+
+
+<!-- ================= REQUEST MODAL ================= -->
+
+<div class="modal" id="requestModal">
+
+<div class="modal-box">
+
+<button class="close" onclick="closeModal('requestModal')">×</button>
+
+<h2>📦 Pubblica una richiesta</h2>
+
+<p style="color:var(--muted);margin:8px 0 20px">
+Trova qualcuno che può portare il tuo oggetto.
+</p>
+
+<div class="form-grid">
+
+<div class="field">
+<label>Da</label>
+<input class="input" placeholder="Milano">
+</div>
+
+<div class="field">
+<label>A</label>
+<input class="input" placeholder="Tunisi">
+</div>
+
+<div class="field">
+<label>Oggetto</label>
+<input class="input" placeholder="Descrizione">
+</div>
+
+<div class="field">
+<label>Peso</label>
+<input class="input" placeholder="kg">
+</div>
+
+<div class="field full">
+<label>Descrizione</label>
+<textarea class="textarea" rows="4"></textarea>
+</div>
+
+</div>
+
+<div class="alert">
+⚠️ Prima della conferma bisogna verificare che l'oggetto sia
+trasportabile secondo le normative applicabili.
+</div>
+
+<button class="primary"
+style="width:100%"
+onclick="publishRequest()">
+
+Pubblica richiesta
+
+</button>
+
+</div>
+
+</div>
+
+
+<!-- ================= TRIP MODAL ================= -->
+
+<div class="modal" id="tripModal">
+
+<div class="modal-box">
+
+<button class="close" onclick="closeModal('tripModal')">×</button>
+
+<h2>✈️ Pubblica il tuo viaggio</h2>
+
+<p style="color:var(--muted);margin:8px 0 20px">
+Indica spazio, data e percorso.
+</p>
+
+<div class="form-grid">
+
+<div class="field">
+<label>Partenza</label>
+<input class="input" placeholder="Milano">
+</div>
+
+<div class="field">
+<label>Arrivo</label>
+<input class="input" placeholder="Tunisi">
+</div>
+
+<div class="field">
+<label>Data</label>
+<input class="input" type="date">
+</div>
+
+<div class="field">
+<label>Spazio disponibile</label>
+<input class="input" placeholder="10 kg">
+</div>
+
+<div class="field full">
+<label>Prezzo €/kg</label>
+<input class="input" type="number" placeholder="5">
+</div>
+
+</div>
+
+<button class="primary"
+style="width:100%"
+onclick="publishTrip()">
+
+Pubblica viaggio
+
+</button>
+
+</div>
+
+</div>
+
+
+<!-- ================= TOAST ================= -->
+
+<div class="toast" id="toast"></div>
+
+
+<script>
+
+/* ================= TRANSLATIONS ================= */
+
+const T={
+
+it:{
+how:"Come funziona",
+market:"Marketplace",
+transport:"Trasportatori",
+security:"Sicurezza",
+register:"Registrati",
+verifiedPlatform:"Persone verificate",
+heroLine1:"Porta ciò che serve.",
+heroLine2:"Italia ↔ Tunisia.",
+heroText:"Il marketplace che mette in contatto persone, viaggiatori e trasportatori per portare oggetti tra Italia e Tunisia.",
+need:"📦 Devo ricevere qualcosa",
+travel:"✈️ Sto viaggiando",
+searchTitle:"Cosa stai cercando?",
+from:"Da",
+to:"A",
+date:"Data",
+weight:"Peso",
+what:"Cosa devi trasportare?",
+search:"Cerca trasportatori",
+verified:"Identità verificata",
+rating:"Rating medio",
+route:"Due direzioni",
+safe:"Marketplace sicuro",
+howTitle:"Come funziona",
+howText:"Quattro semplici passaggi per trovare la persona giusta.",
+s1:"Registrati",
+s1t:"Crea il tuo profilo e verifica la tua identità.",
+s2:"Pubblica",
+s2t:"Pubblica una richiesta o il tuo prossimo viaggio.",
+s3:"Fai match",
+s3t:"Trova persone compatibili con tratta e data.",
+s4:"Consegna",
+s4t:"Completa il servizio e lascia una recensione.",
+trustTitle:"La fiducia è al centro",
+trustText:"Ogni profilo costruisce la propria reputazione nel tempo.",
+identityTitle:"Identità verificata",
+identityText:"Passaporto o carta d'identità per ottenere il badge verificato.",
+reviewTitle:"Recensioni",
+reviewText:"Dopo ogni servizio cliente e trasportatore possono valutarsi.",
+protectionTitle:"Protezione",
+protectionText:"Segnalazioni, moderazione e pagamento protetto possono aumentare la sicurezza.",
+marketTitle:"Viaggi disponibili",
+marketText:"Persone verificate che hanno spazio disponibile.",
+filters:"Filtra risultati",
+direction:"Direzione",
+city:"Città",
+minRating:"Rating minimo",
+apply:"Applica",
+contact:"Contatta",
+transportTitle:"Sei un trasportatore?",
+transportText:"Trasforma i tuoi viaggi in una nuova fonte di guadagno.",
+privateTransport:"Viaggiatore privato",
+privateTransportText:"Hai spazio nella valigia? Pubblica il viaggio e ricevi richieste.",
+companyTransport:"Trasportatore professionale",
+companyTransportText:"Mostra le tue rotte, crea un profilo Business e trova nuovi clienti.",
+earn:"Guadagna",
+earnText:"Decidi prezzi e disponibilità. La piattaforma può applicare una commissione sulle transazioni.",
+join:"Inizia",
+business:"Profilo Business",
+securityTitle:"Un profilo che costruisce fiducia",
+reviews:"Ultime recensioni",
+message:"💬 Messaggio",
+dashboardTitle:"La tua area personale",
+overview:"Panoramica",
+chatTitle:"Comunicazione semplice",
+chatText:"Chatta con le persone prima di confermare il servizio.",
+ctaTitle:"Il prossimo viaggio può aiutare qualcuno.",
+ctaText:"Entra nella community Italia ↔ Tunisia.",
+footerText:"Marketplace Italia ↔ Tunisia per persone, viaggiatori e trasportatori.",
+registerTitle:"Crea il tuo account",
+accountType:"Tipo di account"
+},
+
+fr:{
+how:"Comment ça marche",
+market:"Marketplace",
+transport:"Transporteurs",
+security:"Sécurité",
+register:"S'inscrire",
+verifiedPlatform:"Utilisateurs vérifiés",
+heroLine1:"Transportez ce qui compte.",
+heroLine2:"Italie ↔ Tunisie.",
+heroText:"La marketplace qui connecte particuliers, voyageurs et transporteurs entre l'Italie et la Tunisie.",
+need:"📦 Je dois recevoir quelque chose",
+travel:"✈️ Je voyage",
+searchTitle:"Que recherchez-vous?",
+from:"De",
+to:"À",
+date:"Date",
+weight:"Poids",
+what:"Que souhaitez-vous transporter?",
+search:"Rechercher",
+verified:"Identité vérifiée",
+rating:"Note moyenne",
+route:"Deux directions",
+safe:"Marketplace sécurisée",
+howTitle:"Comment ça marche",
+howText:"Quatre étapes simples pour trouver la bonne personne.",
+s1:"Inscrivez-vous",
+s1t:"Créez votre profil et vérifiez votre identité.",
+s2:"Publiez",
+s2t:"Publiez une demande ou votre prochain voyage.",
+s3:"Match",
+s3t:"Trouvez les personnes compatibles.",
+s4:"Livraison",
+s4t:"Terminez le service et laissez un avis.",
+trustTitle:"La confiance avant tout",
+trustText:"Chaque profil construit sa réputation.",
+identityTitle:"Identité vérifiée",
+identityText:"Passeport ou carte d'identité pour obtenir le badge vérifié.",
+reviewTitle:"Avis",
+reviewText:"Client et transporteur peuvent s'évaluer après le service.",
+protectionTitle:"Protection",
+protectionText:"Signalements, modération et paiement sécurisé.",
+marketTitle:"Voyages disponibles",
+marketText:"Utilisateurs vérifiés avec de l'espace disponible.",
+filters:"Filtres",
+direction:"Direction",
+city:"Ville",
+minRating:"Note minimum",
+apply:"Appliquer",
+contact:"Contacter",
+transportTitle:"Vous êtes transporteur?",
+transportText:"Transformez vos voyages en opportunité.",
+privateTransport:"Voyageur privé",
+privateTransportText:"Vous avez de la place? Publiez votre voyage.",
+companyTransport:"Transporteur professionnel",
+companyTransportText:"Présentez vos itinéraires et trouvez de nouveaux clients.",
+earn:"Gagnez",
+earnText:"Définissez vos prix et disponibilités.",
+join:"Commencer",
+business:"Profil Business",
+securityTitle:"Un profil qui inspire confiance",
+reviews:"Derniers avis",
+message:"💬 Message",
+dashboardTitle:"Votre espace personnel",
+overview:"Vue d'ensemble",
+chatTitle:"Communication simple",
+chatText:"Discutez avant de confirmer le service.",
+ctaTitle:"Votre prochain voyage peut aider quelqu'un.",
+ctaText:"Rejoignez la communauté Italie ↔ Tunisie.",
+footerText:"Marketplace Italie ↔ Tunisie pour particuliers, voyageurs et transporteurs.",
+registerTitle:"Créer votre compte",
+accountType:"Type de compte"
+},
+
+ar:{
+how:"كيفاش تخدم",
+market:"السوق",
+transport:"الناقلين",
+security:"الأمان",
+register:"سجّل",
+verifiedPlatform:"مستعملين موثوقين",
+heroLine1:"وصل الحاجة اللي تستحقها.",
+heroLine2:"تونس ↔ إيطاليا.",
+heroText:"منصة تربط بين الناس والمسافرين والناقلين بين تونس وإيطاليا.",
+need:"📦 نحب نستقبل حاجة",
+travel:"✈️ أنا مسافر",
+searchTitle:"شنوة تحب تلقى؟",
+from:"من",
+to:"إلى",
+date:"التاريخ",
+weight:"الوزن",
+what:"شنوة تحب تنقل؟",
+search:"إبحث",
+verified:"هوية مؤكدة",
+rating:"التقييم",
+route:"الاتجاهين",
+safe:"منصة آمنة",
+howTitle:"كيفاش تخدم",
+howText:"أربع خطوات بسيطة باش تلقى الشخص المناسب.",
+s1:"سجّل",
+s1t:"اعمل حساب وثبّت هويتك.",
+s2:"انشر",
+s2t:"انشر طلب ولا سفرة.",
+s3:"اعمل Match",
+s3t:"إلقى الشخص المناسب حسب الطريق والتاريخ.",
+s4:"التوصيل",
+s4t:"كمّل الخدمة واعمل تقييم.",
+trustTitle:"الثقة قبل كل شيء",
+trustText:"كل حساب يبني السمعة متاعو مع الوقت.",
+identityTitle:"هوية مؤكدة",
+identityText:"باسبور ولا بطاقة تعريف للحصول على badge موثوق.",
+reviewTitle:"التقييمات",
+reviewText:"الحريف والناقل ينجموا يقيموا بعضهم بعد الخدمة.",
+protectionTitle:"الحماية",
+protectionText:"التبليغ والمراقبة والخلاص الآمن يزيدوا في الحماية.",
+marketTitle:"السفرات المتوفرة",
+marketText:"ناس موثوقين عندهم بلاصة.",
+filters:"الفلاتر",
+direction:"الاتجاه",
+city:"المدينة",
+minRating:"أقل تقييم",
+apply:"طبّق",
+contact:"إتصل",
+transportTitle:"إنت ناقل؟",
+transportText:"حوّل سفرياتك لفرصة تربح منها.",
+privateTransport:"مسافر",
+privateTransportText:"عندك بلاصة؟ انشر سفرتك.",
+companyTransport:"ناقل محترف",
+companyTransportText:"بيّن المسارات متاعك والقى حرفاء جدد.",
+earn:"إربح",
+earnText:"حدد الأسعار والوقت المتوفر.",
+join:"إبدأ",
+business:"حساب Business",
+securityTitle:"بروفايل يعطي الثقة",
+reviews:"آخر التقييمات",
+message:"💬 رسالة",
+dashboardTitle:"الحساب متاعك",
+overview:"نظرة عامة",
+chatTitle:"تواصل بسهولة",
+chatText:"إحكي مع الشخص قبل ما تأكد الخدمة.",
+ctaTitle:"السفرة الجاية متاعك تنجم تعاون شخص.",
+ctaText:"إنضم لمجتمع تونس ↔ إيطاليا.",
+footerText:"Marketplace تونس ↔ إيطاليا للأفراد والمسافرين والناقلين.",
+registerTitle:"اعمل حساب",
+accountType:"نوع الحساب"
+}
+
+};
+
+
+/* ================= LANGUAGE ================= */
+
+function setLanguage(lang){
+
+  localStorage.setItem("lang",lang);
+
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+
+    const key=el.dataset.i18n;
+
+    if(T[lang] && T[lang][key]){
+      el.textContent=T[lang][key];
+    }
+
+  });
+
+  document.documentElement.lang=lang;
+
+  document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+}
+
+
+/* ================= MODALS ================= */
+
+function openModal(id){
+  document.getElementById(id).classList.add("show");
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove("show");
+}
+
+document.querySelectorAll(".modal").forEach(modal=>{
+
+  modal.addEventListener("click",e=>{
+
+    if(e.target===modal){
+      modal.classList.remove("show");
+    }
+
+  });
+
+});
+
+
+/* ================= ACCOUNT ================= */
+
+function openRegister(type="private"){
+
+  openModal("registerModal");
+
+  selectAccount(type);
+
+}
+
+function selectAccount(type){
+
+  document.getElementById("privateAccount")
+    .classList.toggle("selected",type==="private");
+
+  document.getElementById("businessAccount")
+    .classList.toggle("selected",type==="business");
+
+  document.getElementById("companyField").style.display=
+    type==="business"?"block":"none";
+}
+
+
+/* ================= DOCUMENT ================= */
+
+function fileUploaded(input){
+
+  const file=input.files[0];
+
+  if(!file)return;
+
+  if(file.size>10*1024*1024){
+
+    toastMsg("Documento troppo grande. Massimo 10 MB.");
+
+    input.value="";
+
+    return;
+  }
+
+  document.getElementById("fileName").textContent=
+    "✓ "+file.name;
+}
+
+
+/* ================= REGISTER ================= */
+
+function register(){
+
+  if(!document.getElementById("terms").checked){
+
+    toastMsg("Accetta Termini e Privacy.");
+
+    return;
+  }
+
+  if(!document.getElementById("document").files.length){
+
+    toastMsg("Carica il documento per continuare.");
+
+    return;
+  }
+
+  closeModal("registerModal");
+
+  toastMsg(
+    "Account creato! La verifica reale verrà completata dal sistema."
+  );
+}
+
+
+/* ================= DIRECTION ================= */
+
+function direction(button){
+
+  document.querySelectorAll(".direction")
+    .forEach(x=>x.classList.remove("active"));
+
+  button.classList.add("active");
+}
+
+
+/* ================= SEARCH ================= */
+
+function search(){
+
+  document.getElementById("market")
+    .scrollIntoView({behavior:"smooth"});
+
+  toastMsg("Ricerca completata ✓");
+
+}
+
+
+/* ================= REQUEST ================= */
+
+function publishRequest(){
+
+  closeModal("requestModal");
+
+  toastMsg("Richiesta pubblicata ✓");
+
+}
+
+
+/* ================= TRIP ================= */
+
+function publishTrip(){
+
+  closeModal("tripModal");
+
+  toastMsg("Viaggio pubblicato ✓");
+
+}
+
+
+/* ================= CHAT ================= */
+
+function openChat(name){
+
+  document.getElementById("chatInput").focus();
+
+  document.querySelector("#messages").innerHTML+=
+    `<div class="message">Hai aperto una conversazione con ${name}.</div>`;
+
+  document.querySelector("#messages")
+    .lastElementChild
+    .scrollIntoView();
+
+  document.querySelector("#chatInput")
+    .focus();
+
+  toastMsg("Chat aperta con "+name);
+
+}
+
+
+function sendMessage(){
+
+  const input=document.getElementById("chatInput");
+
+  const text=input.value.trim();
+
+  if(!text)return;
+
+  const messages=document.getElementById("messages");
+
+  const div=document.createElement("div");
+
+  div.className="message me";
+
+  div.textContent=text;
+
+  messages.appendChild(div);
+
+  input.value="";
+
+  messages.scrollTop=messages.scrollHeight;
+
+}
+
+
+/* ================= TOAST ================= */
+
+let toastTimer;
+
+function toastMsg(message){
+
+  const toast=document.getElementById("toast");
+
+  toast.textContent=message;
+
+  toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+
+  toastTimer=setTimeout(()=>{
+    toast.classList.remove("show");
+  },3000);
+
+}
+
+
+/* ================= DARK MODE ================= */
+
+function toggleDark(){
+
+  document.body.classList.toggle("dark");
+
+  localStorage.setItem(
+    "dark",
+    document.body.classList.contains("dark")
+  );
+
+}
+
+
+/* ================= MOBILE ================= */
+
+function mobileNav(){
+
+  const nav=document.querySelector(".nav-links");
+
+  if(nav.style.display==="flex"){
+
+    nav.style.display="";
+
+  }else{
+
+    nav.style.display="flex";
+    nav.style.position="absolute";
+    nav.style.top="64px";
+    nav.style.left="0";
+    nav.style.right="0";
+    nav.style.background="white";
+    nav.style.padding="20px";
+    nav.style.flexDirection="column";
+    nav.style.borderBottom="1px solid var(--border)";
+
+  }
+
+}
+
+
+/* ================= INIT ================= */
+
+const savedLang=
+  localStorage.getItem("lang") || "it";
+
+document.getElementById("language").value=savedLang;
+
+setLanguage(savedLang);
+
+if(localStorage.getItem("dark")==="true"){
+  document.body.classList.add("dark");
+}
+
+</script>
+
+</body>
+</html>
