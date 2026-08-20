@@ -576,17 +576,17 @@ async function login() {
 
   }
 
+await loadUser();
 
-  await loadUser();
+closeAuth();
 
-  closeAuth();
+updateHeader();
 
-  updateHeader();
+setupActions();
 
-  loadTrips();
+loadTrips();
 
-  loadRequests();
-
+loadRequests();
 }
 
 
@@ -594,64 +594,187 @@ async function login() {
    PROFILE
 ===================================================== */
 
+
 async function showProfile() {
 
   if (!currentUser) {
-
-    openAuth();
-
+    openAuth("login");
     return;
-
   }
 
-
   const {
-    data
-  } =
-    await supabaseClient
-      .from("profiles")
-      .select("*")
-      .eq(
-        "id",
-        currentUser.id
-      )
-      .single();
+    data,
+    error
+  } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("id", currentUser.id)
+    .single();
 
-
-  if (!data) {
+  if (error) {
+    console.error(error);
 
     alert(
-      "Profilo non trovato."
+      "Non riesco a caricare il profilo: " +
+      error.message
     );
 
     return;
-
   }
-
 
   const verified =
     data.is_verified
       ? "✓ Verificato"
-      : "○ Non verificato";
+      : "○ Profilo non verificato";
 
+  const modal =
+    document.createElement("div");
 
-  alert(
+  modal.id = "profileModal";
 
-    `👤 ${data.full_name}\n\n` +
+  modal.innerHTML = `
 
-    `Tipo: ${data.user_type}\n` +
+    <div class="auth-overlay">
 
-    `Paese: ${data.country}\n` +
+      <div class="auth-box">
 
-    `Stato: ${verified}\n` +
+        <button
+          class="auth-close"
+          onclick="closeProfile()">
 
-    `⭐ ${data.rating || 0}`
+          ×
 
-  );
+        </button>
 
+        <div class="avatar">
+          👤
+        </div>
+
+        <h2>
+          ${escapeHtml(
+            data.full_name || "Utente"
+          )}
+        </h2>
+
+        <p>
+          ${escapeHtml(
+            currentUser.email || ""
+          )}
+        </p>
+
+        <hr style="
+          margin:20px 0;
+          border:0;
+          border-top:1px solid #e2e8f0;
+        ">
+
+        <p>
+          <strong>Paese:</strong>
+          ${
+            data.country === "italy"
+              ? "🇮🇹 Italia"
+              : "🇹🇳 Tunisia"
+          }
+        </p>
+
+        <p>
+          <strong>Tipo:</strong>
+          ${
+            data.user_type === "company"
+              ? "🚚 Azienda / Trasportatore"
+              : data.user_type === "traveler"
+              ? "✈️ Viaggiatore"
+              : "👤 Privato"
+          }
+        </p>
+
+        <p>
+          <strong>Stato:</strong>
+          ${verified}
+        </p>
+
+        <p>
+          <strong>Valutazione:</strong>
+          ⭐ ${data.rating || "0"}
+        </p>
+
+        <p>
+          <strong>Recensioni:</strong>
+          ${data.reviews_count || "0"}
+        </p>
+
+        <button
+          class="primary auth-button"
+          onclick="closeProfile(); openTripModal();">
+
+          ✈️ Pubblica un viaggio
+
+        </button>
+
+        <button
+          class="secondary auth-button"
+          onclick="logout();">
+
+          🚪 Esci
+
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(modal);
 }
 
 
+function closeProfile() {
+
+  const modal =
+    document.getElementById(
+      "profileModal"
+    );
+
+  if (modal) {
+    modal.remove();
+  }
+
+}
+
+/*==========================LOG OUT ==================================
+async function logout() {
+
+  const {
+    error
+  } = await supabaseClient.auth.signOut();
+
+  if (error) {
+
+    alert(
+      "Errore durante il logout: " +
+      error.message
+    );
+
+    return;
+  }
+
+  currentUser = null;
+
+  const profileModal =
+    document.getElementById(
+      "profileModal"
+    );
+
+  if (profileModal) {
+    profileModal.remove();
+  }
+
+  updateHeader();
+
+  setupActions();
+
+}
 /* =====================================================
    TRIP MODAL
 ===================================================== */
