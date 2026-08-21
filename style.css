@@ -1216,3 +1216,36 @@ body.dark .verification-icon {
     }
 
 }
+.verified-trip,
+.pending-trip,
+.rejected-trip {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.verified-trip {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.pending-trip {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.rejected-trip {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.upload-help {
+  display: block;
+  margin: -5px 0 15px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #6b7280;
+}
