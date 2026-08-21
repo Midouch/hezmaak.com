@@ -1187,7 +1187,7 @@ function createTripModal() {
           placeholder="Descrizione"
         ></textarea>
       <label>
-  📄 Biglietto del volo
+  📄 Biglietto del viaggio
 </label>
 
 <input
