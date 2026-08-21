@@ -4,5 +4,58 @@
     "requests": "Richieste",
     "how": "Come funziona",
     "login": "Accedi / Registrati"
+  },
+  "hero": {
+    "title": "Porta ciò che serve. Connettiti. Guadagna.",
+    "text": "Waselni mette in contatto persone che devono ricevere oggetti tra Italia e Tunisia con viaggiatori e trasportatori che hanno spazio disponibile.",
+    "traveling": "✈️ Sto viaggiando",
+    "looking": "📦 Cerco qualcuno"
+  },
+  "trust": {
+    "verified": "Utenti verificati",
+    "reviews": "Recensioni",
+    "payments": "Pagamenti sicuri"
+  },
+  "route": {
+    "title": "✈️ Un viaggio, un'opportunità",
+    "space": "Hai spazio in valigia? Puoi aiutare qualcuno e guadagnare."
+  },
+  "how": {
+    "label": "COME FUNZIONA",
+    "title": "Semplice, sicuro, umano.",
+    "publish": "Pubblica",
+    "publishText": "Pubblica il tuo viaggio oppure indica cosa vuoi far trasportare.",
+    "connect": "Connettiti",
+    "connectText": "Trova una persona che percorre la tua stessa tratta.",
+    "organize": "Organizza",
+    "organizeText": "Contatta l'altra persona e concordate i dettagli.",
+    "review": "Recensisci",
+    "reviewText": "Dopo il servizio lascia una recensione."
+  },
+  "trips": {
+    "label": "VIAGGI DISPONIBILI",
+    "title": "Trova un viaggiatore",
+    "publish": "+ Pubblica viaggio",
+    "loading": "Caricamento..."
+  },
+  "requests": {
+    "label": "RICHIESTE",
+    "title": "Cosa cercano le persone?",
+    "publish": "+ Pubblica richiesta",
+    "loading": "Caricamento..."
+  },
+  "cta": {
+    "title": "Hai un viaggio in programma?",
+    "text": "Trasforma lo spazio inutilizzato nel tuo bagaglio in un'opportunità.",
+    "button": "Pubblica il tuo viaggio"
+  },
+  "footer": {
+    "how": "Come funziona",
+    "trips": "Viaggi",
+    "requests": "Richieste",
+    "security": "Sicurezza",
+    "identity": "Verifica identità",
+    "reviews": "Recensioni",
+    "support": "Assistenza"
   }
 }
