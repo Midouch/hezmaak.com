@@ -1,1 +1,61 @@
-
+{
+  "nav": {
+    "trips": "Voyages",
+    "requests": "Demandes",
+    "how": "Comment ça marche",
+    "login": "Connexion / Inscription"
+  },
+  "hero": {
+    "title": "Transportez ce qui compte. Connectez-vous. Gagnez.",
+    "text": "Waselni met en relation les personnes qui souhaitent recevoir des objets entre l'Italie et la Tunisie avec des voyageurs et transporteurs disposant d'espace disponible.",
+    "traveling": "✈️ Je voyage",
+    "looking": "📦 Je cherche quelqu'un"
+  },
+  "trust": {
+    "verified": "Utilisateurs vérifiés",
+    "reviews": "Avis",
+    "payments": "Paiements sécurisés"
+  },
+  "route": {
+    "title": "✈️ Un voyage, une opportunité",
+    "space": "Vous avez de la place dans vos bagages ? Aidez quelqu'un et gagnez de l'argent."
+  },
+  "how": {
+    "label": "COMMENT ÇA MARCHE",
+    "title": "Simple, sûr, humain.",
+    "publish": "Publier",
+    "publishText": "Publiez votre voyage ou indiquez ce que vous souhaitez faire transporter.",
+    "connect": "Connectez-vous",
+    "connectText": "Trouvez une personne qui effectue le même trajet.",
+    "organize": "Organisez",
+    "organizeText": "Contactez l'autre personne et convenez des détails.",
+    "review": "Évaluez",
+    "reviewText": "Laissez un avis après le service."
+  },
+  "trips": {
+    "label": "VOYAGES DISPONIBLES",
+    "title": "Trouver un voyageur",
+    "publish": "+ Publier un voyage",
+    "loading": "Chargement..."
+  },
+  "requests": {
+    "label": "DEMANDES",
+    "title": "Que recherchent les utilisateurs ?",
+    "publish": "+ Publier une demande",
+    "loading": "Chargement..."
+  },
+  "cta": {
+    "title": "Vous avez un voyage prévu ?",
+    "text": "Transformez l'espace inutilisé de vos bagages en opportunité.",
+    "button": "Publier votre voyage"
+  },
+  "footer": {
+    "how": "Comment ça marche",
+    "trips": "Voyages",
+    "requests": "Demandes",
+    "security": "Sécurité",
+    "identity": "Vérification d'identité",
+    "reviews": "Avis",
+    "support": "Assistance"
+  }
+}
