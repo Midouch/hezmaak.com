@@ -1637,7 +1637,19 @@ function tripCard(trip) {
           profile.full_name ||
           "Utente Waselni"
         )}
-
+${
+  trip.verification_status === "approved"
+    ? `<span class="verified-trip">
+         ✈️ Viaggio verificato
+       </span>`
+    : trip.verification_status === "pending"
+      ? `<span class="pending-trip">
+           ⏳ Biglietto in verifica
+         </span>`
+      : `<span class="rejected-trip">
+           ⚠️ Verifica non approvata
+         </span>`
+}
         ${
           profile.is_verified
             ? `<span class="verified">
