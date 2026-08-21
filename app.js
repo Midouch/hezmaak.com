@@ -1186,7 +1186,23 @@ function createTripModal() {
           rows="4"
           placeholder="Descrizione"
         ></textarea>
+      <label>
+  📄 Biglietto del volo
+</label>
 
+<input
+  id="travelTicket"
+  type="file"
+  accept=".jpg,.jpeg,.png,.pdf"
+  required
+>
+
+<small class="upload-help">
+  Carica una foto, screenshot o PDF del biglietto.
+  Il biglietto è privato e sarà visibile solo
+  all'amministratore per la verifica.
+  Massimo 10 MB.
+</small>
 
         <button
           class="primary auth-button"
@@ -1237,13 +1253,9 @@ function closeTripModal() {
 async function publishTrip() {
 
   if (!currentUser) {
-
-    openAuth();
-
+    openAuth("login");
     return;
-
   }
-
 
   const departureCountry =
     document.getElementById(
@@ -1289,12 +1301,15 @@ async function publishTrip() {
       "tripDescription"
     ).value.trim();
 
+  const ticketInput =
+    document.getElementById(
+      "travelTicket"
+    );
 
   const message =
     document.getElementById(
       "tripMessage"
     );
-
 
   if (
     !departureCity ||
@@ -1304,19 +1319,16 @@ async function publishTrip() {
   ) {
 
     message.textContent =
-      "Compila i campi obbligatori.";
+      "Compila tutti i campi obbligatori.";
 
     message.className =
       "auth-error";
 
     return;
-
   }
 
-
   if (
-    departureCountry ===
-    arrivalCountry
+    departureCountry === arrivalCountry
   ) {
 
     message.textContent =
@@ -1326,83 +1338,186 @@ async function publishTrip() {
       "auth-error";
 
     return;
-
   }
 
-
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("trips")
-      .insert({
-
-        user_id:
-          currentUser.id,
-
-        departure_country:
-          departureCountry,
-
-        arrival_country:
-          arrivalCountry,
-
-        departure_city:
-          departureCity,
-
-        arrival_city:
-          arrivalCity,
-
-        travel_date:
-          date,
-
-        available_kg:
-          kg,
-
-        price_per_kg:
-          price,
-
-        description:
-          description,
-
-        status:
-          "active"
-
-      });
-
-
-  if (error) {
-
-    console.error(error);
+  if (
+    !ticketInput ||
+    !ticketInput.files ||
+    !ticketInput.files.length
+  ) {
 
     message.textContent =
-      error.message;
+      "Devi caricare il biglietto del volo.";
 
     message.className =
       "auth-error";
 
     return;
-
   }
 
+  const ticketFile =
+    ticketInput.files[0];
+
+  const maxSize =
+    10 * 1024 * 1024;
+
+  if (ticketFile.size > maxSize) {
+
+    message.textContent =
+      "Il biglietto supera il limite di 10 MB.";
+
+    message.className =
+      "auth-error";
+
+    return;
+  }
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "application/pdf"
+  ];
+
+  if (
+    !allowedTypes.includes(
+      ticketFile.type
+    )
+  ) {
+
+    message.textContent =
+      "Formato non supportato. Usa JPG, PNG o PDF.";
+
+    message.className =
+      "auth-error";
+
+    return;
+  }
 
   message.textContent =
-    "✓ Viaggio pubblicato!";
+    "Caricamento biglietto...";
 
   message.className =
     "auth-success";
 
+  const extension =
+    ticketFile.name
+      .split(".")
+      .pop()
+      .toLowerCase();
+
+  const ticketPath =
+    `${currentUser.id}/ticket-${Date.now()}.${extension}`;
+
+  const {
+    error: uploadError
+  } = await supabaseClient
+    .storage
+    .from("travel-tickets")
+    .upload(
+      ticketPath,
+      ticketFile,
+      {
+        upsert: false
+      }
+    );
+
+  if (uploadError) {
+
+    console.error(uploadError);
+
+    message.textContent =
+      "Errore caricamento biglietto: " +
+      uploadError.message;
+
+    message.className =
+      "auth-error";
+
+    return;
+  }
+
+  message.textContent =
+    "Pubblicazione viaggio...";
+
+  const {
+    error: tripError
+  } = await supabaseClient
+    .from("trips")
+    .insert({
+
+      user_id:
+        currentUser.id,
+
+      departure_country:
+        departureCountry,
+
+      arrival_country:
+        arrivalCountry,
+
+      departure_city:
+        departureCity,
+
+      arrival_city:
+        arrivalCity,
+
+      travel_date:
+        date,
+
+      available_kg:
+        kg,
+
+      price_per_kg:
+        price,
+
+      description:
+        description,
+
+      ticket_path:
+        ticketPath,
+
+      verification_status:
+        "pending",
+
+      status:
+        "active"
+
+    });
+
+  if (tripError) {
+
+    console.error(tripError);
+
+    await supabaseClient
+      .storage
+      .from("travel-tickets")
+      .remove([
+        ticketPath
+      ]);
+
+    message.textContent =
+      "Errore pubblicazione viaggio: " +
+      tripError.message;
+
+    message.className =
+      "auth-error";
+
+    return;
+  }
+
+  message.textContent =
+    "✓ Viaggio pubblicato e biglietto inviato per verifica.";
+
+  message.className =
+    "auth-success";
 
   setTimeout(
     () => {
 
       closeTripModal();
-
       loadTrips();
 
     },
-    800
+    1000
   );
-
 }
 
 
