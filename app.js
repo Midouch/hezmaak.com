@@ -5059,15 +5059,241 @@ async function deleteMyRequest(requestId) {
   loadRequests();
 
 }
-function showMyReviews() {
+async function showMyReviews() {
 
-  alert(
-    t("reviewsComing")
-  );
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
 
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("reviews")
+    .select(`
+      id,
+      reviewer_id,
+      reviewer_user_id,
+      reviewed_user_id,
+      rating,
+      comment,
+      created_at
+    `)
+    .eq(
+      "reviewed_user_id",
+      currentUser.id
+    )
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    );
+
+  if (error) {
+
+    console.error(error);
+
+    alert(
+      "Errore caricamento recensioni: " +
+      error.message
+    );
+
+    return;
+  }
+
+  const oldPage =
+    document.getElementById(
+      "myReviewsPage"
+    );
+
+  if (oldPage) {
+    oldPage.remove();
+  }
+
+  const page =
+    document.createElement("div");
+
+  page.id =
+    "myReviewsPage";
+
+  page.innerHTML = `
+
+    <div class="profile-page">
+
+      <div class="container">
+
+        <button
+          class="back-button"
+          onclick="closeMyReviews()">
+
+          ← Torna al profilo
+
+        </button>
+
+
+        <div class="profile-header">
+
+          <div>
+
+            <span class="section-label">
+              LA MIA ATTIVITÀ
+            </span>
+
+            <h1>
+              ⭐ Le mie recensioni
+            </h1>
+
+            <p>
+              Le recensioni ricevute dagli altri utenti.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="profile-card">
+
+          <div class="profile-card-title">
+
+            <h3>
+              Le mie valutazioni
+            </h3>
+
+            <strong>
+              ${data.length}
+            </strong>
+
+          </div>
+
+
+          ${
+            data.length
+              ? `
+                <div class="reviews-list">
+
+                  ${data
+                    .map(reviewCard)
+                    .join("")}
+
+                </div>
+              `
+              : `
+
+                <div class="empty-state">
+
+                  <div class="avatar">
+                    ⭐
+                  </div>
+
+                  <h3>
+                    Nessuna recensione
+                  </h3>
+
+                  <p>
+                    Non hai ancora ricevuto recensioni.
+                  </p>
+
+                </div>
+
+              `
+          }
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(page);
+
+  document.body.style.overflow =
+    "hidden";
 }
+function reviewCard(review) {
+
+  const rating =
+    Math.max(
+      1,
+      Math.min(
+        5,
+        Number(review.rating) || 0
+      )
+    );
+
+  const stars =
+    "⭐".repeat(rating);
+
+  const date =
+    review.created_at
+      ? new Date(
+          review.created_at
+        ).toLocaleDateString("it-IT")
+      : "";
+
+  return `
+
+    <div class="review-item">
+
+      <div class="review-header">
+
+        <div>
+
+          <strong>
+            ${stars}
+          </strong>
+
+          <div class="review-date">
+            ${date}
+          </div>
+
+        </div>
+
+        <span>
+          ${rating}/5
+        </span>
+
+      </div>
 
 
+      ${
+        review.comment
+          ? `
+            <p class="review-comment">
+              "${escapeHtml(
+                review.comment
+              )}"
+            </p>
+          `
+          : `
+            <p class="review-comment">
+              Nessun commento.
+            </p>
+          `
+      }
+
+    </div>
+
+  `;
+}
+function closeMyReviews() {
+
+  const page =
+    document.getElementById(
+      "myReviewsPage"
+    );
+
+  if (page) {
+    page.remove();
+  }
+
+  document.body.style.overflow =
+    "";
+}
 /* =====================================================
    IDENTITY VERIFICATION
 ===================================================== */
