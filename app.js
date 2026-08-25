@@ -5074,7 +5074,6 @@ async function showMyReviews() {
     .select(`
       id,
       reviewer_id,
-      reviewer_user_id,
       reviewed_user_id,
       rating,
       comment,
