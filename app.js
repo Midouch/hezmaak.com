@@ -2224,160 +2224,39 @@ function contactUser(userId) {
 
 }
 
-
 /* =====================================================
-   LANGUAGE
-
-
-const languages = [
-  {
-    code: "it",
-    label: "🇮🇹 IT"
-  },
-  {
-    code: "fr",
-    label: "🇫🇷 FR"
-  },
-  {
-    code: "tn",
-    label: "🇹🇳 TN"
-  }
-];
-
-let currentLanguage = 0;
-
-
-function cycleLanguage() {
-
-  currentLanguage++;
-
-  if (
-    currentLanguage >=
-    languages.length
-  ) {
-    currentLanguage = 0;
-  }
-
-
-  document.getElementById(
-    "languageButton"
-  ).textContent =
-    languages[
-      currentLanguage
-    ].label;
-
-
-  const lang =
-    languages[
-      currentLanguage
-    ].code;
-
-
-  translatePage(lang);
-
-}
-
-
-function translatePage(lang) {
-
-  const translations = {
-
-    it: {
-      heroTitle:
-        "Porta ciò che serve. Connettiti. Guadagna.",
-
-      heroText:
-        "Hez maak mette in contatto persone che devono ricevere oggetti tra Italia e Tunisia con viaggiatori e trasportatori che hanno spazio disponibile."
-    },
-
-    fr: {
-      heroTitle:
-        "Transportez ce dont les autres ont besoin. Connectez-vous. Gagnez.",
-
-      heroText:
-        "Hez maak met en relation les personnes qui souhaitent envoyer des objets entre l'Italie et la Tunisie avec des voyageurs et transporteurs."
-    },
-
-    tn: {
-      heroTitle:
-        "وصّل الحاجة. تواصل. واربح.",
-
-      heroText:
-        "هزّ معاك، تربط بين الناس في إيطاليا وتونس لإرسال و نقل الأغراض مع المسافرين والناقلين."
-    }
-
-  };
-
-
-  const t =
-    translations[lang];
-
-
-  document.getElementById(
-    "heroTitle"
-  ).textContent =
-    t.heroTitle;
-
-
-  document.getElementById(
-    "heroText"
-  ).textContent =
-    t.heroText;
-
-}
+   LANGUAGE SYSTEM
+   ITALIANO / FRANCESE / ARABO TUNISINO
 ===================================================== */
-/* =====================================================
-   LANGUAGE
-===================================================== */
-
-const languages = [
-  {
-    code: "it",
-    label: "🇮🇹 IT"
-  },
-  {
-    code: "fr",
-    label: "🇫🇷 FR"
-  },
-  {
-    code: "ar",
-    label: "🇹🇳 ع"
-  }
-];
-
-let currentLanguage = 0;
-
 
 const translations = {
 
-  /* =====================
-     ITALIANO
-  ===================== */
-
   it: {
+
+    languageName: "🇮🇹 IT",
 
     navTrips: "Viaggi",
     navRequests: "Richieste",
     navHow: "Come funziona",
-    loginRegister: "Accedi / Registrati",
+    login: "Accedi / Registrati",
+    profile: "👤 Il mio profilo",
 
-    route: "🇮🇹 Italia ↔ 🇹🇳 Tunisia",
-
-    heroTitle: `
-      Porta ciò che serve.
-      <span>Connettiti.</span>
-      Guadagna.
-    `,
-
+    heroTitle: "Porta ciò che serve. Connettiti. Guadagna.",
     heroText:
       "Hez Maak mette in contatto persone che devono ricevere oggetti tra Italia e Tunisia con viaggiatori e trasportatori che hanno spazio disponibile.",
 
     traveling: "✈️ Sto viaggiando",
-    lookingFor: "📦 Cerco qualcuno",
+    looking: "📦 Cerco qualcuno",
 
-    trustVerified: "✓ Utenti verificati",
-    trustReviews: "⭐ Recensioni",
-    trustPayments: "🔐 Pagamenti sicuri",
+    verifiedUsers: "Utenti verificati",
+    reviews: "Recensioni",
+    securePayments: "Pagamenti sicuri",
+
+    routeTitle: "✈️ Un viaggio, un'opportunità",
+    italy: "Italia",
+    tunisia: "Tunisia",
+    routeDescription:
+      "Hai spazio in valigia? Puoi aiutare qualcuno e guadagnare.",
 
     howLabel: "COME FUNZIONA",
     howTitle: "Semplice, sicuro, umano.",
@@ -2406,54 +2285,145 @@ const translations = {
     requestsTitle: "Cosa cercano le persone?",
     publishRequest: "+ Pubblica richiesta",
 
+    loading: "Caricamento...",
+
     ctaTitle: "Hai un viaggio in programma?",
     ctaText:
       "Trasforma lo spazio inutilizzato nel tuo bagaglio in un'opportunità.",
 
     ctaButton: "Pubblica il tuo viaggio",
 
-    footerCompany: "Hez Maak",
+    security: "Sicurezza",
+    verifyIdentity: "Verifica identità",
+    reviewsFooter: "Recensioni",
+    assistance: "Assistenza",
 
-    footerHow: "Come funziona",
-    footerTrips: "Viaggi",
-    footerRequests: "Richieste",
+    loginTitle: "Accedi a Hez Maak",
+    loginDescription: "Accedi al tuo account.",
+    email: "Email",
+    password: "Password",
+    loginButton: "Accedi",
+    noAccount: "Non hai un account?",
+    register: "Registrati",
 
-    footerSecurity: "Sicurezza",
-    footerVerification: "Verifica identità",
-    footerReviews: "Recensioni",
-    footerSupport: "Assistenza"
+    registerTitle: "Crea account",
+    registerDescription: "Entra nella comunità Hez Maak.",
+    fullName: "Nome e cognome",
+    private: "👤 Privato",
+    traveler: "✈️ Viaggiatore",
+    company: "🚚 Azienda / Trasportatore",
+    registerButton: "Registrati",
+    alreadyAccount: "Hai già un account?",
+    
+    publishTripTitle: "✈️ Pubblica viaggio",
+    tripDescriptionIntro: "Indica il tuo viaggio.",
+    departure: "Partenza",
+    arrival: "Arrivo",
+    departureCity: "Città di partenza",
+    arrivalCity: "Città di arrivo",
+    availableKg: "Kg disponibili",
+    priceKg: "Prezzo €/kg",
+    description: "Descrizione",
+    ticket: "📄 Biglietto del viaggio",
+    ticketHelp:
+      "Carica una foto, screenshot o PDF del biglietto. Il biglietto è privato e sarà visibile solo all'amministratore per la verifica. Massimo 10 MB.",
+    publishTripButton: "Pubblica viaggio",
+
+    requestTitle: "📦 Pubblica richiesta",
+    whatTransport: "Cosa vuoi trasportare?",
+    weight: "Peso kg",
+    budget: "Budget €",
+    publishRequestButton: "Pubblica richiesta",
+
+    profileTitle: "IL MIO PROFILO",
+    hello: "Ciao",
+    manageAccount: "Gestisci il tuo account Hez Maak.",
+    personalInfo: "Informazioni personali",
+    edit: "Modifica",
+    country: "Paese",
+    accountType: "Tipo account",
+    securityTitle: "SICUREZZA",
+    verifyTitle: "🪪 Verifica la tua identità",
+    verificationDescription:
+      "Verifica la tua identità per ottenere il badge ✓ e aumentare la fiducia degli altri utenti.",
+    verifiedProfile: "✓ Profilo verificato",
+    notVerified: "○ Profilo non verificato",
+    verified: "✓ Verificato",
+
+    myActivity: "La mia attività",
+    myTrips: "I miei viaggi",
+    myTripsDescription: "Gestisci i tuoi viaggi",
+    myRequests: "Le mie richieste",
+    myRequestsDescription: "Gestisci le tue richieste",
+    myReviews: "Le mie recensioni",
+    myReviewsDescription: "Visualizza le valutazioni",
+
+    verificationTitle: "Verifica la tua identità",
+    verificationIntro:
+      "Per garantire maggiore sicurezza alla comunità Hez Maak, chiediamo a tutti gli utenti di verificare la propria identità.",
+    documentType: "Tipo di documento",
+    passport: "🛂 Passaporto",
+    identityCard: "🪪 Carta d'identità",
+    document: "Documento",
+    documentHelp:
+      "Formati accettati: JPG, PNG, PDF. Dimensione massima: 10 MB.",
+    sendDocument: "🔐 Invia documento",
+
+    pendingVerification: "Verifica in revisione",
+    pendingText:
+      "Abbiamo ricevuto il tuo documento. Un amministratore lo controllerà.",
+    approvedVerification: "Identità verificata",
+    approvedText:
+      "Il tuo profilo possiede il badge verificato.",
+    rejectedVerification: "Verifica rifiutata",
+
+    back: "← Torna a Hez Maak",
+    logout: "🚪 Esci",
+
+    verifiedTrip: "✈️ Viaggio verificato",
+    ticketPending: "⏳ Biglietto in verifica",
+    verificationRejected: "⚠️ Verifica non approvata",
+    contact: "Contatta",
+
+    admin: "🔐 Admin",
+    administration: "AMMINISTRAZIONE",
+    adminTitle: "Pannello Hez Maak 🔐",
+    adminDescription: "Gestione delle verifiche identità",
+    pendingRequests: "Richieste in attesa",
+    viewDocument: "👁 Visualizza documento",
+    approve: "✓ Approva",
+    reject: "✕ Rifiuta"
 
   },
 
 
-  /* =====================
-     FRANCESE
-  ===================== */
-
   fr: {
+
+    languageName: "🇫🇷 FR",
 
     navTrips: "Voyages",
     navRequests: "Demandes",
     navHow: "Comment ça marche",
-    loginRegister: "Connexion / Inscription",
+    login: "Connexion / Inscription",
+    profile: "👤 Mon profil",
 
-    route: "🇮🇹 Italie ↔ 🇹🇳 Tunisie",
-
-    heroTitle: `
-      Transportez ce dont les autres ont besoin.
-      <span>Connectez-vous.</span>
-      Gagnez.
-    `,
-
+    heroTitle:
+      "Transportez ce dont les autres ont besoin. Connectez-vous. Gagnez.",
     heroText:
-      "Hez Maak met en relation les personnes qui souhaitent envoyer des objets entre l'Italie et la Tunisie avec des voyageurs et des transporteurs disposant d'espace.",
+      "Hez Maak met en relation les personnes qui souhaitent recevoir des objets entre l'Italie et la Tunisie avec des voyageurs et transporteurs disposant d'espace.",
 
     traveling: "✈️ Je voyage",
-    lookingFor: "📦 Je cherche quelqu'un",
+    looking: "📦 Je cherche quelqu'un",
 
-    trustVerified: "✓ Utilisateurs vérifiés",
-    trustReviews: "⭐ Avis",
-    trustPayments: "🔐 Paiements sécurisés",
+    verifiedUsers: "Utilisateurs vérifiés",
+    reviews: "Avis",
+    securePayments: "Paiements sécurisés",
+
+    routeTitle: "✈️ Un voyage, une opportunité",
+    italy: "Italie",
+    tunisia: "Tunisie",
+    routeDescription:
+      "Vous avez de la place dans votre valise ? Vous pouvez aider quelqu'un et gagner de l'argent.",
 
     howLabel: "COMMENT ÇA MARCHE",
     howTitle: "Simple, sûr, humain.",
@@ -2479,172 +2449,661 @@ const translations = {
     publishTrip: "+ Publier un voyage",
 
     requestsLabel: "DEMANDES",
-    requestsTitle: "Que recherchent les personnes ?",
+    requestsTitle: "Que recherchent les gens ?",
     publishRequest: "+ Publier une demande",
+
+    loading: "Chargement...",
 
     ctaTitle: "Vous avez un voyage prévu ?",
     ctaText:
-      "Transformez l'espace inutilisé de vos bagages en opportunité.",
+      "Transformez l'espace inutilisé de votre bagage en opportunité.",
 
     ctaButton: "Publier votre voyage",
 
-    footerCompany: "Hez Maak",
+    security: "Sécurité",
+    verifyIdentity: "Vérification d'identité",
+    reviewsFooter: "Avis",
+    assistance: "Assistance",
 
-    footerHow: "Comment ça marche",
-    footerTrips: "Voyages",
-    footerRequests: "Demandes",
+    loginTitle: "Connexion à Hez Maak",
+    loginDescription: "Connectez-vous à votre compte.",
+    email: "Email",
+    password: "Mot de passe",
+    loginButton: "Se connecter",
+    noAccount: "Vous n'avez pas de compte ?",
+    register: "S'inscrire",
 
-    footerSecurity: "Sécurité",
-    footerVerification: "Vérification d'identité",
-    footerReviews: "Avis",
-    footerSupport: "Assistance"
+    registerTitle: "Créer un compte",
+    registerDescription: "Rejoignez la communauté Hez Maak.",
+    fullName: "Nom et prénom",
+    private: "👤 Particulier",
+    traveler: "✈️ Voyageur",
+    company: "🚚 Entreprise / Transporteur",
+    registerButton: "S'inscrire",
+    alreadyAccount: "Vous avez déjà un compte ?",
+
+    publishTripTitle: "✈️ Publier un voyage",
+    tripDescriptionIntro: "Indiquez votre voyage.",
+    departure: "Départ",
+    arrival: "Arrivée",
+    departureCity: "Ville de départ",
+    arrivalCity: "Ville d'arrivée",
+    availableKg: "Kg disponibles",
+    priceKg: "Prix €/kg",
+    description: "Description",
+    ticket: "📄 Billet du voyage",
+    ticketHelp:
+      "Téléchargez une photo, une capture d'écran ou un PDF du billet. Le billet est privé et sera visible uniquement par l'administrateur pour vérification. Maximum 10 Mo.",
+    publishTripButton: "Publier le voyage",
+
+    requestTitle: "📦 Publier une demande",
+    whatTransport: "Que souhaitez-vous transporter ?",
+    weight: "Poids kg",
+    budget: "Budget €",
+    publishRequestButton: "Publier la demande",
+
+    profileTitle: "MON PROFIL",
+    hello: "Bonjour",
+    manageAccount: "Gérez votre compte Hez Maak.",
+    personalInfo: "Informations personnelles",
+    edit: "Modifier",
+    country: "Pays",
+    accountType: "Type de compte",
+    securityTitle: "SÉCURITÉ",
+    verifyTitle: "🪪 Vérifiez votre identité",
+    verificationDescription:
+      "Vérifiez votre identité pour obtenir le badge ✓ et renforcer la confiance des autres utilisateurs.",
+    verifiedProfile: "✓ Profil vérifié",
+    notVerified: "○ Profil non vérifié",
+    verified: "✓ Vérifié",
+
+    myActivity: "Mon activité",
+    myTrips: "Mes voyages",
+    myTripsDescription: "Gérer vos voyages",
+    myRequests: "Mes demandes",
+    myRequestsDescription: "Gérer vos demandes",
+    myReviews: "Mes avis",
+    myReviewsDescription: "Voir vos évaluations",
+
+    verificationTitle: "Vérifiez votre identité",
+    verificationIntro:
+      "Pour garantir davantage de sécurité à la communauté Hez Maak, nous demandons à tous les utilisateurs de vérifier leur identité.",
+    documentType: "Type de document",
+    passport: "🛂 Passeport",
+    identityCard: "🪪 Carte d'identité",
+    document: "Document",
+    documentHelp:
+      "Formats acceptés : JPG, PNG, PDF. Taille maximale : 10 Mo.",
+    sendDocument: "🔐 Envoyer le document",
+
+    pendingVerification: "Vérification en cours",
+    pendingText:
+      "Nous avons reçu votre document. Un administrateur va le vérifier.",
+    approvedVerification: "Identité vérifiée",
+    approvedText:
+      "Votre profil possède le badge vérifié.",
+    rejectedVerification: "Vérification refusée",
+
+    back: "← Retour à Hez Maak",
+    logout: "🚪 Déconnexion",
+
+    verifiedTrip: "✈️ Voyage vérifié",
+    ticketPending: "⏳ Billet en vérification",
+    verificationRejected: "⚠️ Vérification refusée",
+    contact: "Contacter",
+
+    admin: "🔐 Admin",
+    administration: "ADMINISTRATION",
+    adminTitle: "Panneau Hez Maak 🔐",
+    adminDescription: "Gestion des vérifications d'identité",
+    pendingRequests: "Demandes en attente",
+    viewDocument: "👁 Voir le document",
+    approve: "✓ Approuver",
+    reject: "✕ Refuser"
 
   },
 
 
-  /* =====================
-     ARABO / TUNISINO
-  ===================== */
+  tn: {
 
-  ar: {
+    languageName: "🇹🇳 TN",
 
-    navTrips: "الرحلات",
+    navTrips: "السفرات",
     navRequests: "الطلبات",
     navHow: "كيفاش تخدم",
-    loginRegister: "دخول / تسجيل",
+    login: "دخول / تسجيل",
+    profile: "👤 البروفيل متاعي",
 
-    route: "🇮🇹 إيطاليا ↔ 🇹🇳 تونس",
-
-    heroTitle: `
-      هزّ اللي يلزم.
-      <span>تواصل.</span>
-      واربح.
-    `,
+    heroTitle:
+      "وصّل الحاجة. تواصل. واربح.",
 
     heroText:
-      "هزّ معاك تربط بين الناس اللي يحبوا يبعثوا حاجات بين تونس وإيطاليا وبين المسافرين والناقلين اللي عندهم بلاصة متوفرة.",
+      "هزّ معاك تربط بين الناس اللي تحب تبعث حاجات بين تونس وإيطاليا والمسافرين والناقلين اللي عندهم بلاصة.",
 
     traveling: "✈️ أنا مسافر",
-    lookingFor: "📦 نلوج على شكون",
+    looking: "📦 نلوج على شكون",
 
-    trustVerified: "✓ مستخدمين موثوقين",
-    trustReviews: "⭐ تقييمات",
-    trustPayments: "🔐 دفع آمن",
+    verifiedUsers: "مستعملين موثوقين",
+    reviews: "التقييمات",
+    securePayments: "خلاص آمن",
+
+    routeTitle: "✈️ سفرة وفرصة",
+    italy: "إيطاليا",
+    tunisia: "تونس",
+    routeDescription:
+      "عندك بلاصة في الفاليزة؟ تنجم تعاون شكون وتربح فلوس.",
 
     howLabel: "كيفاش تخدم",
-    howTitle: "سهلة، آمنة وإنسانية.",
+    howTitle: "ساهلة، آمنة وإنسانية.",
 
     step1Title: "انشر",
     step1Text:
-      "انشر رحلتك ولا قول شنوة تحب تبعث.",
+      "انشر سفرتك ولا قول شنوّة تحب تبعث.",
 
     step2Title: "تواصل",
     step2Text:
-      "القى شخص ماشي في نفس الطريق.",
+      "لقى شكون ماشي في نفس الطريق متاعك.",
 
-    step3Title: "نظم",
+    step3Title: "نظّم",
     step3Text:
-      "اتصل بالشخص واتفقوا على التفاصيل.",
+      "تواصل مع الشخص الآخر واتفقوا على التفاصيل.",
 
     step4Title: "قيّم",
     step4Text:
-      "بعد الخدمة خلي تقييم.",
+      "بعد الخدمة خلّي تقييم.",
 
-    tripsLabel: "الرحلات المتوفرة",
-    tripsTitle: "القى مسافر",
-    publishTrip: "+ انشر رحلة",
+    tripsLabel: "السفرات الموجودة",
+    tripsTitle: "لقى مسافر",
+    publishTrip: "+ انشر سفرة",
 
     requestsLabel: "الطلبات",
-    requestsTitle: "شنوة يلوجوا عليه الناس؟",
+    requestsTitle: "شنوّة الناس تلوج عليه؟",
     publishRequest: "+ انشر طلب",
 
-    ctaTitle: "عندك رحلة مبرمجة؟",
+    loading: "جاري التحميل...",
+
+    ctaTitle: "عندك سفرة قريبة؟",
     ctaText:
-      "حوّل البلاصة الفارغة في متاعك لفرصة للربح.",
+      "استغل البلاصة الفارغة في الفاليزة متاعك وحوّلها لفرصة.",
 
-    ctaButton: "انشر رحلتك",
+    ctaButton: "انشر سفرتك",
 
-    footerCompany: "هزّ معاك",
+    security: "الأمان",
+    verifyIdentity: "تثبّت من الهوية",
+    reviewsFooter: "التقييمات",
+    assistance: "المساعدة",
 
-    footerHow: "كيفاش تخدم",
-    footerTrips: "الرحلات",
-    footerRequests: "الطلبات",
+    loginTitle: "ادخل لهزّ معاك",
+    loginDescription: "ادخل للحساب متاعك.",
+    email: "الإيميل",
+    password: "كلمة السر",
+    loginButton: "دخول",
+    noAccount: "ما عندكش حساب؟",
+    register: "سجّل",
 
-    footerSecurity: "الأمان",
-    footerVerification: "تأكيد الهوية",
-    footerReviews: "التقييمات",
-    footerSupport: "المساعدة"
+    registerTitle: "اعمل حساب",
+    registerDescription: "ادخل لمجتمع هزّ معاك.",
+    fullName: "الاسم واللقب",
+    private: "👤 شخص عادي",
+    traveler: "✈️ مسافر",
+    company: "🚚 شركة / ناقل",
+    registerButton: "سجّل",
+    alreadyAccount: "عندك حساب؟",
+
+    publishTripTitle: "✈️ انشر سفرة",
+    tripDescriptionIntro: "عطينا تفاصيل السفرة متاعك.",
+    departure: "الانطلاق",
+    arrival: "الوصول",
+    departureCity: "مدينة الانطلاق",
+    arrivalCity: "مدينة الوصول",
+    availableKg: "الكيلوغرامات المتوفرة",
+    priceKg: "السوم €/كغ",
+    description: "الوصف",
+    ticket: "📄 تذكرة السفر",
+    ticketHelp:
+      "حمّل تصويرة، screenshot ولا PDF متاع التذكرة. التذكرة خاصة وما يشوفها كان الأدمن للتثبّت. الحد الأقصى 10 ميغا.",
+    publishTripButton: "انشر السفرة",
+
+    requestTitle: "📦 انشر طلب",
+    whatTransport: "شنوّة تحب تبعث؟",
+    weight: "الوزن بالكغ",
+    budget: "الميزانية €",
+    publishRequestButton: "انشر الطلب",
+
+    profileTitle: "البروفيل متاعي",
+    hello: "عسلامة",
+    manageAccount: "تصرّف في الحساب متاعك في هزّ معاك.",
+    personalInfo: "المعلومات الشخصية",
+    edit: "تعديل",
+    country: "البلاد",
+    accountType: "نوع الحساب",
+    securityTitle: "الأمان",
+    verifyTitle: "🪪 ثبّت هويتك",
+    verificationDescription:
+      "ثبّت هويتك باش تاخو العلامة ✓ وتزيد ثقة الناس فيك.",
+    verifiedProfile: "✓ البروفيل موثوق",
+    notVerified: "○ البروفيل موش موثوق",
+    verified: "✓ موثوق",
+
+    myActivity: "النشاط متاعي",
+    myTrips: "السفرات متاعي",
+    myTripsDescription: "تصرّف في السفرات متاعك",
+    myRequests: "الطلبات متاعي",
+    myRequestsDescription: "تصرّف في الطلبات متاعك",
+    myReviews: "التقييمات متاعي",
+    myReviewsDescription: "شوف التقييمات",
+
+    verificationTitle: "ثبّت هويتك",
+    verificationIntro:
+      "باش نحافظوا على الأمان في مجتمع هزّ معاك، نطلبوا من كل المستعملين يثبتوا هويتهم.",
+    documentType: "نوع الوثيقة",
+    passport: "🛂 باسبورت",
+    identityCard: "🪪 بطاقة تعريف",
+    document: "الوثيقة",
+    documentHelp:
+      "الصيغ المقبولة: JPG, PNG, PDF. الحجم الأقصى: 10 ميغا.",
+    sendDocument: "🔐 ابعث الوثيقة",
+
+    pendingVerification: "التثبّت جاري",
+    pendingText:
+      "وصلتنا الوثيقة متاعك. الأدمن باش يراجعها.",
+    approvedVerification: "الهوية موثوقة",
+    approvedText:
+      "البروفيل متاعك عندو علامة التوثيق.",
+    rejectedVerification: "التثبّت ترفض",
+
+    back: "← ارجع لهزّ معاك",
+    logout: "🚪 خروج",
+
+    verifiedTrip: "✈️ سفرة موثوقة",
+    ticketPending: "⏳ التذكرة قاعدة تتراجع",
+    verificationRejected: "⚠️ التثبّت ما تقبلش",
+    contact: "تواصل",
+
+    admin: "🔐 Admin",
+    administration: "الإدارة",
+    adminTitle: "لوحة هزّ معاك 🔐",
+    adminDescription: "إدارة التثبّت من الهوية",
+    pendingRequests: "طلبات تستنى",
+    viewDocument: "👁 شوف الوثيقة",
+    approve: "✓ وافق",
+    reject: "✕ ارفض"
 
   }
 
 };
 
 
-function cycleLanguage() {
+let currentLanguage =
+  localStorage.getItem("hezmaak_language") || "it";
 
-  currentLanguage++;
 
-  if (
-    currentLanguage >= languages.length
-  ) {
-    currentLanguage = 0;
-  }
+function t(key) {
 
-  const language =
-    languages[currentLanguage];
-
-  document
-    .getElementById("languageButton")
-    .textContent =
-    language.label;
-
-  translatePage(language.code);
+  return (
+    translations[currentLanguage]?.[key] ||
+    translations.it[key] ||
+    key
+  );
 
 }
 
 
-function translatePage(lang) {
+function setLanguage(lang) {
 
-  const t = translations[lang];
+  if (!translations[lang]) {
+    lang = "it";
+  }
 
-  if (!t) {
-    return;
+  currentLanguage = lang;
+
+  localStorage.setItem(
+    "hezmaak_language",
+    lang
+  );
+
+  document.documentElement.lang =
+    lang === "tn" ? "ar" : lang;
+
+  document.documentElement.dir =
+    lang === "tn" ? "rtl" : "ltr";
+
+  const button =
+    document.getElementById(
+      "languageButton"
+    );
+
+  if (button) {
+    button.textContent =
+      t("languageName");
+  }
+
+  translatePage();
+
+  refreshDynamicContent();
+
+}
+
+
+function cycleLanguage() {
+
+  const order = [
+    "it",
+    "fr",
+    "tn"
+  ];
+
+  let index =
+    order.indexOf(
+      currentLanguage
+    );
+
+  index++;
+
+  if (index >= order.length) {
+    index = 0;
+  }
+
+  setLanguage(
+    order[index]
+  );
+
+}
+
+
+function translatePage() {
+
+  const translationsMap = {
+
+    "heroTitle": "heroTitle",
+    "heroText": "heroText"
+
+  };
+
+
+  Object.entries(
+    translationsMap
+  ).forEach(
+    ([id, key]) => {
+
+      const element =
+        document.getElementById(id);
+
+      if (element) {
+        element.textContent =
+          t(key);
+      }
+
+    }
+  );
+
+
+  const nav =
+    document.getElementById(
+      "mainNav"
+    );
+
+  if (nav) {
+
+    const links =
+      nav.querySelectorAll(
+        "a"
+      );
+
+    if (links[0])
+      links[0].textContent =
+        t("navTrips");
+
+    if (links[1])
+      links[1].textContent =
+        t("navRequests");
+
+    if (links[2])
+      links[2].textContent =
+        t("navHow");
+
   }
 
 
-  document.documentElement.lang = lang;
+  const authButton =
+    document.getElementById(
+      "authButton"
+    );
 
+  if (
+    authButton &&
+    !currentUser
+  ) {
 
-  if (lang === "ar") {
-
-    document.documentElement.dir = "rtl";
-
-  } else {
-
-    document.documentElement.dir = "ltr";
+    authButton.textContent =
+      t("login");
 
   }
 
 
-  document
-    .querySelectorAll("[data-i18n]")
-    .forEach(element => {
+  document.querySelectorAll(
+    ".badge"
+  ).forEach(
+    element => {
 
-      const key =
-        element.dataset.i18n;
+      element.textContent =
+        currentLanguage === "tn"
+          ? "🇮🇹 إيطاليا ↔ 🇹🇳 تونس"
+          : currentLanguage === "fr"
+          ? "🇮🇹 Italie ↔ 🇹🇳 Tunisie"
+          : "🇮🇹 Italia ↔ 🇹🇳 Tunisia";
+
+    }
+  );
+
+
+  const sectionLabels =
+    document.querySelectorAll(
+      ".section-label"
+    );
+
+  if (sectionLabels[0])
+    sectionLabels[0].textContent =
+      t("tripsLabel");
+
+  if (sectionLabels[1])
+    sectionLabels[1].textContent =
+      t("requestsLabel");
+
+
+  const sectionTitles =
+    document.querySelectorAll(
+      ".section-header h2"
+    );
+
+  if (sectionTitles[0])
+    sectionTitles[0].textContent =
+      t("tripsTitle");
+
+  if (sectionTitles[1])
+    sectionTitles[1].textContent =
+      t("requestsTitle");
+
+
+  const publishButtons =
+    document.querySelectorAll(
+      '[data-action="publish-trip"]'
+    );
+
+  publishButtons.forEach(
+    button => {
 
       if (
-        t[key] !== undefined
+        button.classList.contains(
+          "large"
+        )
       ) {
 
-        element.innerHTML =
-          t[key];
+        button.textContent =
+          t("traveling");
+
+      } else {
+
+        button.textContent =
+          t("publishTrip");
 
       }
 
-    });
+    }
+  );
+
+
+  document.querySelectorAll(
+    '[data-action="publish-request"]'
+  ).forEach(
+    button => {
+
+      if (
+        button.classList.contains(
+          "large"
+        )
+      ) {
+
+        button.textContent =
+          t("looking");
+
+      } else {
+
+        button.textContent =
+          t("publishRequest");
+
+      }
+
+    }
+  );
 
 }
+
+
+function refreshDynamicContent() {
+
+  /*
+    Se un modal è aperto, lo ricreiamo
+    nella lingua selezionata.
+  */
+
+  const tripModal =
+    document.getElementById(
+      "tripModal"
+    );
+
+  const requestModal =
+    document.getElementById(
+      "requestModal"
+    );
+
+  const authModal =
+    document.getElementById(
+      "authModal"
+    );
+
+  const verificationModal =
+    document.getElementById(
+      "verificationModal"
+    );
+
+
+  if (tripModal) {
+
+    const visible =
+      tripModal.style.display !==
+      "none";
+
+    tripModal.remove();
+
+    createTripModal();
+
+    if (visible) {
+      openTripModal();
+    }
+
+  }
+
+
+  if (requestModal) {
+
+    const visible =
+      requestModal.style.display !==
+      "none";
+
+    requestModal.remove();
+
+    createRequestModal();
+
+    if (visible) {
+      openRequestModal();
+    }
+
+  }
+
+
+  if (authModal) {
+
+    const visible =
+      authModal.style.display !==
+      "none";
+
+    authModal.remove();
+
+    createAuthModal();
+
+    if (visible) {
+      openAuth("login");
+    }
+
+  }
+
+
+  if (verificationModal) {
+
+    verificationModal.remove();
+
+    if (currentUser) {
+      openVerification();
+    }
+
+  }
+
+
+  if (
+    document.getElementById(
+      "profilePage"
+    )
+  ) {
+
+    showProfile();
+
+  }
+
+}
+
+
+function applySavedLanguage() {
+
+  setLanguage(
+    currentLanguage
+  );
+
+}
+
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    setTimeout(
+      applySavedLanguage,
+      100
+    );
+
+  }
+);
+
 /* =====================================================
    DARK MODE
 ===================================================== */
