@@ -1249,3 +1249,48 @@ body.dark .verification-icon {
   line-height: 1.5;
   color: #6b7280;
 }
+/* =========================
+   SUPPORTO LINGUA ARABA
+========================= */
+
+html[dir="rtl"] {
+  direction: rtl;
+}
+
+html[dir="rtl"] body {
+  text-align: right;
+}
+
+html[dir="rtl"] .nav {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .hero-grid {
+  direction: rtl;
+}
+
+html[dir="rtl"] .route {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .hero-buttons {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .trust {
+  direction: rtl;
+}
+
+html[dir="rtl"] .section-header {
+  direction: rtl;
+}
+
+html[dir="rtl"] .footer-grid {
+  direction: rtl;
+}
+
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[dir="rtl"] select {
+  text-align: right;
+}
