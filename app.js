@@ -3955,11 +3955,11 @@ function requestCard(request) {
 
 ${
   currentUser &&
-  currentUser.id !== request.user_id
+  currentUser.id !== trip.user_id
 
     ? `<button
         class="primary"
-        onclick="contactUser('${request.user_id}', null, ${request.id})">
+        onclick="contactUser('${trip.user_id}')">
 
         💬 Contatta
 
@@ -3971,7 +3971,7 @@ ${
 
 }
 
-/* ====================================================  CONTACT      ===================================================== 
+/* ====================================================  CONTACT      =====================================================*/ 
   function contactUser(userId) {
 
   if (!currentUser) {
@@ -3990,7 +3990,7 @@ ${
   }
 
   alert("Chat in preparazione.");
-}*/
+}
 /* =====================================================
    MESSAGGING
 ===================================================== */
