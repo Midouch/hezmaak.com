@@ -4728,54 +4728,337 @@ async function deleteTrip(tripId) {
 }
 async function showMyRequests() {
 
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
   const {
     data,
     error
-  } =
-    await supabaseClient
-      .from("requests")
-      .select("*")
-      .eq(
-        "user_id",
-        currentUser.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
-
+  } = await supabaseClient
+    .from("requests")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .order("created_at", {
+      ascending: false
+    });
 
   if (error) {
 
+    console.error(error);
+
     alert(
+      "Errore caricamento richieste: " +
       error.message
     );
 
     return;
-
   }
 
+  const oldPage =
+    document.getElementById("myRequestsPage");
 
-  if (!data.length) {
+  if (oldPage) {
+    oldPage.remove();
+  }
+
+  const page =
+    document.createElement("div");
+
+  page.id = "myRequestsPage";
+
+  page.innerHTML = `
+
+    <div class="profile-page">
+
+      <div class="container">
+
+        <button
+          class="back-button"
+          onclick="closeMyRequests()">
+
+          ← Torna al profilo
+
+        </button>
+
+        <div class="profile-header">
+
+          <div>
+
+            <span class="section-label">
+              LA MIA ATTIVITÀ
+            </span>
+
+            <h1>
+              📦 Le mie richieste
+            </h1>
+
+            <p>
+              Gestisci le richieste che hai pubblicato.
+            </p>
+
+          </div>
+
+          <button
+            class="primary"
+            onclick="closeMyRequests(); openRequestModal();">
+
+            + Nuova richiesta
+
+          </button>
+
+        </div>
+
+        <div class="my-activity-list">
+
+          ${
+            data.length
+              ? data.map(myRequestCard).join("")
+              : `
+
+                <div class="profile-card empty-state">
+
+                  <div class="avatar">
+                    📦
+                  </div>
+
+                  <h3>
+                    Nessuna richiesta
+                  </h3>
+
+                  <p>
+                    Non hai ancora pubblicato
+                    nessuna richiesta.
+                  </p>
+
+                  <button
+                    class="primary"
+                    onclick="closeMyRequests(); openRequestModal();">
+
+                    Pubblica una richiesta
+
+                  </button>
+
+                </div>
+
+              `
+          }
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(page);
+
+  document.body.style.overflow = "hidden";
+}
+function myRequestCard(request) {
+
+  const date = request.needed_date
+    ? new Date(
+        request.needed_date + "T12:00:00"
+      ).toLocaleDateString("it-IT")
+    : "Non specificata";
+
+  let statusLabel = "Aperta";
+
+  if (request.status === "open") {
+    statusLabel = "🟢 Aperta";
+  } else if (request.status === "closed") {
+    statusLabel = "⚪ Chiusa";
+  } else if (request.status === "cancelled") {
+    statusLabel = "🔴 Annullata";
+  }
+
+  return `
+
+    <div
+      class="profile-card activity-card"
+      id="my-request-${request.id}">
+
+      <div class="activity-card-header">
+
+        <div>
+
+          <span class="section-label">
+            RICHIESTA
+          </span>
+
+          <h3>
+
+            ${flag(request.departure_country)}
+
+            ${escapeHtml(request.departure_city)}
+
+            →
+
+            ${flag(request.arrival_country)}
+
+            ${escapeHtml(request.arrival_city)}
+
+          </h3>
+
+        </div>
+
+        <span class="activity-status">
+          ${statusLabel}
+        </span>
+
+      </div>
+
+
+      <div class="profile-info-grid">
+
+        <div>
+
+          <span>
+            Data necessaria
+          </span>
+
+          <strong>
+            📅 ${date}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Oggetto
+          </span>
+
+          <strong>
+            ${escapeHtml(
+              request.item_description || "-"
+            )}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Peso
+          </span>
+
+          <strong>
+            ${
+              request.weight_kg
+                ? request.weight_kg + " kg"
+                : "-"
+            }
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Budget
+          </span>
+
+          <strong>
+            ${
+              request.budget
+                ? "€" + request.budget
+                : "-"
+            }
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <div class="activity-actions">
+
+        ${
+          request.status === "open"
+
+            ? `
+
+              <button
+                class="danger-button"
+                onclick="deleteMyRequest('${request.id}')">
+
+                🗑 Elimina richiesta
+
+              </button>
+
+            `
+
+            : ""
+
+        }
+
+      </div>
+
+    </div>
+
+  `;
+}
+function closeMyRequests() {
+
+  const page =
+    document.getElementById(
+      "myRequestsPage"
+    );
+
+  if (page) {
+    page.remove();
+  }
+
+  document.body.style.overflow = "";
+
+}
+async function deleteMyRequest(requestId) {
+
+  if (
+    !confirm(
+      "Vuoi davvero eliminare questa richiesta?"
+    )
+  ) {
+    return;
+  }
+
+  const {
+    error
+  } = await supabaseClient
+    .from("requests")
+    .delete()
+    .eq("id", requestId)
+    .eq("user_id", currentUser.id);
+
+  if (error) {
 
     alert(
-      t("noRequestsUser")
+      "Errore eliminazione: " +
+      error.message
     );
 
     return;
-
   }
 
+  const card =
+    document.getElementById(
+      `my-request-${requestId}`
+    );
 
-  alert(
-    `${data.length} ${t("myRequests")}`
-  );
+  if (card) {
+    card.remove();
+  }
+
+  loadRequests();
 
 }
-
-
 function showMyReviews() {
 
   alert(
