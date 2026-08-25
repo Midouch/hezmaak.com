@@ -4129,54 +4129,391 @@ function editProfile() {
 
 async function showMyTrips() {
 
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
   const {
     data,
     error
-  } =
-    await supabaseClient
-      .from("trips")
-      .select("*")
-      .eq(
-        "user_id",
-        currentUser.id
-      )
-      .order(
-        "travel_date",
-        {
-          ascending: false
-        }
-      );
-
+  } = await supabaseClient
+    .from("trips")
+    .select(`
+      id,
+      departure_country,
+      arrival_country,
+      departure_city,
+      arrival_city,
+      travel_date,
+      available_kg,
+      price_per_kg,
+      description,
+      verification_status,
+      status,
+      created_at
+    `)
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .order(
+      "travel_date",
+      {
+        ascending: false
+      }
+    );
 
   if (error) {
 
+    console.error(error);
+
     alert(
+      "Errore caricamento viaggi: " +
       error.message
     );
 
     return;
-
   }
 
-
-  if (!data.length) {
-
-    alert(
-      t("noTripsUser")
+  const old =
+    document.getElementById(
+      "myTripsPage"
     );
 
-    return;
+  if (old) {
+    old.remove();
+  }
+
+  const page =
+    document.createElement("div");
+
+  page.id =
+    "myTripsPage";
+
+  page.innerHTML = `
+
+    <div class="profile-page">
+
+      <div class="container">
+
+        <button
+          class="back-button"
+          onclick="closeMyTrips()">
+
+          ← Torna al profilo
+
+        </button>
+
+
+        <div class="profile-header">
+
+          <div>
+
+            <span class="section-label">
+              LA MIA ATTIVITÀ
+            </span>
+
+            <h1>
+              ✈️ I miei viaggi
+            </h1>
+
+            <p>
+              Gestisci i viaggi che hai pubblicato.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        ${
+          !data.length
+
+          ? `
+
+            <div class="profile-card empty-state">
+
+              <div class="avatar">
+                ✈️
+              </div>
+
+              <h3>
+                Non hai ancora pubblicato viaggi
+              </h3>
+
+              <p>
+                Pubblica il tuo primo viaggio
+                e aiuta qualcuno a trasportare
+                ciò di cui ha bisogno.
+              </p>
+
+              <button
+                class="primary"
+                onclick="
+                  closeMyTrips();
+                  openTripModal();
+                ">
+
+                + Pubblica viaggio
+
+              </button>
+
+            </div>
+
+          `
+
+          : `
+
+            <div class="my-activity-list">
+
+              ${data
+                .map(
+                  trip =>
+                    myTripHTML(trip)
+                )
+                .join("")
+              }
+
+            </div>
+
+          `
+        }
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(page);
+
+  document.body.style.overflow =
+    "hidden";
+}
+
+function myTripHTML(trip) {
+
+  const date =
+    trip.travel_date
+      ? new Date(
+          trip.travel_date +
+          "T12:00:00"
+        ).toLocaleDateString(
+          "it-IT"
+        )
+      : "-";
+
+
+  let verificationHTML = "";
+
+  if (
+    trip.verification_status ===
+    "approved"
+  ) {
+
+    verificationHTML = `
+      <span class="verified-trip">
+        ✓ Biglietto verificato
+      </span>
+    `;
+
+  } else if (
+    trip.verification_status ===
+    "pending"
+  ) {
+
+    verificationHTML = `
+      <span class="pending-trip">
+        ⏳ Biglietto in verifica
+      </span>
+    `;
+
+  } else {
+
+    verificationHTML = `
+      <span class="rejected-trip">
+        ⚠️ Verifica non approvata
+      </span>
+    `;
 
   }
 
 
-  alert(
-    `${data.length} ${t("myTrips")}`
-  );
+  return `
+
+    <article
+      class="profile-card activity-card"
+      id="trip-${trip.id}">
+
+      <div class="activity-header">
+
+        <div>
+
+          <span class="section-label">
+            VIAGGIO
+          </span>
+
+          <h3>
+
+            ${flag(
+              trip.departure_country
+            )}
+
+            ${escapeHtml(
+              trip.departure_city
+            )}
+
+            →
+
+            ${flag(
+              trip.arrival_country
+            )}
+
+            ${escapeHtml(
+              trip.arrival_city
+            )}
+
+          </h3>
+
+        </div>
+
+        ${verificationHTML}
+
+      </div>
+
+
+      <div class="activity-info">
+
+        <div>
+
+          <span>
+            📅 Data
+          </span>
+
+          <strong>
+            ${date}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            📦 Spazio disponibile
+          </span>
+
+          <strong>
+            ${trip.available_kg} kg
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            💰 Prezzo
+          </span>
+
+          <strong>
+
+            ${
+              trip.price_per_kg
+                ? `€${trip.price_per_kg}/kg`
+                : "Non specificato"
+            }
+
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            📌 Stato
+          </span>
+
+          <strong>
+
+            ${
+              trip.status === "active"
+                ? "🟢 Attivo"
+                : "⚪ Chiuso"
+            }
+
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      ${
+        trip.description
+
+          ? `
+
+            <p class="activity-description">
+
+              ${escapeHtml(
+                trip.description
+              )}
+
+            </p>
+
+          `
+
+          : ""
+      }
+
+
+      <div class="activity-actions">
+
+        <button
+          class="secondary"
+          onclick="
+            editTrip('${trip.id}')
+          ">
+
+          ✏️ Modifica
+
+        </button>
+
+
+        <button
+          class="danger-button"
+          onclick="
+            deleteTrip('${trip.id}')
+          ">
+
+          🗑 Elimina
+
+        </button>
+
+      </div>
+
+    </article>
+
+  `;
+}
+function closeMyTrips() {
+
+  const page =
+    document.getElementById(
+      "myTripsPage"
+    );
+
+  if (page) {
+    page.remove();
+  }
+
+  document.body.style.overflow =
+    "";
 
 }
-
-
 async function showMyRequests() {
 
   const {
