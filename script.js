@@ -138,3 +138,36 @@ languageOptions.forEach(button => {
   });
 
 });
+html[dir="rtl"] {
+  direction: rtl;
+}
+
+html[dir="rtl"] body {
+  text-align: right;
+}
+
+html[dir="rtl"] .nav {
+  direction: rtl;
+}
+
+html[dir="rtl"] .hero-grid {
+  direction: rtl;
+}
+
+html[dir="rtl"] .profile-layout {
+  direction: rtl;
+}
+
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[dir="rtl"] select {
+  text-align: right;
+}
+
+html[dir="rtl"] .auth-box {
+  text-align: right;
+}
+
+html[dir="rtl"] .profile-sidebar {
+  text-align: right;
+}
