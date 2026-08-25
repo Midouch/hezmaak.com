@@ -7023,157 +7023,87 @@ async function viewTravelTicket(path) {
         "noopener,noreferrer"
     );
 }
-/* =====================================================
-   APPROVA BIGLIETTO
-===================================================== */
+async function approveTicket(ticketId) {
 
-function approveTravelTicket(
-    tripId
-) {
+  const confirmed = confirm(
+    "✈️ Confermi di aver verificato il biglietto?\n\n" +
+    "Il viaggio verrà approvato e sarà considerato verificato."
+  );
 
-    showPopup({
+  if (!confirmed) {
+    return;
+  }
 
-        title:
-            "Approva biglietto?",
+  if (!currentUser) {
+    alert("Devi essere autenticato come amministratore.");
+    return;
+  }
 
-        message:
-            "Hai verificato il biglietto e confermi che il viaggio può essere pubblicato come verificato?",
+  try {
 
-        type:
-            "info",
+    // ==========================================
+    // 1. APPROVA IL BIGLIETTO
+    // ==========================================
 
-        confirmText:
-            "✓ Approva",
+    const { data, error } = await supabaseClient
+      .from("trips")
+      .update({
+        verification_status: "approved"
+      })
+      .eq("id", ticketId)
+      .select()
+      .single();
 
-        cancelText:
-            "Annulla",
+    if (error) {
 
-        onConfirm:
-            async () => {
+      console.error(
+        "Errore approvazione biglietto:",
+        error
+      );
 
-                if (!currentUser) {
+      alert(
+        "❌ Errore durante l'approvazione:\n\n" +
+        error.message
+      );
 
-                    closeSystemPopup();
-
-                    return;
-
-                }
-
-
-                const {
-                    data: isAdmin,
-                    error: adminError
-                } =
-                    await supabaseClient.rpc(
-                        "is_admin"
-                    );
-
-
-                if (
-                    adminError ||
-                    !isAdmin
-                ) {
-
-                    closeSystemPopup();
-
-                    showPopup({
-
-                        title:
-                            "Accesso negato",
-
-                        message:
-                            "Non hai i permessi per approvare questo biglietto.",
-
-                        type:
-                            "error"
-
-                    });
-
-                    return;
-
-                }
+      return;
+    }
 
 
-                const {
-                    error
-                } =
-                    await supabaseClient
-                        .from("trips")
-                        .update({
+    // ==========================================
+    // 2. CONFERMA
+    // ==========================================
 
-                            verification_status:
-                                "approved",
-
-                            verification_rejection_reason:
-                                null
-
-                        })
-                        .eq(
-                            "id",
-                            tripId
-                        );
+    alert(
+      "✓ Biglietto approvato!\n\n" +
+      "Il viaggio è ora verificato."
+    );
 
 
-                if (error) {
+    // ==========================================
+    // 3. RICARICA PANNELLO ADMIN
+    // ==========================================
 
-                    console.error(error);
+    await loadAdminTicketPanel();
 
-                    closeSystemPopup();
+    // aggiorna anche i viaggi pubblici
+    await loadTrips();
 
-                    showPopup({
+  } catch (error) {
 
-                        title:
-                            "Errore",
+    console.error(
+      "Errore inatteso approvazione:",
+      error
+    );
 
-                        message:
-                            escapeHtml(
-                                error.message
-                            ),
+    alert(
+      "❌ Si è verificato un errore:\n\n" +
+      error.message
+    );
 
-                        type:
-                            "error"
-
-                    });
-
-                    return;
-
-                }
-
-
-                closeSystemPopup();
-
-
-                showPopup({
-
-                    title:
-                        "Biglietto approvato ✓",
-
-                    message:
-                        "Il biglietto è stato verificato. Il viaggio ora risulta verificato per gli utenti.",
-
-                    type:
-                        "success",
-
-                    confirmText:
-                        "Continua",
-
-                    onConfirm:
-                        async () => {
-
-                            closeSystemPopup();
-
-                            await loadAdminPanel();
-
-                        }
-
-                });
-
-            }
-
-    });
+  }
 
 }
-
 /* =====================================================
    RIFIUTA BIGLIETTO
 ===================================================== */
