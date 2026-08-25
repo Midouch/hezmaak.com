@@ -2287,7 +2287,7 @@ function translatePage(lang) {
         "Porta ciò che serve. Connettiti. Guadagna.",
 
       heroText:
-        "Waselni mette in contatto persone che devono ricevere oggetti tra Italia e Tunisia con viaggiatori e trasportatori che hanno spazio disponibile."
+        "Hez maak mette in contatto persone che devono ricevere oggetti tra Italia e Tunisia con viaggiatori e trasportatori che hanno spazio disponibile."
     },
 
     fr: {
@@ -2295,7 +2295,7 @@ function translatePage(lang) {
         "Transportez ce dont les autres ont besoin. Connectez-vous. Gagnez.",
 
       heroText:
-        "Waselni met en relation les personnes qui souhaitent envoyer des objets entre l'Italie et la Tunisie avec des voyageurs et transporteurs."
+        "Hez maak met en relation les personnes qui souhaitent envoyer des objets entre l'Italie et la Tunisie avec des voyageurs et transporteurs."
     },
 
     tn: {
@@ -2303,7 +2303,7 @@ function translatePage(lang) {
         "وصّل الحاجة. تواصل. واربح.",
 
       heroText:
-        "Waselni تربط بين الناس في إيطاليا وتونس لإرسال و نقل الأغراض مع المسافرين والناقلين."
+        "هزّ معاك، تربط بين الناس في إيطاليا وتونس لإرسال و نقل الأغراض مع المسافرين والناقلين."
     }
 
   };
