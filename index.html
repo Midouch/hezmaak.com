@@ -4,17 +4,26 @@
 <head>
 
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <meta
     name="description"
     content="Hez Maak - Connetti persone tra Italia e Tunisia per viaggi, acquisti e trasporti."
   >
 
-  <title>HEZ Maak</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Hez Maak | هزّ معاك</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
 
 </head>
+
 
 <body>
 
@@ -22,30 +31,87 @@
 
   <div class="container nav">
 
-    <a href="#" class="logo" onclick="goHome()">
+    <!-- LOGO -->
+
+    <a
+      href="#"
+      class="logo"
+      onclick="goHome()"
+    >
       <span>Hez Maak</span>
       <small>هزّ معاك</small>
     </a>
 
-    <button class="mobile-menu" onclick="toggleMenu()" aria-label="Menu">
+
+    <!-- MENU MOBILE -->
+
+    <button
+      class="mobile-menu"
+      onclick="toggleMenu()"
+      aria-label="Menu"
+    >
       ☰
     </button>
 
+
+    <!-- NAVIGAZIONE -->
+
     <nav id="mainNav">
 
-      <a href="#viaggi">Viaggi</a>
-      <a href="#richieste">Richieste</a>
-      <a href="#come">Come funziona</a>
+      <a
+        href="#viaggi"
+        data-i18n="navTrips"
+      >
+        Viaggi
+      </a>
 
-      <button id="languageButton" class="language-button" onclick="cycleLanguage()">
+
+      <a
+        href="#richieste"
+        data-i18n="navRequests"
+      >
+        Richieste
+      </a>
+
+
+      <a
+        href="#come"
+        data-i18n="navHow"
+      >
+        Come funziona
+      </a>
+
+
+      <!-- LINGUA -->
+
+      <button
+        id="languageButton"
+        class="language-button"
+        onclick="cycleLanguage()"
+      >
         🇮🇹 IT
       </button>
 
-      <button id="darkButton" class="icon-button" onclick="toggleDarkMode()">
+
+      <!-- DARK MODE -->
+
+      <button
+        id="darkButton"
+        class="icon-button"
+        onclick="toggleDarkMode()"
+      >
         🌙
       </button>
 
-      <button id="authButton" class="primary" onclick="openAuth('login')">
+
+      <!-- LOGIN -->
+
+      <button
+        id="authButton"
+        class="primary"
+        onclick="openAuth('login')"
+        data-i18n="loginRegister"
+      >
         Accedi / Registrati
       </button>
 
@@ -56,251 +122,601 @@
 </header>
 
 
+
 <main>
 
-<section class="hero">
 
-  <div class="container hero-grid">
+  <!-- =========================================
+       HERO
+  ========================================== -->
 
-    <div class="hero-content">
+  <section class="hero">
 
-      <div class="badge">
-        🇮🇹 Italia ↔ 🇹🇳 Tunisia
-      </div>
-
-      <h1 id="heroTitle">
-        Porta ciò che serve.
-        <span>Connettiti.</span>
-        Guadagna.
-      </h1>
-
-      <p id="heroText">
-        Hez Maak mette in contatto persone che devono
-        ricevere oggetti tra Italia e Tunisia con
-        viaggiatori e trasportatori che hanno spazio
-        disponibile.
-      </p>
-
-      <div class="hero-buttons">
-
-        <button class="primary large" data-action="publish-trip">
-          ✈️ Sto viaggiando
-        </button>
-
-        <button class="secondary large" data-action="publish-request">
-          📦 Cerco qualcuno
-        </button>
-
-      </div>
-
-      <div class="trust">
-
-        <div><strong>✓</strong> Utenti verificati</div>
-        <div><strong>⭐</strong> Recensioni</div>
-        <div><strong>🔐</strong> Pagamenti sicuri</div>
-
-      </div>
-
-    </div>
+    <div class="container hero-grid">
 
 
-    <div class="hero-card">
+      <!-- CONTENUTO HERO -->
 
-      <div class="route-card">
+      <div class="hero-content">
 
-        <div class="route-title">
-          ✈️ Un viaggio, un'opportunità
+
+        <div
+          class="badge"
+          data-i18n="route"
+        >
+          🇮🇹 Italia ↔ 🇹🇳 Tunisia
         </div>
 
-        <div class="route">
 
-          <div>
-            <span>🇮🇹</span>
-            <strong>Italia</strong>
-          </div>
+        <h1
+          id="heroTitle"
+          data-i18n="heroTitle"
+        >
+          Porta ciò che serve.
+          <span>Connettiti.</span>
+          Guadagna.
+        </h1>
 
-          <div class="route-line">
-            ━━━━━ ✈️ ━━━━━
-          </div>
 
-          <div>
-            <span>🇹🇳</span>
-            <strong>Tunisia</strong>
-          </div>
-
-        </div>
-
-        <p>
-          Hai spazio in valigia?
-          Puoi aiutare qualcuno e
-          guadagnare.
+        <p
+          id="heroText"
+          data-i18n="heroText"
+        >
+          Hez Maak mette in contatto persone che devono
+          ricevere oggetti tra Italia e Tunisia con
+          viaggiatori e trasportatori che hanno spazio
+          disponibile.
         </p>
 
+
+        <!-- BOTTONI HERO -->
+
+        <div class="hero-buttons">
+
+          <button
+            class="primary large"
+            data-action="publish-trip"
+            data-i18n="traveling"
+          >
+            ✈️ Sto viaggiando
+          </button>
+
+
+          <button
+            class="secondary large"
+            data-action="publish-request"
+            data-i18n="lookingFor"
+          >
+            📦 Cerco qualcuno
+          </button>
+
+        </div>
+
+
+        <!-- FIDUCIA -->
+
+        <div class="trust">
+
+          <div data-i18n="trustVerified">
+            ✓ Utenti verificati
+          </div>
+
+
+          <div data-i18n="trustReviews">
+            ⭐ Recensioni
+          </div>
+
+
+          <div data-i18n="trustPayments">
+            🔐 Pagamenti sicuri
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- HERO CARD -->
+
+      <div class="hero-card">
+
+        <div class="route-card">
+
+
+          <div class="route-title">
+            ✈️ Un viaggio, un'opportunità
+          </div>
+
+
+          <div class="route">
+
+
+            <div>
+
+              <span>
+                🇮🇹
+              </span>
+
+              <strong>
+                Italia
+              </strong>
+
+            </div>
+
+
+            <div class="route-line">
+              ━━━━━ ✈️ ━━━━━
+            </div>
+
+
+            <div>
+
+              <span>
+                🇹🇳
+              </span>
+
+              <strong>
+                Tunisia
+              </strong>
+
+            </div>
+
+
+          </div>
+
+
+          <p>
+            Hai spazio in valigia?
+            Puoi aiutare qualcuno e
+            guadagnare.
+          </p>
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =========================================
+       COME FUNZIONA
+  ========================================== -->
+
+  <section
+    id="come"
+    class="how"
+  >
+
+    <div class="container">
+
+
+      <div class="section-title">
+
+        <span data-i18n="howLabel">
+          COME FUNZIONA
+        </span>
+
+
+        <h2 data-i18n="howTitle">
+          Semplice, sicuro, umano.
+        </h2>
+
+      </div>
+
+
+
+      <!-- STEPS -->
+
+      <div class="steps">
+
+
+        <!-- STEP 1 -->
+
+        <div class="step">
+
+          <div class="step-number">
+            1
+          </div>
+
+
+          <h3 data-i18n="step1Title">
+            Pubblica
+          </h3>
+
+
+          <p data-i18n="step1Text">
+            Pubblica il tuo viaggio
+            oppure indica cosa vuoi
+            far trasportare.
+          </p>
+
+        </div>
+
+
+
+        <!-- STEP 2 -->
+
+        <div class="step">
+
+          <div class="step-number">
+            2
+          </div>
+
+
+          <h3 data-i18n="step2Title">
+            Connettiti
+          </h3>
+
+
+          <p data-i18n="step2Text">
+            Trova una persona che
+            percorre la tua stessa
+            tratta.
+          </p>
+
+        </div>
+
+
+
+        <!-- STEP 3 -->
+
+        <div class="step">
+
+          <div class="step-number">
+            3
+          </div>
+
+
+          <h3 data-i18n="step3Title">
+            Organizza
+          </h3>
+
+
+          <p data-i18n="step3Text">
+            Contatta l'altra persona
+            e concordate i dettagli.
+          </p>
+
+        </div>
+
+
+
+        <!-- STEP 4 -->
+
+        <div class="step">
+
+          <div class="step-number">
+            4
+          </div>
+
+
+          <h3 data-i18n="step4Title">
+            Recensisci
+          </h3>
+
+
+          <p data-i18n="step4Text">
+            Dopo il servizio lascia
+            una recensione.
+          </p>
+
+        </div>
+
+
       </div>
 
     </div>
 
-  </div>
-
-</section>
+  </section>
 
 
-<section id="come" class="how">
 
-  <div class="container">
+  <!-- =========================================
+       VIAGGI
+  ========================================== -->
 
-    <div class="section-title">
-      <span>COME FUNZIONA</span>
-      <h2>Semplice, sicuro, umano.</h2>
+  <section
+    id="viaggi"
+    class="marketplace"
+  >
+
+    <div class="container">
+
+
+      <div class="section-header">
+
+
+        <div>
+
+          <span
+            class="section-label"
+            data-i18n="tripsLabel"
+          >
+            VIAGGI DISPONIBILI
+          </span>
+
+
+          <h2 data-i18n="tripsTitle">
+            Trova un viaggiatore
+          </h2>
+
+        </div>
+
+
+
+        <button
+          class="secondary"
+          data-action="publish-trip"
+          data-i18n="publishTrip"
+        >
+          + Pubblica viaggio
+        </button>
+
+      </div>
+
+
+
+      <!-- CONTENITORE VIAGGI -->
+
+      <div
+        id="tripsContainer"
+        class="cards"
+      >
+
+        <div class="loading">
+          Caricamento...
+        </div>
+
+      </div>
+
+
     </div>
 
-    <div class="steps">
+  </section>
 
-      <div class="step">
-        <div class="step-number">1</div>
-        <h3>Pubblica</h3>
-        <p>Pubblica il tuo viaggio oppure indica cosa vuoi far trasportare.</p>
+
+
+  <!-- =========================================
+       RICHIESTE
+  ========================================== -->
+
+  <section
+    id="richieste"
+    class="requests-section"
+  >
+
+    <div class="container">
+
+
+      <div class="section-header">
+
+
+        <div>
+
+          <span
+            class="section-label"
+            data-i18n="requestsLabel"
+          >
+            RICHIESTE
+          </span>
+
+
+          <h2 data-i18n="requestsTitle">
+            Cosa cercano le persone?
+          </h2>
+
+        </div>
+
+
+
+        <button
+          class="secondary"
+          data-action="publish-request"
+          data-i18n="publishRequest"
+        >
+          + Pubblica richiesta
+        </button>
+
       </div>
 
-      <div class="step">
-        <div class="step-number">2</div>
-        <h3>Connettiti</h3>
-        <p>Trova una persona che viaggia nella data che desideri.</p>
+
+
+      <!-- CONTENITORE RICHIESTE -->
+
+      <div
+        id="requestsContainer"
+        class="cards"
+      >
+
+        <div class="loading">
+          Caricamento...
+        </div>
+
       </div>
 
-      <div class="step">
-        <div class="step-number">3</div>
-        <h3>Organizza</h3>
-        <p>Contatta l'altra persona e concordate i dettagli.</p>
-      </div>
-
-      <div class="step">
-        <div class="step-number">4</div>
-        <h3>Recensisci</h3>
-        <p>Dopo il servizio lascia una recensione.</p>
-      </div>
 
     </div>
 
-  </div>
-
-</section>
+  </section>
 
 
-<section id="viaggi" class="marketplace">
 
-  <div class="container">
+  <!-- =========================================
+       CTA
+  ========================================== -->
 
-    <div class="section-header">
+  <section class="cta">
 
-      <div>
-        <span class="section-label">VIAGGI DISPONIBILI</span>
-        <h2>Trova un viaggiatore</h2>
-      </div>
+    <div class="container">
 
-      <button class="secondary" data-action="publish-trip">
-        + Pubblica viaggio
+
+      <h2 data-i18n="ctaTitle">
+        Hai un viaggio in programma?
+      </h2>
+
+
+      <p data-i18n="ctaText">
+        Trasforma lo spazio inutilizzato
+        nel tuo bagaglio in un'opportunità.
+      </p>
+
+
+      <button
+        class="primary large"
+        data-action="publish-trip"
+        data-i18n="ctaButton"
+      >
+        Pubblica il tuo viaggio
       </button>
 
-    </div>
-
-    <div id="tripsContainer" class="cards">
-      <div class="loading">Caricamento...</div>
-    </div>
-
-  </div>
-
-</section>
-
-
-<section id="richieste" class="requests-section">
-
-  <div class="container">
-
-    <div class="section-header">
-
-      <div>
-        <span class="section-label">RICHIESTE</span>
-        <h2>Cosa cercano le persone?</h2>
-      </div>
-
-      <button class="secondary" data-action="publish-request">
-        + Pubblica richiesta
-      </button>
 
     </div>
 
-    <div id="requestsContainer" class="cards">
-      <div class="loading">Caricamento...</div>
-    </div>
+  </section>
 
-  </div>
-
-</section>
-
-
-<section class="cta">
-
-  <div class="container">
-
-    <h2>Hai un viaggio in programma?</h2>
-
-    <p>Trasforma lo spazio inutilizzato nel tuo bagaglio in un'opportunità.</p>
-
-    <button class="primary large" data-action="publish-trip">
-      Pubblica il tuo viaggio
-    </button>
-
-  </div>
-
-</section>
 
 </main>
 
+
+
+<!-- =========================================
+     FOOTER
+========================================== -->
 
 <footer>
 
   <div class="container footer-grid">
 
+
+    <!-- BRAND -->
+
     <div>
+
       <div class="logo">
-        Hez Maak
+
+        <span>Hez Maak</span>
+
         <small>هزّ معاك</small>
+
       </div>
-      <p>Italia 🇮🇹 ↔ Tunisia 🇹🇳</p>
+
+
+      <p data-i18n="route">
+        Italia 🇮🇹 ↔ Tunisia 🇹🇳
+      </p>
+
     </div>
 
-    <div>
-      <h4>Hez Maak</h4>
-      <a href="#come">Come funziona</a>
-      <a href="#viaggi">Viaggi</a>
-      <a href="#richieste">Richieste</a>
-    </div>
+
+
+    <!-- LINK SITO -->
 
     <div>
-      <h4>Sicurezza</h4>
-      <a href="#">Verifica identità</a>
-      <a href="#">Recensioni</a>
-      <a href="#">Assistenza</a>
+
+      <h4 data-i18n="footerCompany">
+        Hez Maak
+      </h4>
+
+
+      <a
+        href="#come"
+        data-i18n="footerHow"
+      >
+        Come funziona
+      </a>
+
+
+      <a
+        href="#viaggi"
+        data-i18n="footerTrips"
+      >
+        Viaggi
+      </a>
+
+
+      <a
+        href="#richieste"
+        data-i18n="footerRequests"
+      >
+        Richieste
+      </a>
+
     </div>
+
+
+
+    <!-- SICUREZZA -->
+
+    <div>
+
+      <h4 data-i18n="footerSecurity">
+        Sicurezza
+      </h4>
+
+
+      <a
+        href="#"
+        data-i18n="footerVerification"
+      >
+        Verifica identità
+      </a>
+
+
+      <a
+        href="#"
+        data-i18n="footerReviews"
+      >
+        Recensioni
+      </a>
+
+
+      <a
+        href="#"
+        data-i18n="footerSupport"
+      >
+        Assistenza
+      </a>
+
+    </div>
+
 
   </div>
 
+
+
   <div class="copyright">
+
     © 2026 Hez Maak
+
   </div>
 
 </footer>
 
 
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- =========================================
+     SUPABASE
+========================================== -->
+
+<script
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
+
+
+<!-- CONFIG -->
 
 <script src="config.js"></script>
-<script src="lang.js"></script>
-<script src="multilang.js"></script>
+
+
+<!-- APP -->
 
 <script src="app.js"></script>
+
 
 </body>
 
