@@ -8093,3 +8093,92 @@ function showRejectTicketPopup(
 
 }
 }
+// =====================================================
+// ADMIN - VERIFICA BIGLIETTI VIAGGIO
+// =====================================================
+
+window.approveTravelTicket = async function(ticketId) {
+
+  if (!currentUser) {
+    alert("Devi essere autenticato.");
+    return;
+  }
+
+  const conferma = confirm(
+    "✈️ Approva biglietto\n\n" +
+    "Confermi che il biglietto è valido?"
+  );
+
+  if (!conferma) {
+    return;
+  }
+
+  try {
+
+    const { error } = await supabaseClient
+      .from("trips")
+      .update({
+        verification_status: "approved",
+        rejection_reason: null
+      })
+      .eq("id", ticketId);
+
+    if (error) {
+
+      console.error(
+        "Errore approvazione biglietto:",
+        error
+      );
+
+      alert(
+        "❌ Errore approvazione:\n\n" +
+        error.message
+      );
+
+      return;
+    }
+
+    alert(
+      "✓ Biglietto approvato!\n\n" +
+      "Il viaggio è stato verificato."
+    );
+
+    if (
+      typeof loadAdminTicketPanel === "function"
+    ) {
+      await loadAdminTicketPanel();
+    }
+
+    if (
+      typeof loadTrips === "function"
+    ) {
+      await loadTrips();
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "❌ Errore:\n\n" +
+      error.message
+    );
+
+  }
+
+};
+window.rejectTravelTicket = function(ticketId) {
+
+  if (
+    typeof showRejectTicketPopup === "function"
+  ) {
+    showRejectTicketPopup(ticketId);
+  } else {
+
+    alert(
+      "Errore: popup rifiuto biglietto non disponibile."
+    );
+
+  }
+
+};
