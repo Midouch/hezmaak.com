@@ -5879,178 +5879,725 @@ async function openAdminPanel() {
 
 async function loadAdminPanel() {
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("verification_requests")
-      .select(`
-        id,
-        user_id,
-        document_type,
-        document_path,
-        status,
-        rejection_reason,
-        created_at
-      `)
-      .eq(
-        "status",
-        "pending"
-      )
-      .order(
-        "created_at",
-        {
-          ascending: true
-        }
-      );
+    if (!currentUser) {
+        openAuth("login");
+        return;
+    }
+
+    // Controlla che sia admin
+    const {
+        data: isAdmin,
+        error: adminError
+    } = await supabaseClient.rpc("is_admin");
+
+    if (adminError || !isAdmin) {
+
+        alert("Accesso non autorizzato.");
+        return;
+    }
 
 
-  if (error) {
+    // ==========================================
+    // RICHIESTE DOCUMENTI IDENTITÀ
+    // ==========================================
 
-    console.error(
-      error
-    );
-
-    alert(
-      error.message
-    );
-
-    return;
-
-  }
-
-
-  const old =
-    document.getElementById(
-      "adminPage"
-    );
-
-  if (old) {
-
-    old.remove();
-
-  }
+    const {
+        data: verificationRequests,
+        error: verificationError
+    } = await supabaseClient
+        .from("verification_requests")
+        .select(`
+            id,
+            user_id,
+            document_type,
+            document_path,
+            status,
+            rejection_reason,
+            created_at
+        `)
+        .eq("status", "pending")
+        .order("created_at", {
+            ascending: true
+        });
 
 
-  const page =
-    document.createElement(
-      "div"
-    );
+    if (verificationError) {
 
-  page.id =
-    "adminPage";
+        console.error(
+            "Errore verifiche identità:",
+            verificationError
+        );
 
+        alert(
+            "Errore caricamento verifiche: " +
+            verificationError.message
+        );
 
-  page.innerHTML = `
-
-    <div class="profile-page">
-
-      <div class="container">
-
-
-        <button
-          class="back-button"
-          onclick="closeAdminPanel()">
-
-          ${t("backHome")}
-
-        </button>
+        return;
+    }
 
 
-        <div class="profile-header">
+    // ==========================================
+    // BIGLIETTI VIAGGI
+    // ==========================================
 
-          <span class="section-label">
-            ${t("administration")}
-          </span>
+    const {
+        data: pendingTrips,
+        error: tripsError
+    } = await supabaseClient
+        .from("trips")
+        .select(`
+            id,
+            user_id,
+            departure_country,
+            arrival_country,
+            departure_city,
+            arrival_city,
+            travel_date,
+            available_kg,
+            price_per_kg,
+            description,
+            ticket_path,
+            verification_status,
+            created_at
+        `)
+        .eq(
+            "verification_status",
+            "pending"
+        )
+        .not(
+            "ticket_path",
+            "is",
+            null
+        )
+        .order(
+            "created_at",
+            {
+                ascending: true
+            }
+        );
 
 
-          <h1>
-            ${t("adminTitle")}
-          </h1>
+    if (tripsError) {
+
+        console.error(
+            "Errore biglietti:",
+            tripsError
+        );
+
+        alert(
+            "Errore caricamento biglietti: " +
+            tripsError.message
+        );
+
+        return;
+    }
 
 
-          <p>
-            ${t("adminDescription")}
-          </p>
+    // ==========================================
+    // RIMUOVE VECCHIO PANNELLO
+    // ==========================================
+
+    const old =
+        document.getElementById(
+            "adminPage"
+        );
+
+    if (old) {
+        old.remove();
+    }
+
+
+    // ==========================================
+    // CREA PAGINA ADMIN
+    // ==========================================
+
+    const page =
+        document.createElement("div");
+
+    page.id =
+        "adminPage";
+
+
+    page.innerHTML = `
+
+        <div class="profile-page">
+
+            <div class="container">
+
+                <button
+                    class="back-button"
+                    onclick="closeAdminPanel()">
+
+                    ← Torna al sito
+
+                </button>
+
+
+                <div class="profile-header">
+
+                    <span class="section-label">
+                        AMMINISTRAZIONE
+                    </span>
+
+                    <h1>
+                        Pannello Hez Maak 🔐
+                    </h1>
+
+                    <p>
+                        Gestione verifiche utenti e viaggi.
+                    </p>
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- STATISTICHE -->
+                <!-- ================================= -->
+
+                <div class="profile-card">
+
+                    <div class="profile-card-title">
+
+                        <h3>
+                            📊 Panoramica
+                        </h3>
+
+                    </div>
+
+
+                    <div class="profile-info-grid">
+
+                        <div>
+
+                            <span>
+                                Verifiche identità
+                            </span>
+
+                            <strong>
+                                ${verificationRequests.length}
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Biglietti da verificare
+                            </span>
+
+                            <strong>
+                                ${pendingTrips.length}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- DOCUMENTI IDENTITÀ -->
+                <!-- ================================= -->
+
+                <div class="profile-header">
+
+                    <span class="section-label">
+                        IDENTITÀ
+                    </span>
+
+                    <h2>
+                        🪪 Verifiche identità
+                    </h2>
+
+                </div>
+
+
+                <div id="adminVerificationRequests">
+
+                    ${
+                        verificationRequests.length
+
+                        ? verificationRequests
+                            .map(
+                                request =>
+                                    adminRequestHTML(request)
+                            )
+                            .join("")
+
+                        : `
+
+                            <div class="profile-card">
+
+                                <h3>
+                                    ✓ Nessuna verifica identità
+                                </h3>
+
+                                <p>
+                                    Non ci sono documenti
+                                    in attesa di verifica.
+                                </p>
+
+                            </div>
+
+                        `
+                    }
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- BIGLIETTI -->
+                <!-- ================================= -->
+
+                <div
+                    class="profile-header"
+                    style="margin-top:40px;"
+                >
+
+                    <span class="section-label">
+                        VIAGGI
+                    </span>
+
+                    <h2>
+                        🎫 Verifica biglietti
+                    </h2>
+
+                    <p>
+                        Controlla i biglietti caricati
+                        dagli utenti prima di approvare
+                        il viaggio.
+                    </p>
+
+                </div>
+
+
+                <div id="adminTicketRequests">
+
+                    ${
+                        pendingTrips.length
+
+                        ? pendingTrips
+                            .map(
+                                trip =>
+                                    adminTripHTML(trip)
+                            )
+                            .join("")
+
+                        : `
+
+                            <div class="profile-card">
+
+                                <h3>
+                                    ✓ Nessun biglietto in attesa
+                                </h3>
+
+                                <p>
+                                    Tutti i biglietti sono stati
+                                    verificati.
+                                </p>
+
+                            </div>
+
+                        `
+                    }
+
+                </div>
+
+            </div>
 
         </div>
 
-
-        <div class="profile-card">
-
-
-          <div class="profile-card-title">
-
-            <h3>
-              ${t("pendingRequests")}
-            </h3>
+    `;
 
 
-            <strong>
-              ${data.length}
-            </strong>
+    document.body.appendChild(page);
 
-          </div>
+    document.body.style.overflow =
+        "hidden";
+}
+function adminTripHTML(trip) {
+
+    const departureFlag =
+        flag(trip.departure_country);
+
+    const arrivalFlag =
+        flag(trip.arrival_country);
 
 
-        </div>
+    const date =
+        trip.travel_date
+            ? new Date(
+                trip.travel_date + "T12:00:00"
+              ).toLocaleDateString("it-IT")
+            : "-";
 
 
-        <div id="adminRequests">
+    return `
 
+        <div
+            class="profile-card admin-request"
+            id="admin-trip-${trip.id}"
+        >
 
-          ${
-            data.length
+            <div>
 
-            ? data
-                .map(
-                  request =>
-                    adminRequestHTML(
-                      request
-                    )
-                )
-                .join("")
+                <span class="section-label">
+                    BIGLIETTO DA VERIFICARE
+                </span>
 
-            : `
-
-              <div class="profile-card">
 
                 <h3>
-                  ${t("everythingOk")}
+                    ✈️
+
+                    ${escapeHtml(
+                        trip.departure_city || ""
+                    )}
+
+                    →
+
+                    ${escapeHtml(
+                        trip.arrival_city || ""
+                    )}
                 </h3>
 
+
                 <p>
-                  ${t("noPending")}
+
+                    ${departureFlag}
+
+                    ${escapeHtml(
+                        trip.departure_country || ""
+                    )}
+
+                    →
+
+                    ${arrivalFlag}
+
+                    ${escapeHtml(
+                        trip.arrival_country || ""
+                    )}
+
                 </p>
 
-              </div>
 
-            `
-          }
+                <p>
 
+                    📅
+
+                    <strong>
+                        ${date}
+                    </strong>
+
+                </p>
+
+
+                <p>
+
+                    📦 Spazio disponibile:
+
+                    <strong>
+                        ${trip.available_kg || 0} kg
+                    </strong>
+
+                </p>
+
+
+                ${
+                    trip.price_per_kg
+                    ? `
+                        <p>
+                            💰 €${trip.price_per_kg}/kg
+                        </p>
+                    `
+                    : ""
+                }
+
+
+                <p>
+
+                    👤 User ID:
+
+                    <br>
+
+                    <code>
+                        ${escapeHtml(
+                            trip.user_id
+                        )}
+                    </code>
+
+                </p>
+
+
+                ${
+                    trip.description
+                    ? `
+                        <p>
+                            📝
+                            ${escapeHtml(
+                                trip.description
+                            )}
+                        </p>
+                    `
+                    : ""
+                }
+
+            </div>
+
+
+            <div class="admin-actions">
+
+
+                <!-- VISUALIZZA BIGLIETTO -->
+
+                <button
+                    class="secondary"
+                    onclick="viewTravelTicket('${escapeHtml(
+                        trip.ticket_path
+                    )}')"
+                >
+
+                    👁 Visualizza biglietto
+
+                </button>
+
+
+                <!-- APPROVA -->
+
+                <button
+                    class="primary"
+                    onclick="approveTravelTicket('${trip.id}')"
+                >
+
+                    ✓ Approva biglietto
+
+                </button>
+
+
+                <!-- RIFIUTA -->
+
+                <button
+                    class="danger-button"
+                    onclick="rejectTravelTicket('${trip.id}')"
+                >
+
+                    ✕ Rifiuta
+
+                </button>
+
+
+            </div>
 
         </div>
 
-
-      </div>
-
-    </div>
-
-  `;
-
-
-  document.body.appendChild(
-    page
-  );
-
-
-  document.body.style.overflow =
-    "hidden";
-
+    `;
 }
+async function viewTravelTicket(path) {
+
+    if (!path) {
+
+        alert(
+            "Questo viaggio non ha un biglietto."
+        );
+
+        return;
+    }
 
 
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .storage
+        .from("travel-tickets")
+        .createSignedUrl(
+            path,
+            300
+        );
+
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Impossibile aprire il biglietto: " +
+            error.message
+        );
+
+        return;
+    }
+
+
+    window.open(
+        data.signedUrl,
+        "_blank",
+        "noopener,noreferrer"
+    );
+}
+async function approveTravelTicket(
+    tripId
+) {
+
+    if (
+        !confirm(
+            "Confermi di aver verificato il biglietto?"
+        )
+    ) {
+        return;
+    }
+
+
+    if (!currentUser) {
+
+        alert(
+            "Sessione amministratore non valida."
+        );
+
+        return;
+    }
+
+
+    const {
+        data: isAdmin,
+        error: adminError
+    } = await supabaseClient.rpc(
+        "is_admin"
+    );
+
+
+    if (adminError || !isAdmin) {
+
+        alert(
+            "Non sei autorizzato."
+        );
+
+        return;
+    }
+
+
+    const {
+        error
+    } = await supabaseClient
+        .from("trips")
+        .update({
+
+            verification_status:
+                "approved"
+
+        })
+        .eq(
+            "id",
+            tripId
+        );
+
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Errore approvazione biglietto: " +
+            error.message
+        );
+
+        return;
+    }
+
+
+    alert(
+        "✓ Biglietto approvato."
+    );
+
+
+    // Ricarica il pannello
+
+    loadAdminPanel();
+}
+async function rejectTravelTicket(
+    tripId
+) {
+
+    const reason =
+        prompt(
+            "Perché stai rifiutando il biglietto?"
+        );
+
+
+    if (!reason) {
+        return;
+    }
+
+
+    if (!currentUser) {
+
+        alert(
+            "Sessione amministratore non valida."
+        );
+
+        return;
+    }
+
+
+    const {
+        data: isAdmin,
+        error: adminError
+    } = await supabaseClient.rpc(
+        "is_admin"
+    );
+
+
+    if (adminError || !isAdmin) {
+
+        alert(
+            "Non sei autorizzato."
+        );
+
+        return;
+    }
+
+
+    const {
+        error
+    } = await supabaseClient
+        .from("trips")
+        .update({
+
+            verification_status:
+                "rejected",
+
+            verification_rejection_reason:
+                reason
+
+        })
+        .eq(
+            "id",
+            tripId
+        );
+
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Errore rifiuto biglietto: " +
+            error.message
+        );
+
+        return;
+    }
+
+
+    alert(
+        "Biglietto rifiutato."
+    );
+
+
+    loadAdminPanel();
+}
 function adminRequestHTML(
   request
 ) {
