@@ -2777,10 +2777,11 @@ function setLanguage(lang) {
     button.textContent =
       t("languageName");
   }
+translatePage();
 
-  translatePage();
+translateDataAttributes();
 
-  refreshDynamicContent();
+refreshDynamicContent();
 
 }
 
@@ -2979,7 +2980,23 @@ function translatePage() {
 
 }
 
+function translateDataAttributes() {
 
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach(element => {
+
+      const key =
+        element.dataset.i18n;
+
+      if (!key) return;
+
+      element.textContent =
+        t(key);
+
+    });
+
+}
 function refreshDynamicContent() {
 
   /*
