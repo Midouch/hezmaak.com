@@ -7108,7 +7108,7 @@ async function approveTicket(ticketId) {
    RIFIUTA BIGLIETTO
 ===================================================== */
 
-function rejectTravelTicket(
+async function rejectTravelTicket(
     tripId
 ) {
 
@@ -7120,168 +7120,214 @@ function rejectTravelTicket(
 /* =====================================================
    CONFERMA RIFIUTO BIGLIETTO
 ===================================================== */
+function showRejectTicketPopup(ticketId) {
 
-async function rejectTravelTicketConfirmed(
-    tripId
-) {
+  // Rimuove eventuale popup precedente
+  const existing =
+    document.getElementById("rejectTicketPopup");
 
-    const reasonInput =
-        document.getElementById(
-            "rejectTicketReason"
-        );
-
-
-    const reason =
-        reasonInput
-            ? reasonInput.value.trim()
-            : "";
+  if (existing) {
+    existing.remove();
+  }
 
 
-    if (!reason) {
+  const popup =
+    document.createElement("div");
 
-        reasonInput.focus();
+  popup.id = "rejectTicketPopup";
 
-        reasonInput.style.border =
-            "2px solid #ef4444";
+  popup.innerHTML = `
 
-        return;
+    <div class="ticket-popup-overlay">
 
-    }
+      <div class="ticket-popup">
 
+        <button
+          class="ticket-popup-close"
+          onclick="closeRejectTicketPopup()">
 
-    const button =
-        document.getElementById(
-            "confirmRejectTicket"
-        );
+          ×
 
-
-    if (button) {
-
-        button.disabled =
-            true;
-
-        button.textContent =
-            "Rifiuto...";
-
-    }
+        </button>
 
 
-    if (!currentUser) {
+        <div class="ticket-popup-icon">
+          ⚠️
+        </div>
 
-        closeSystemPopup();
 
-        return;
+        <h2>
+          Rifiuta biglietto
+        </h2>
 
-    }
 
+        <p>
+          Indica il motivo per cui il biglietto
+          non può essere approvato.
+        </p>
+
+
+        <textarea
+          id="ticketRejectionReason"
+          rows="4"
+          placeholder="Es. Il biglietto non è leggibile..."
+        ></textarea>
+
+
+        <div
+          id="ticketRejectMessage">
+        </div>
+
+
+        <div class="ticket-popup-actions">
+
+          <button
+            class="secondary"
+            onclick="closeRejectTicketPopup()">
+
+            Annulla
+
+          </button>
+
+
+          <button
+            class="danger-button"
+            onclick="confirmRejectTravelTicket('${ticketId}')">
+
+            ✕ Rifiuta biglietto
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.body.appendChild(popup);
+
+}
+
+
+function closeRejectTicketPopup() {
+
+  const popup =
+    document.getElementById(
+      "rejectTicketPopup"
+    );
+
+  if (popup) {
+    popup.remove();
+  }
+
+}
+async function confirmRejectTravelTicket(ticketId) {
+
+  const reasonElement =
+    document.getElementById(
+      "ticketRejectionReason"
+    );
+
+  const message =
+    document.getElementById(
+      "ticketRejectMessage"
+    );
+
+
+  const reason =
+    reasonElement
+      ? reasonElement.value.trim()
+      : "";
+
+
+  if (!reason) {
+
+    message.innerHTML = `
+      <div class="auth-error">
+        Inserisci il motivo del rifiuto.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  message.innerHTML = `
+    <div class="auth-success">
+      Rifiuto del biglietto in corso...
+    </div>
+  `;
+
+
+  try {
 
     const {
-        data: isAdmin,
-        error: adminError
-    } =
-        await supabaseClient.rpc(
-            "is_admin"
-        );
+      error
+    } = await supabaseClient
+      .from("trips")
+      .update({
 
+        verification_status:
+          "rejected",
 
-    if (
-        adminError ||
-        !isAdmin
-    ) {
+        rejection_reason:
+          reason
 
-        closeSystemPopup();
-
-        showPopup({
-
-            title:
-                "Accesso negato",
-
-            message:
-                "Non hai i permessi per rifiutare questo biglietto.",
-
-            type:
-                "error"
-
-        });
-
-        return;
-
-    }
-
-
-    const {
-        error
-    } =
-        await supabaseClient
-            .from("trips")
-            .update({
-
-                verification_status:
-                    "rejected",
-
-                verification_rejection_reason:
-                    reason
-
-            })
-            .eq(
-                "id",
-                tripId
-            );
+      })
+      .eq(
+        "id",
+        ticketId
+      );
 
 
     if (error) {
 
-        console.error(error);
+      console.error(
+        "Errore rifiuto biglietto:",
+        error
+      );
 
-        closeSystemPopup();
+      message.innerHTML = `
+        <div class="auth-error">
+          Errore:
+          ${escapeHtml(error.message)}
+        </div>
+      `;
 
-        showPopup({
-
-            title:
-                "Errore",
-
-            message:
-                escapeHtml(
-                    error.message
-                ),
-
-            type:
-                "error"
-
-        });
-
-        return;
+      return;
 
     }
 
 
-    closeSystemPopup();
+    closeRejectTicketPopup();
 
 
-    showPopup({
+    alert(
+      "✓ Biglietto rifiutato."
+    );
 
-        title:
-            "Biglietto rifiutato",
 
-        message:
-            "Il viaggio è stato contrassegnato come non verificato. L'utente potrà visualizzare il motivo e caricare un nuovo biglietto.",
+    await loadAdminTicketPanel();
 
-        type:
-            "success",
+    await loadTrips();
 
-        confirmText:
-            "Continua",
 
-        onConfirm:
-            async () => {
+  } catch (error) {
 
-                closeSystemPopup();
+    console.error(error);
 
-                await loadAdminPanel();
+    message.innerHTML = `
+      <div class="auth-error">
+        Errore imprevisto:
+        ${escapeHtml(error.message)}
+      </div>
+    `;
 
-            }
-
-    });
+  }
 
 }
 function adminRequestHTML(
