@@ -2227,7 +2227,7 @@ function contactUser(userId) {
 
 /* =====================================================
    LANGUAGE
-===================================================== */
+
 
 const languages = [
   {
@@ -2325,8 +2325,326 @@ function translatePage(lang) {
     t.heroText;
 
 }
+===================================================== */
+/* =====================================================
+   LANGUAGE
+===================================================== */
+
+const languages = [
+  {
+    code: "it",
+    label: "🇮🇹 IT"
+  },
+  {
+    code: "fr",
+    label: "🇫🇷 FR"
+  },
+  {
+    code: "ar",
+    label: "🇹🇳 ع"
+  }
+];
+
+let currentLanguage = 0;
 
 
+const translations = {
+
+  /* =====================
+     ITALIANO
+  ===================== */
+
+  it: {
+
+    navTrips: "Viaggi",
+    navRequests: "Richieste",
+    navHow: "Come funziona",
+    loginRegister: "Accedi / Registrati",
+
+    route: "🇮🇹 Italia ↔ 🇹🇳 Tunisia",
+
+    heroTitle: `
+      Porta ciò che serve.
+      <span>Connettiti.</span>
+      Guadagna.
+    `,
+
+    heroText:
+      "Hez Maak mette in contatto persone che devono ricevere oggetti tra Italia e Tunisia con viaggiatori e trasportatori che hanno spazio disponibile.",
+
+    traveling: "✈️ Sto viaggiando",
+    lookingFor: "📦 Cerco qualcuno",
+
+    trustVerified: "✓ Utenti verificati",
+    trustReviews: "⭐ Recensioni",
+    trustPayments: "🔐 Pagamenti sicuri",
+
+    howLabel: "COME FUNZIONA",
+    howTitle: "Semplice, sicuro, umano.",
+
+    step1Title: "Pubblica",
+    step1Text:
+      "Pubblica il tuo viaggio oppure indica cosa vuoi far trasportare.",
+
+    step2Title: "Connettiti",
+    step2Text:
+      "Trova una persona che percorre la tua stessa tratta.",
+
+    step3Title: "Organizza",
+    step3Text:
+      "Contatta l'altra persona e concordate i dettagli.",
+
+    step4Title: "Recensisci",
+    step4Text:
+      "Dopo il servizio lascia una recensione.",
+
+    tripsLabel: "VIAGGI DISPONIBILI",
+    tripsTitle: "Trova un viaggiatore",
+    publishTrip: "+ Pubblica viaggio",
+
+    requestsLabel: "RICHIESTE",
+    requestsTitle: "Cosa cercano le persone?",
+    publishRequest: "+ Pubblica richiesta",
+
+    ctaTitle: "Hai un viaggio in programma?",
+    ctaText:
+      "Trasforma lo spazio inutilizzato nel tuo bagaglio in un'opportunità.",
+
+    ctaButton: "Pubblica il tuo viaggio",
+
+    footerCompany: "Hez Maak",
+
+    footerHow: "Come funziona",
+    footerTrips: "Viaggi",
+    footerRequests: "Richieste",
+
+    footerSecurity: "Sicurezza",
+    footerVerification: "Verifica identità",
+    footerReviews: "Recensioni",
+    footerSupport: "Assistenza"
+
+  },
+
+
+  /* =====================
+     FRANCESE
+  ===================== */
+
+  fr: {
+
+    navTrips: "Voyages",
+    navRequests: "Demandes",
+    navHow: "Comment ça marche",
+    loginRegister: "Connexion / Inscription",
+
+    route: "🇮🇹 Italie ↔ 🇹🇳 Tunisie",
+
+    heroTitle: `
+      Transportez ce dont les autres ont besoin.
+      <span>Connectez-vous.</span>
+      Gagnez.
+    `,
+
+    heroText:
+      "Hez Maak met en relation les personnes qui souhaitent envoyer des objets entre l'Italie et la Tunisie avec des voyageurs et des transporteurs disposant d'espace.",
+
+    traveling: "✈️ Je voyage",
+    lookingFor: "📦 Je cherche quelqu'un",
+
+    trustVerified: "✓ Utilisateurs vérifiés",
+    trustReviews: "⭐ Avis",
+    trustPayments: "🔐 Paiements sécurisés",
+
+    howLabel: "COMMENT ÇA MARCHE",
+    howTitle: "Simple, sûr, humain.",
+
+    step1Title: "Publiez",
+    step1Text:
+      "Publiez votre voyage ou indiquez ce que vous souhaitez faire transporter.",
+
+    step2Title: "Connectez-vous",
+    step2Text:
+      "Trouvez une personne qui effectue le même trajet.",
+
+    step3Title: "Organisez",
+    step3Text:
+      "Contactez l'autre personne et convenez des détails.",
+
+    step4Title: "Évaluez",
+    step4Text:
+      "Après le service, laissez un avis.",
+
+    tripsLabel: "VOYAGES DISPONIBLES",
+    tripsTitle: "Trouvez un voyageur",
+    publishTrip: "+ Publier un voyage",
+
+    requestsLabel: "DEMANDES",
+    requestsTitle: "Que recherchent les personnes ?",
+    publishRequest: "+ Publier une demande",
+
+    ctaTitle: "Vous avez un voyage prévu ?",
+    ctaText:
+      "Transformez l'espace inutilisé de vos bagages en opportunité.",
+
+    ctaButton: "Publier votre voyage",
+
+    footerCompany: "Hez Maak",
+
+    footerHow: "Comment ça marche",
+    footerTrips: "Voyages",
+    footerRequests: "Demandes",
+
+    footerSecurity: "Sécurité",
+    footerVerification: "Vérification d'identité",
+    footerReviews: "Avis",
+    footerSupport: "Assistance"
+
+  },
+
+
+  /* =====================
+     ARABO / TUNISINO
+  ===================== */
+
+  ar: {
+
+    navTrips: "الرحلات",
+    navRequests: "الطلبات",
+    navHow: "كيفاش تخدم",
+    loginRegister: "دخول / تسجيل",
+
+    route: "🇮🇹 إيطاليا ↔ 🇹🇳 تونس",
+
+    heroTitle: `
+      هزّ اللي يلزم.
+      <span>تواصل.</span>
+      واربح.
+    `,
+
+    heroText:
+      "هزّ معاك تربط بين الناس اللي يحبوا يبعثوا حاجات بين تونس وإيطاليا وبين المسافرين والناقلين اللي عندهم بلاصة متوفرة.",
+
+    traveling: "✈️ أنا مسافر",
+    lookingFor: "📦 نلوج على شكون",
+
+    trustVerified: "✓ مستخدمين موثوقين",
+    trustReviews: "⭐ تقييمات",
+    trustPayments: "🔐 دفع آمن",
+
+    howLabel: "كيفاش تخدم",
+    howTitle: "سهلة، آمنة وإنسانية.",
+
+    step1Title: "انشر",
+    step1Text:
+      "انشر رحلتك ولا قول شنوة تحب تبعث.",
+
+    step2Title: "تواصل",
+    step2Text:
+      "القى شخص ماشي في نفس الطريق.",
+
+    step3Title: "نظم",
+    step3Text:
+      "اتصل بالشخص واتفقوا على التفاصيل.",
+
+    step4Title: "قيّم",
+    step4Text:
+      "بعد الخدمة خلي تقييم.",
+
+    tripsLabel: "الرحلات المتوفرة",
+    tripsTitle: "القى مسافر",
+    publishTrip: "+ انشر رحلة",
+
+    requestsLabel: "الطلبات",
+    requestsTitle: "شنوة يلوجوا عليه الناس؟",
+    publishRequest: "+ انشر طلب",
+
+    ctaTitle: "عندك رحلة مبرمجة؟",
+    ctaText:
+      "حوّل البلاصة الفارغة في متاعك لفرصة للربح.",
+
+    ctaButton: "انشر رحلتك",
+
+    footerCompany: "هزّ معاك",
+
+    footerHow: "كيفاش تخدم",
+    footerTrips: "الرحلات",
+    footerRequests: "الطلبات",
+
+    footerSecurity: "الأمان",
+    footerVerification: "تأكيد الهوية",
+    footerReviews: "التقييمات",
+    footerSupport: "المساعدة"
+
+  }
+
+};
+
+
+function cycleLanguage() {
+
+  currentLanguage++;
+
+  if (
+    currentLanguage >= languages.length
+  ) {
+    currentLanguage = 0;
+  }
+
+  const language =
+    languages[currentLanguage];
+
+  document
+    .getElementById("languageButton")
+    .textContent =
+    language.label;
+
+  translatePage(language.code);
+
+}
+
+
+function translatePage(lang) {
+
+  const t = translations[lang];
+
+  if (!t) {
+    return;
+  }
+
+
+  document.documentElement.lang = lang;
+
+
+  if (lang === "ar") {
+
+    document.documentElement.dir = "rtl";
+
+  } else {
+
+    document.documentElement.dir = "ltr";
+
+  }
+
+
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach(element => {
+
+      const key =
+        element.dataset.i18n;
+
+      if (
+        t[key] !== undefined
+      ) {
+
+        element.innerHTML =
+          t[key];
+
+      }
+
+    });
+
+}
 /* =====================================================
    DARK MODE
 ===================================================== */
