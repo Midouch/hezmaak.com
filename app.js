@@ -4514,6 +4514,218 @@ function closeMyTrips() {
     "";
 
 }
+/* =====================================================
+   DELETE TRIP
+===================================================== */
+
+async function deleteTrip(tripId) {
+
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const confirmed = confirm(
+    "Sei sicuro di voler eliminare questo viaggio?\n\n" +
+    "Il viaggio e il relativo biglietto verranno eliminati."
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  /*
+    Recuperiamo prima il viaggio
+    per ottenere il percorso del biglietto.
+  */
+
+  const {
+    data: trip,
+    error: tripFetchError
+  } = await supabaseClient
+    .from("trips")
+    .select(`
+      id,
+      user_id,
+      ticket_path
+    `)
+    .eq("id", tripId)
+    .eq("user_id", currentUser.id)
+    .single();
+
+
+  if (tripFetchError) {
+
+    console.error(tripFetchError);
+
+    alert(
+      "Errore recupero viaggio: " +
+      tripFetchError.message
+    );
+
+    return;
+  }
+
+
+  /*
+    Controllo sicurezza:
+    il viaggio deve appartenere
+    all'utente loggato.
+  */
+
+  if (
+    !trip ||
+    trip.user_id !== currentUser.id
+  ) {
+
+    alert(
+      "Non puoi eliminare questo viaggio."
+    );
+
+    return;
+  }
+
+
+  /*
+    Eliminiamo il viaggio dal database.
+  */
+
+  const {
+    error: deleteError
+  } = await supabaseClient
+    .from("trips")
+    .delete()
+    .eq("id", tripId)
+    .eq("user_id", currentUser.id);
+
+
+  if (deleteError) {
+
+    console.error(deleteError);
+
+    alert(
+      "Errore eliminazione viaggio: " +
+      deleteError.message
+    );
+
+    return;
+  }
+
+
+  /*
+    Se esiste un biglietto,
+    eliminiamo anche il file Storage.
+  */
+
+  if (trip.ticket_path) {
+
+    const {
+      error: storageError
+    } = await supabaseClient
+      .storage
+      .from("travel-tickets")
+      .remove([
+        trip.ticket_path
+      ]);
+
+
+    if (storageError) {
+
+      console.error(
+        "Errore eliminazione biglietto:",
+        storageError
+      );
+
+      /*
+        Il viaggio è comunque stato eliminato.
+        Mostriamo solo un avviso.
+      */
+
+      alert(
+        "Viaggio eliminato, ma non è stato possibile eliminare il biglietto dal deposito."
+      );
+
+    }
+  }
+
+
+  /*
+    Rimuoviamo la scheda dalla pagina
+    senza dover ricaricare tutto.
+  */
+
+  const card =
+    document.getElementById(
+      `trip-${tripId}`
+    );
+
+  if (card) {
+    card.remove();
+  }
+
+
+  /*
+    Se non ci sono più viaggi,
+    mostriamo il messaggio vuoto.
+  */
+
+  const list =
+    document.querySelector(
+      ".my-activity-list"
+    );
+
+  if (
+    list &&
+    !list.children.length
+  ) {
+
+    list.innerHTML = `
+
+      <div class="profile-card empty-state">
+
+        <div class="avatar">
+          ✈️
+        </div>
+
+        <h3>
+          Non hai più viaggi pubblicati
+        </h3>
+
+        <p>
+          Pubblica un nuovo viaggio
+          quando vuoi.
+        </p>
+
+        <button
+          class="primary"
+          onclick="
+            closeMyTrips();
+            openTripModal();
+          ">
+
+          + Pubblica viaggio
+
+        </button>
+
+      </div>
+
+    `;
+  }
+
+
+  /*
+    Aggiorniamo anche la homepage.
+  */
+
+  loadTrips();
+
+
+  alert(
+    "✓ Viaggio eliminato correttamente."
+  );
+
+}
 async function showMyRequests() {
 
   const {
