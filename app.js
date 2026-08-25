@@ -4126,172 +4126,758 @@ function editProfile() {
 
 }
 
+/* =====================================================
+   I MIEI VIAGGI
+===================================================== */
 
 async function showMyTrips() {
 
-  if (!currentUser) {
-    openAuth("login");
-    return;
-  }
-
-  const {
-    data,
-    error
-  } = await supabaseClient
-    .from("trips")
-    .select(`
-      id,
-      departure_country,
-      arrival_country,
-      departure_city,
-      arrival_city,
-      travel_date,
-      available_kg,
-      price_per_kg,
-      description,
-      verification_status,
-      status,
-      created_at
-    `)
-    .eq(
-      "user_id",
-      currentUser.id
-    )
-    .order(
-      "travel_date",
-      {
-        ascending: false
-      }
-    );
-
-  if (error) {
-
-    console.error(error);
-
-    alert(
-      "Errore caricamento viaggi: " +
-      error.message
-    );
-
-    return;
-  }
-
-  const old =
-    document.getElementById(
-      "myTripsPage"
-    );
-
-  if (old) {
-    old.remove();
-  }
-
-  const page =
-    document.createElement("div");
-
-  page.id =
-    "myTripsPage";
-
-  page.innerHTML = `
-
-    <div class="profile-page">
-
-      <div class="container">
-
-        <button
-          class="back-button"
-          onclick="closeMyTrips()">
-
-          ← Torna al profilo
-
-        </button>
+    if (!currentUser) {
+        openAuth("login");
+        return;
+    }
 
 
-        <div class="profile-header">
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("trips")
+            .select("*")
+            .eq(
+                "user_id",
+                currentUser.id
+            )
+            .order(
+                "travel_date",
+                {
+                    ascending: false
+                }
+            );
 
-          <div>
 
-            <span class="section-label">
-              LA MIA ATTIVITÀ
-            </span>
+    if (error) {
 
-            <h1>
-              ✈️ I miei viaggi
-            </h1>
+        showPopup({
 
-            <p>
-              Gestisci i viaggi che hai pubblicato.
-            </p>
+            title:
+                "Errore",
 
-          </div>
+            message:
+                escapeHtml(
+                    error.message
+                ),
+
+            type:
+                "error"
+
+        });
+
+        return;
+
+    }
+
+
+    const old =
+        document.getElementById(
+            "myTripsPage"
+        );
+
+    if (old) {
+        old.remove();
+    }
+
+
+    const page =
+        document.createElement("div");
+
+    page.id =
+        "myTripsPage";
+
+
+    page.innerHTML = `
+
+        <div class="profile-page">
+
+            <div class="container">
+
+                <button
+                    class="back-button"
+                    onclick="closeMyTrips()">
+
+                    ← Torna al profilo
+
+                </button>
+
+
+                <div class="profile-header">
+
+                    <span class="section-label">
+                        LA MIA ATTIVITÀ
+                    </span>
+
+                    <h1>
+                        ✈️ I miei viaggi
+                    </h1>
+
+                    <p>
+                        Gestisci i viaggi che hai pubblicato.
+                    </p>
+
+                </div>
+
+
+                <div class="my-trips-list">
+
+                    ${
+                        data.length
+
+                        ? data
+                            .map(
+                                myTripHTML
+                            )
+                            .join("")
+
+                        : `
+
+                            <div class="profile-card">
+
+                                <h3>
+                                    ✈️ Nessun viaggio
+                                </h3>
+
+                                <p>
+                                    Non hai ancora pubblicato
+                                    nessun viaggio.
+                                </p>
+
+                                <button
+                                    class="primary"
+                                    onclick="closeMyTrips(); openTripModal();">
+
+                                    + Pubblica viaggio
+
+                                </button>
+
+                            </div>
+
+                        `
+                    }
+
+                </div>
+
+            </div>
 
         </div>
 
+    `;
 
-        ${
-          !data.length
 
-          ? `
+    document.body.appendChild(page);
 
-            <div class="profile-card empty-state">
-
-              <div class="avatar">
-                ✈️
-              </div>
-
-              <h3>
-                Non hai ancora pubblicato viaggi
-              </h3>
-
-              <p>
-                Pubblica il tuo primo viaggio
-                e aiuta qualcuno a trasportare
-                ciò di cui ha bisogno.
-              </p>
-
-              <button
-                class="primary"
-                onclick="
-                  closeMyTrips();
-                  openTripModal();
-                ">
-
-                + Pubblica viaggio
-
-              </button>
-
-            </div>
-
-          `
-
-          : `
-
-            <div class="my-activity-list">
-
-              ${data
-                .map(
-                  trip =>
-                    myTripHTML(trip)
-                )
-                .join("")
-              }
-
-            </div>
-
-          `
-        }
-
-      </div>
-
-    </div>
-
-  `;
-
-  document.body.appendChild(page);
-
-  document.body.style.overflow =
-    "hidden";
+    document.body.style.overflow =
+        "hidden";
 }
+function myTripHTML(trip) {
 
+    const date =
+        trip.travel_date
+            ? new Date(
+                trip.travel_date +
+                "T12:00:00"
+              ).toLocaleDateString(
+                "it-IT"
+              )
+            : "-";
+
+
+    let statusHTML = "";
+
+
+    if (
+        trip.verification_status ===
+        "approved"
+    ) {
+
+        statusHTML = `
+
+            <div class="my-trip-status approved">
+
+                ✓ Biglietto verificato
+
+            </div>
+
+        `;
+
+    }
+
+
+    else if (
+        trip.verification_status ===
+        "rejected"
+    ) {
+
+        statusHTML = `
+
+            <div class="my-trip-status rejected">
+
+                ⚠️ Biglietto non approvato
+
+            </div>
+
+
+            <div class="trip-rejection">
+
+                <strong>
+                    Motivo del rifiuto:
+                </strong>
+
+                <p>
+                    ${escapeHtml(
+                        trip.verification_rejection_reason ||
+                        "Il biglietto non è stato approvato."
+                    )}
+                </p>
+
+            </div>
+
+
+            <button
+                class="primary"
+                onclick="replaceTravelTicket('${trip.id}')">
+
+                🎫 Carica nuovo biglietto
+
+            </button>
+
+        `;
+
+    }
+
+
+    else {
+
+        statusHTML = `
+
+            <div class="my-trip-status pending">
+
+                ⏳ Biglietto in verifica
+
+                <small>
+                    L'amministratore sta controllando
+                    il tuo biglietto.
+                </small>
+
+            </div>
+
+        `;
+
+    }
+
+
+    return `
+
+        <div
+            class="profile-card my-trip-card"
+            id="my-trip-${trip.id}"
+        >
+
+            <div class="my-trip-header">
+
+                <div>
+
+                    <span class="section-label">
+                        VIAGGIO
+                    </span>
+
+
+                    <h3>
+
+                        ${flag(
+                            trip.departure_country
+                        )}
+
+                        ${escapeHtml(
+                            trip.departure_city
+                        )}
+
+                        →
+
+                        ${flag(
+                            trip.arrival_country
+                        )}
+
+                        ${escapeHtml(
+                            trip.arrival_city
+                        )}
+
+                    </h3>
+
+                </div>
+
+
+                ${statusHTML}
+
+            </div>
+
+
+            <div class="profile-info-grid">
+
+                <div>
+
+                    <span>
+                        Data
+                    </span>
+
+                    <strong>
+                        📅 ${date}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Spazio
+                    </span>
+
+                    <strong>
+                        📦 ${trip.available_kg} kg
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Prezzo
+                    </span>
+
+                    <strong>
+
+                        ${
+                            trip.price_per_kg
+                            ? `€${trip.price_per_kg}/kg`
+                            : "Non specificato"
+                        }
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            ${
+                trip.description
+                ? `
+                    <p class="trip-description">
+
+                        ${escapeHtml(
+                            trip.description
+                        )}
+
+                    </p>
+                `
+                : ""
+            }
+
+        </div>
+
+    `;
+
+}
+function closeMyTrips() {
+
+    const page =
+        document.getElementById(
+            "myTripsPage"
+        );
+
+    if (page) {
+        page.remove();
+    }
+
+
+    document.body.style.overflow =
+        "";
+
+
+    showProfile();
+
+}
+/* =====================================================
+   NUOVO BIGLIETTO
+===================================================== */
+
+async function replaceTravelTicket(
+    tripId
+) {
+
+    const old =
+        document.getElementById(
+            "replaceTicketModal"
+        );
+
+    if (old) {
+        old.remove();
+    }
+
+
+    const modal =
+        document.createElement("div");
+
+    modal.id =
+        "replaceTicketModal";
+
+
+    modal.innerHTML = `
+
+        <div class="popup-overlay">
+
+            <div class="popup-box">
+
+                <button
+                    class="popup-close"
+                    onclick="closeReplaceTicket()">
+
+                    ×
+
+                </button>
+
+
+                <div class="popup-icon">
+                    🎫
+                </div>
+
+
+                <h3>
+                    Carica nuovo biglietto
+                </h3>
+
+
+                <p>
+                    Carica il nuovo biglietto
+                    per permettere all'amministratore
+                    di effettuare una nuova verifica.
+                </p>
+
+
+                <input
+                    id="newTravelTicket"
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                >
+
+
+                <small class="upload-help">
+
+                    JPG, PNG o PDF.
+                    Massimo 10 MB.
+
+                </small>
+
+
+                <div
+                    id="replaceTicketMessage">
+                </div>
+
+
+                <div class="popup-buttons">
+
+                    <button
+                        class="secondary"
+                        onclick="closeReplaceTicket()">
+
+                        Annulla
+
+                    </button>
+
+
+                    <button
+                        class="primary"
+                        onclick="uploadNewTravelTicket('${tripId}')">
+
+                        🎫 Invia nuovo biglietto
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        modal
+    );
+
+}
+/* =====================================================
+   UPLOAD NUOVO BIGLIETTO
+===================================================== */
+
+async function uploadNewTravelTicket(
+    tripId
+) {
+
+    if (!currentUser) {
+        return;
+    }
+
+
+    const input =
+        document.getElementById(
+            "newTravelTicket"
+        );
+
+
+    const message =
+        document.getElementById(
+            "replaceTicketMessage"
+        );
+
+
+    if (
+        !input.files ||
+        !input.files.length
+    ) {
+
+        message.innerHTML = `
+
+            <div class="auth-error">
+
+                Seleziona un biglietto.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const file =
+        input.files[0];
+
+
+    const maxSize =
+        10 * 1024 * 1024;
+
+
+    if (file.size > maxSize) {
+
+        message.innerHTML = `
+
+            <div class="auth-error">
+
+                Il file supera i 10 MB.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const allowedTypes = [
+
+        "image/jpeg",
+        "image/png",
+        "application/pdf"
+
+    ];
+
+
+    if (
+        !allowedTypes.includes(
+            file.type
+        )
+    ) {
+
+        message.innerHTML = `
+
+            <div class="auth-error">
+
+                Formato non supportato.
+                Usa JPG, PNG o PDF.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    message.innerHTML = `
+
+        <div class="auth-success">
+
+            Upload in corso...
+
+        </div>
+
+    `;
+
+
+    const extension =
+        file.name
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+
+    const ticketPath =
+        `${currentUser.id}/ticket-${Date.now()}.${extension}`;
+
+
+    const {
+        error: uploadError
+    } =
+        await supabaseClient
+            .storage
+            .from("travel-tickets")
+            .upload(
+                ticketPath,
+                file,
+                {
+                    upsert: false
+                }
+            );
+
+
+    if (uploadError) {
+
+        console.error(uploadError);
+
+        message.innerHTML = `
+
+            <div class="auth-error">
+
+                Errore caricamento:
+                ${escapeHtml(
+                    uploadError.message
+                )}
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const {
+        error: updateError
+    } =
+        await supabaseClient
+            .from("trips")
+            .update({
+
+                ticket_path:
+                    ticketPath,
+
+                verification_status:
+                    "pending",
+
+                verification_rejection_reason:
+                    null
+
+            })
+            .eq(
+                "id",
+                tripId
+            )
+            .eq(
+                "user_id",
+                currentUser.id
+            );
+
+
+    if (updateError) {
+
+        console.error(
+            updateError
+        );
+
+
+        await supabaseClient
+            .storage
+            .from("travel-tickets")
+            .remove([
+                ticketPath
+            ]);
+
+
+        message.innerHTML = `
+
+            <div class="auth-error">
+
+                Errore aggiornamento viaggio:
+                ${escapeHtml(
+                    updateError.message
+                )}
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    message.innerHTML = `
+
+        <div class="auth-success">
+
+            ✓ Nuovo biglietto inviato.
+
+            <br>
+
+            È ora nuovamente in verifica.
+
+        </div>
+
+    `;
+
+
+    setTimeout(
+        () => {
+
+            closeReplaceTicket();
+
+            showMyTrips();
+
+        },
+        1200
+    );
+
+}
+function closeReplaceTicket() {
+
+    const modal =
+        document.getElementById(
+            "replaceTicketModal"
+        );
+
+    if (modal) {
+        modal.remove();
+    }
+
+}
 function myTripHTML(trip) {
 
   const date =
@@ -6437,166 +7023,336 @@ async function viewTravelTicket(path) {
         "noopener,noreferrer"
     );
 }
-async function approveTravelTicket(
+/* =====================================================
+   APPROVA BIGLIETTO
+===================================================== */
+
+function approveTravelTicket(
     tripId
 ) {
 
-    if (
-        !confirm(
-            "Confermi di aver verificato il biglietto?"
-        )
-    ) {
-        return;
-    }
+    showPopup({
+
+        title:
+            "Approva biglietto?",
+
+        message:
+            "Hai verificato il biglietto e confermi che il viaggio può essere pubblicato come verificato?",
+
+        type:
+            "info",
+
+        confirmText:
+            "✓ Approva",
+
+        cancelText:
+            "Annulla",
+
+        onConfirm:
+            async () => {
+
+                if (!currentUser) {
+
+                    closeSystemPopup();
+
+                    return;
+
+                }
 
 
-    if (!currentUser) {
-
-        alert(
-            "Sessione amministratore non valida."
-        );
-
-        return;
-    }
-
-
-    const {
-        data: isAdmin,
-        error: adminError
-    } = await supabaseClient.rpc(
-        "is_admin"
-    );
+                const {
+                    data: isAdmin,
+                    error: adminError
+                } =
+                    await supabaseClient.rpc(
+                        "is_admin"
+                    );
 
 
-    if (adminError || !isAdmin) {
+                if (
+                    adminError ||
+                    !isAdmin
+                ) {
 
-        alert(
-            "Non sei autorizzato."
-        );
+                    closeSystemPopup();
 
-        return;
-    }
+                    showPopup({
 
+                        title:
+                            "Accesso negato",
 
-    const {
-        error
-    } = await supabaseClient
-        .from("trips")
-        .update({
+                        message:
+                            "Non hai i permessi per approvare questo biglietto.",
 
-            verification_status:
-                "approved"
+                        type:
+                            "error"
 
-        })
-        .eq(
-            "id",
-            tripId
-        );
+                    });
 
+                    return;
 
-    if (error) {
-
-        console.error(error);
-
-        alert(
-            "Errore approvazione biglietto: " +
-            error.message
-        );
-
-        return;
-    }
+                }
 
 
-    alert(
-        "✓ Biglietto approvato."
-    );
+                const {
+                    error
+                } =
+                    await supabaseClient
+                        .from("trips")
+                        .update({
+
+                            verification_status:
+                                "approved",
+
+                            verification_rejection_reason:
+                                null
+
+                        })
+                        .eq(
+                            "id",
+                            tripId
+                        );
 
 
-    // Ricarica il pannello
+                if (error) {
 
-    loadAdminPanel();
+                    console.error(error);
+
+                    closeSystemPopup();
+
+                    showPopup({
+
+                        title:
+                            "Errore",
+
+                        message:
+                            escapeHtml(
+                                error.message
+                            ),
+
+                        type:
+                            "error"
+
+                    });
+
+                    return;
+
+                }
+
+
+                closeSystemPopup();
+
+
+                showPopup({
+
+                    title:
+                        "Biglietto approvato ✓",
+
+                    message:
+                        "Il biglietto è stato verificato. Il viaggio ora risulta verificato per gli utenti.",
+
+                    type:
+                        "success",
+
+                    confirmText:
+                        "Continua",
+
+                    onConfirm:
+                        async () => {
+
+                            closeSystemPopup();
+
+                            await loadAdminPanel();
+
+                        }
+
+                });
+
+            }
+
+    });
+
 }
-async function rejectTravelTicket(
+
+/* =====================================================
+   RIFIUTA BIGLIETTO
+===================================================== */
+
+function rejectTravelTicket(
     tripId
 ) {
+
+    showRejectTicketPopup(
+        tripId
+    );
+
+}
+/* =====================================================
+   CONFERMA RIFIUTO BIGLIETTO
+===================================================== */
+
+async function rejectTravelTicketConfirmed(
+    tripId
+) {
+
+    const reasonInput =
+        document.getElementById(
+            "rejectTicketReason"
+        );
+
 
     const reason =
-        prompt(
-            "Perché stai rifiutando il biglietto?"
-        );
+        reasonInput
+            ? reasonInput.value.trim()
+            : "";
 
 
     if (!reason) {
+
+        reasonInput.focus();
+
+        reasonInput.style.border =
+            "2px solid #ef4444";
+
         return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "confirmRejectTicket"
+        );
+
+
+    if (button) {
+
+        button.disabled =
+            true;
+
+        button.textContent =
+            "Rifiuto...";
+
     }
 
 
     if (!currentUser) {
 
-        alert(
-            "Sessione amministratore non valida."
-        );
+        closeSystemPopup();
 
         return;
+
     }
 
 
     const {
         data: isAdmin,
         error: adminError
-    } = await supabaseClient.rpc(
-        "is_admin"
-    );
-
-
-    if (adminError || !isAdmin) {
-
-        alert(
-            "Non sei autorizzato."
+    } =
+        await supabaseClient.rpc(
+            "is_admin"
         );
 
+
+    if (
+        adminError ||
+        !isAdmin
+    ) {
+
+        closeSystemPopup();
+
+        showPopup({
+
+            title:
+                "Accesso negato",
+
+            message:
+                "Non hai i permessi per rifiutare questo biglietto.",
+
+            type:
+                "error"
+
+        });
+
         return;
+
     }
 
 
     const {
         error
-    } = await supabaseClient
-        .from("trips")
-        .update({
+    } =
+        await supabaseClient
+            .from("trips")
+            .update({
 
-            verification_status:
-                "rejected",
+                verification_status:
+                    "rejected",
 
-            verification_rejection_reason:
-                reason
+                verification_rejection_reason:
+                    reason
 
-        })
-        .eq(
-            "id",
-            tripId
-        );
+            })
+            .eq(
+                "id",
+                tripId
+            );
 
 
     if (error) {
 
         console.error(error);
 
-        alert(
-            "Errore rifiuto biglietto: " +
-            error.message
-        );
+        closeSystemPopup();
+
+        showPopup({
+
+            title:
+                "Errore",
+
+            message:
+                escapeHtml(
+                    error.message
+                ),
+
+            type:
+                "error"
+
+        });
 
         return;
+
     }
 
 
-    alert(
-        "Biglietto rifiutato."
-    );
+    closeSystemPopup();
 
 
-    loadAdminPanel();
+    showPopup({
+
+        title:
+            "Biglietto rifiutato",
+
+        message:
+            "Il viaggio è stato contrassegnato come non verificato. L'utente potrà visualizzare il motivo e caricare un nuovo biglietto.",
+
+        type:
+            "success",
+
+        confirmText:
+            "Continua",
+
+        onConfirm:
+            async () => {
+
+                closeSystemPopup();
+
+                await loadAdminPanel();
+
+            }
+
+    });
+
 }
 function adminRequestHTML(
   request
@@ -7083,5 +7839,281 @@ function removeAdminButton() {
     button.remove();
 
   }
+/* =====================================================
+   POPUP SISTEMA
+===================================================== */
 
+function showPopup({
+    title = "",
+    message = "",
+    type = "info",
+    confirmText = "OK",
+    cancelText = null,
+    onConfirm = null
+}) {
+
+    const old =
+        document.getElementById("systemPopup");
+
+    if (old) {
+        old.remove();
+    }
+
+
+    const popup =
+        document.createElement("div");
+
+    popup.id =
+        "systemPopup";
+
+
+    let icon = "ℹ️";
+
+    if (type === "success") {
+        icon = "✓";
+    }
+
+    if (type === "error") {
+        icon = "⚠️";
+    }
+
+    if (type === "warning") {
+        icon = "⚠️";
+    }
+
+
+    popup.innerHTML = `
+
+        <div class="popup-overlay">
+
+            <div class="popup-box ${type}">
+
+                <button
+                    class="popup-close"
+                    onclick="closeSystemPopup()">
+
+                    ×
+
+                </button>
+
+
+                <div class="popup-icon">
+                    ${icon}
+                </div>
+
+
+                <h3>
+                    ${escapeHtml(title)}
+                </h3>
+
+
+                <p>
+                    ${message}
+                </p>
+
+
+                <div class="popup-buttons">
+
+                    ${
+                        cancelText
+                        ? `
+                            <button
+                                class="secondary"
+                                onclick="closeSystemPopup()">
+
+                                ${escapeHtml(cancelText)}
+
+                            </button>
+                        `
+                        : ""
+                    }
+
+
+                    <button
+                        class="primary"
+                        id="popupConfirmButton">
+
+                        ${escapeHtml(confirmText)}
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(popup);
+
+
+    const confirmButton =
+        document.getElementById(
+            "popupConfirmButton"
+        );
+
+
+    confirmButton.onclick =
+        async () => {
+
+            if (onConfirm) {
+
+                confirmButton.disabled =
+                    true;
+
+                confirmButton.textContent =
+                    "Attendi...";
+
+                await onConfirm();
+
+            }
+
+        };
+
+
+    // Chiudi cliccando fuori
+
+    popup
+        .querySelector(".popup-overlay")
+        .addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target.classList
+                        .contains("popup-overlay")
+                ) {
+
+                    closeSystemPopup();
+
+                }
+
+            }
+        );
+}
+
+
+function closeSystemPopup() {
+
+    const popup =
+        document.getElementById(
+            "systemPopup"
+        );
+
+    if (popup) {
+        popup.remove();
+    }
+
+}
+   /* =====================================================
+   POPUP RIFIUTO BIGLIETTO
+===================================================== */
+
+function showRejectTicketPopup(
+    tripId
+) {
+
+    const old =
+        document.getElementById(
+            "systemPopup"
+        );
+
+    if (old) {
+        old.remove();
+    }
+
+
+    const popup =
+        document.createElement("div");
+
+    popup.id =
+        "systemPopup";
+
+
+    popup.innerHTML = `
+
+        <div class="popup-overlay">
+
+            <div class="popup-box warning">
+
+                <button
+                    class="popup-close"
+                    onclick="closeSystemPopup()">
+
+                    ×
+
+                </button>
+
+
+                <div class="popup-icon">
+                    ⚠️
+                </div>
+
+
+                <h3>
+                    Rifiuta biglietto
+                </h3>
+
+
+                <p>
+                    Indica all'utente perché
+                    il biglietto non può essere approvato.
+                </p>
+
+
+                <textarea
+                    id="rejectTicketReason"
+                    class="popup-textarea"
+                    rows="5"
+                    placeholder="Es. Il biglietto non è leggibile..."
+                ></textarea>
+
+
+                <div class="popup-buttons">
+
+                    <button
+                        class="secondary"
+                        onclick="closeSystemPopup()">
+
+                        Annulla
+
+                    </button>
+
+
+                    <button
+                        class="danger-button"
+                        id="confirmRejectTicket">
+
+                        ✕ Rifiuta biglietto
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(popup);
+
+
+    document
+        .getElementById(
+            "confirmRejectTicket"
+        )
+        .onclick =
+        () => {
+
+            rejectTravelTicketConfirmed(
+                tripId
+            );
+
+        };
+
+}
 }
