@@ -3423,8 +3423,7 @@ function tripCard(trip) {
 
     </article>
 
-  `;
-
+ 
 }
 
 
