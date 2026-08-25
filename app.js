@@ -3400,7 +3400,7 @@ function tripCard(trip) {
 
           : ""
       }
-
+}
 
       ${
         currentUser &&
