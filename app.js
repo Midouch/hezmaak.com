@@ -1,3 +1,11 @@
+/* =====================================================
+   HEZ MAAK - APP.JS
+   Lingue:
+   🇮🇹 Italiano
+   🇫🇷 Français
+   🇹🇳 العربية التونسية
+===================================================== */
+
 const supabaseClient =
   window.supabase.createClient(
     SUPABASE_URL,
@@ -8,12 +16,1420 @@ let currentUser = null;
 
 
 /* =====================================================
+   LANGUAGE SYSTEM
+===================================================== */
+
+const languages = [
+  {
+    code: "it",
+    label: "🇮🇹 IT",
+    dir: "ltr"
+  },
+  {
+    code: "fr",
+    label: "🇫🇷 FR",
+    dir: "ltr"
+  },
+  {
+    code: "tn",
+    label: "🇹🇳 TN",
+    dir: "rtl"
+  }
+];
+
+let currentLanguage =
+  localStorage.getItem("hezmaak_language") || "it";
+
+
+const translations = {
+
+  /* ===================================================
+     ITALIANO
+  =================================================== */
+
+  it: {
+
+    navTrips: "Viaggi",
+    navRequests: "Richieste",
+    navHow: "Come funziona",
+    loginRegister: "Accedi / Registrati",
+
+    badge: "🇮🇹 Italia ↔ 🇹🇳 Tunisia",
+
+    heroTitle:
+      "Porta ciò che serve. Connettiti. Guadagna.",
+
+    heroText:
+      "Hez Maak mette in contatto persone che devono ricevere oggetti tra Italia e Tunisia con viaggiatori e trasportatori che hanno spazio disponibile.",
+
+    travelButton:
+      "✈️ Sto viaggiando",
+
+    requestButton:
+      "📦 Cerco qualcuno",
+
+    verifiedUsers:
+      "Utenti verificati",
+
+    reviews:
+      "Recensioni",
+
+    securePayments:
+      "Pagamenti sicuri",
+
+    routeTitle:
+      "✈️ Un viaggio, un'opportunità",
+
+    italy:
+      "Italia",
+
+    tunisia:
+      "Tunisia",
+
+    routeDescription:
+      "Hai spazio in valigia? Puoi aiutare qualcuno e guadagnare.",
+
+    howLabel:
+      "COME FUNZIONA",
+
+    howTitle:
+      "Semplice, sicuro, umano.",
+
+    step1Title:
+      "Pubblica",
+
+    step1Text:
+      "Pubblica il tuo viaggio oppure indica cosa vuoi far trasportare.",
+
+    step2Title:
+      "Connettiti",
+
+    step2Text:
+      "Trova una persona che percorre la tua stessa tratta.",
+
+    step3Title:
+      "Organizza",
+
+    step3Text:
+      "Contatta l'altra persona e concordate i dettagli.",
+
+    step4Title:
+      "Recensisci",
+
+    step4Text:
+      "Dopo il servizio lascia una recensione.",
+
+    tripsLabel:
+      "VIAGGI DISPONIBILI",
+
+    tripsTitle:
+      "Trova un viaggiatore",
+
+    publishTrip:
+      "+ Pubblica viaggio",
+
+    requestsLabel:
+      "RICHIESTE",
+
+    requestsTitle:
+      "Cosa cercano le persone?",
+
+    publishRequest:
+      "+ Pubblica richiesta",
+
+    loading:
+      "Caricamento...",
+
+    ctaTitle:
+      "Hai un viaggio in programma?",
+
+    ctaText:
+      "Trasforma lo spazio inutilizzato nel tuo bagaglio in un'opportunità.",
+
+    ctaButton:
+      "Pubblica il tuo viaggio",
+
+    footerBrand:
+      "Hez Maak",
+
+    securityTitle:
+      "Sicurezza",
+
+    verifyIdentity:
+      "Verifica identità",
+
+    support:
+      "Assistenza",
+
+    loginTitle:
+      "Accedi a Hez Maak",
+
+    loginText:
+      "Accedi al tuo account.",
+
+    email:
+      "Email",
+
+    password:
+      "Password",
+
+    login:
+      "Accedi",
+
+    noAccount:
+      "Non hai un account?",
+
+    register:
+      "Registrati",
+
+    createAccount:
+      "Crea account",
+
+    joinCommunity:
+      "Entra nella comunità Hez Maak.",
+
+    fullName:
+      "Nome e cognome",
+
+    accountType:
+      "Tipo di account",
+
+    private:
+      "👤 Privato",
+
+    traveler:
+      "✈️ Viaggiatore",
+
+    company:
+      "🚚 Azienda / Trasportatore",
+
+    country:
+      "Paese",
+
+    create:
+      "Registrati",
+
+    alreadyAccount:
+      "Hai già un account?",
+
+    backToLogin:
+      "Accedi",
+
+    fillFields:
+      "Compila tutti i campi.",
+
+    accountCreated:
+      "Account creato. Controlla la tua email per confermare l'account.",
+
+    tripPublished:
+      "✓ Viaggio pubblicato e biglietto inviato per verifica.",
+
+    requestPublished:
+      "✓ Richiesta pubblicata!",
+
+    profile:
+      "👤 Il mio profilo",
+
+    verifiedProfile:
+      "✓ Profilo verificato",
+
+    notVerified:
+      "○ Profilo non verificato",
+
+    personalInfo:
+      "Informazioni personali",
+
+    edit:
+      "Modifica",
+
+    countryLabel:
+      "Paese",
+
+    accountLabel:
+      "Tipo account",
+
+    security:
+      "SICUREZZA",
+
+    verifyTitle:
+      "🪪 Verifica la tua identità",
+
+    verifyText:
+      "Verifica la tua identità per ottenere il badge ✓ e aumentare la fiducia degli altri utenti.",
+
+    verifyButton:
+      "🪪 Verifica identità",
+
+    verified:
+      "✓ VERIFICATO",
+
+    verifiedIdentity:
+      "✓ La tua identità è stata verificata.",
+
+    identityVerified:
+      "Identità verificata",
+
+    pending:
+      "⏳ Verifica in revisione",
+
+    rejected:
+      "⚠️ Verifica rifiutata",
+
+    documentType:
+      "Tipo di documento",
+
+    passport:
+      "🛂 Passaporto",
+
+    identityCard:
+      "🪪 Carta d'identità",
+
+    document:
+      "Documento",
+
+    sendDocument:
+      "🔐 Invia documento",
+
+    uploadHelp:
+      "Formati accettati: JPG, PNG, PDF. Dimensione massima: 10 MB.",
+
+    uploadInProgress:
+      "Upload in corso...",
+
+    documentSent:
+      "✓ Documento inviato correttamente.",
+
+    reviewText:
+      "La verifica è ora in revisione.",
+
+    publishTripTitle:
+      "✈️ Pubblica viaggio",
+
+    tripDescription:
+      "Indica il tuo viaggio.",
+
+    departure:
+      "Partenza",
+
+    arrival:
+      "Arrivo",
+
+    departureCity:
+      "Città di partenza",
+
+    arrivalCity:
+      "Città di arrivo",
+
+    travelDate:
+      "Data del viaggio",
+
+    availableKg:
+      "Kg disponibili",
+
+    priceKg:
+      "Prezzo €/kg",
+
+    description:
+      "Descrizione",
+
+    ticket:
+      "📄 Biglietto del viaggio",
+
+    ticketHelp:
+      "Carica una foto, screenshot o PDF del biglietto. Il biglietto è privato e sarà visibile solo all'amministratore per la verifica. Massimo 10 MB.",
+
+    publish:
+      "Pubblica",
+
+    requestTitle:
+      "📦 Pubblica richiesta",
+
+    itemDescription:
+      "Cosa vuoi trasportare?",
+
+    weight:
+      "Peso kg",
+
+    budget:
+      "Budget €",
+
+    myActivity:
+      "La mia attività",
+
+    myTrips:
+      "I miei viaggi",
+
+    manageTrips:
+      "Gestisci i tuoi viaggi",
+
+    myRequests:
+      "Le mie richieste",
+
+    manageRequests:
+      "Gestisci le tue richieste",
+
+    myReviews:
+      "Le mie recensioni",
+
+    viewReviews:
+      "Visualizza le valutazioni",
+
+    logout:
+      "🚪 Esci",
+
+    backHome:
+      "← Torna a Hez Maak",
+
+    contact:
+      "Contatta",
+
+    admin:
+      "🔐 Admin",
+
+    administration:
+      "AMMINISTRAZIONE",
+
+    adminTitle:
+      "Pannello Hez Maak 🔐",
+
+    adminDescription:
+      "Gestione delle verifiche identità.",
+
+    pendingRequests:
+      "Richieste in attesa",
+
+    everythingOk:
+      "✓ Tutto in ordine",
+
+    noPending:
+      "Non ci sono verifiche in attesa.",
+
+    viewDocument:
+      "👁 Visualizza documento",
+
+    approve:
+      "✓ Approva",
+
+    reject:
+      "✕ Rifiuta",
+
+    user:
+      "Utente",
+
+    sent:
+      "Inviata",
+
+    noTrips:
+      "✈️ Nessun viaggio disponibile",
+
+    publishFirstTrip:
+      "Pubblica il primo viaggio.",
+
+    noRequests:
+      "📦 Nessuna richiesta",
+
+    publishFirstRequest:
+      "Pubblica una richiesta.",
+
+    verifiedTrip:
+      "✈️ Viaggio verificato",
+
+    ticketPending:
+      "⏳ Biglietto in verifica",
+
+    verificationRejected:
+      "⚠️ Verifica non approvata",
+
+    kg:
+      "kg",
+
+    contactSoon:
+      "La messaggistica sarà collegata alla tabella messages nel prossimo modulo.",
+
+    reviewsComing:
+      "Il sistema di recensioni verrà collegato al database nel prossimo modulo.",
+
+    editComing:
+      "La modifica del profilo sarà disponibile nel prossimo modulo.",
+
+    noTripsUser:
+      "Non hai ancora pubblicato nessun viaggio.",
+
+    noRequestsUser:
+      "Non hai ancora pubblicato nessuna richiesta."
+
+  },
+
+
+  /* ===================================================
+     FRANÇAIS
+  =================================================== */
+
+  fr: {
+
+    navTrips: "Voyages",
+    navRequests: "Demandes",
+    navHow: "Comment ça marche",
+    loginRegister: "Connexion / Inscription",
+
+    badge: "🇮🇹 Italie ↔ 🇹🇳 Tunisie",
+
+    heroTitle:
+      "Transportez ce dont les autres ont besoin. Connectez-vous. Gagnez.",
+
+    heroText:
+      "Hez Maak met en relation les personnes qui souhaitent recevoir des objets entre l'Italie et la Tunisie avec des voyageurs et transporteurs disposant d'espace.",
+
+    travelButton:
+      "✈️ Je voyage",
+
+    requestButton:
+      "📦 Je cherche quelqu'un",
+
+    verifiedUsers:
+      "Utilisateurs vérifiés",
+
+    reviews:
+      "Avis",
+
+    securePayments:
+      "Paiements sécurisés",
+
+    routeTitle:
+      "✈️ Un voyage, une opportunité",
+
+    italy:
+      "Italie",
+
+    tunisia:
+      "Tunisie",
+
+    routeDescription:
+      "Vous avez de la place dans votre valise ? Aidez quelqu'un et gagnez de l'argent.",
+
+    howLabel:
+      "COMMENT ÇA MARCHE",
+
+    howTitle:
+      "Simple, sûr et humain.",
+
+    step1Title:
+      "Publiez",
+
+    step1Text:
+      "Publiez votre voyage ou indiquez ce que vous souhaitez faire transporter.",
+
+    step2Title:
+      "Connectez-vous",
+
+    step2Text:
+      "Trouvez une personne qui suit le même itinéraire.",
+
+    step3Title:
+      "Organisez",
+
+    step3Text:
+      "Contactez l'autre personne et convenez des détails.",
+
+    step4Title:
+      "Évaluez",
+
+    step4Text:
+      "Après le service, laissez un avis.",
+
+    tripsLabel:
+      "VOYAGES DISPONIBLES",
+
+    tripsTitle:
+      "Trouvez un voyageur",
+
+    publishTrip:
+      "+ Publier un voyage",
+
+    requestsLabel:
+      "DEMANDES",
+
+    requestsTitle:
+      "Que recherchent les gens ?",
+
+    publishRequest:
+      "+ Publier une demande",
+
+    loading:
+      "Chargement...",
+
+    ctaTitle:
+      "Vous avez un voyage prévu ?",
+
+    ctaText:
+      "Transformez l'espace inutilisé dans vos bagages en opportunité.",
+
+    ctaButton:
+      "Publier votre voyage",
+
+    footerBrand:
+      "Hez Maak",
+
+    securityTitle:
+      "Sécurité",
+
+    verifyIdentity:
+      "Vérifier l'identité",
+
+    support:
+      "Assistance",
+
+    loginTitle:
+      "Connectez-vous à Hez Maak",
+
+    loginText:
+      "Connectez-vous à votre compte.",
+
+    email:
+      "Email",
+
+    password:
+      "Mot de passe",
+
+    login:
+      "Connexion",
+
+    noAccount:
+      "Vous n'avez pas de compte ?",
+
+    register:
+      "Inscrivez-vous",
+
+    createAccount:
+      "Créer un compte",
+
+    joinCommunity:
+      "Rejoignez la communauté Hez Maak.",
+
+    fullName:
+      "Nom et prénom",
+
+    accountType:
+      "Type de compte",
+
+    private:
+      "👤 Particulier",
+
+    traveler:
+      "✈️ Voyageur",
+
+    company:
+      "🚚 Entreprise / Transporteur",
+
+    country:
+      "Pays",
+
+    create:
+      "S'inscrire",
+
+    alreadyAccount:
+      "Vous avez déjà un compte ?",
+
+    backToLogin:
+      "Connexion",
+
+    fillFields:
+      "Veuillez remplir tous les champs.",
+
+    accountCreated:
+      "Compte créé. Vérifiez votre email pour confirmer votre compte.",
+
+    tripPublished:
+      "✓ Voyage publié et billet envoyé pour vérification.",
+
+    requestPublished:
+      "✓ Demande publiée !",
+
+    profile:
+      "👤 Mon profil",
+
+    verifiedProfile:
+      "✓ Profil vérifié",
+
+    notVerified:
+      "○ Profil non vérifié",
+
+    personalInfo:
+      "Informations personnelles",
+
+    edit:
+      "Modifier",
+
+    countryLabel:
+      "Pays",
+
+    accountLabel:
+      "Type de compte",
+
+    security:
+      "SÉCURITÉ",
+
+    verifyTitle:
+      "🪪 Vérifiez votre identité",
+
+    verifyText:
+      "Vérifiez votre identité pour obtenir le badge ✓ et renforcer la confiance des autres utilisateurs.",
+
+    verifyButton:
+      "🪪 Vérifier l'identité",
+
+    verified:
+      "✓ VÉRIFIÉ",
+
+    verifiedIdentity:
+      "✓ Votre identité a été vérifiée.",
+
+    identityVerified:
+      "Identité vérifiée",
+
+    pending:
+      "⏳ Vérification en cours",
+
+    rejected:
+      "⚠️ Vérification refusée",
+
+    documentType:
+      "Type de document",
+
+    passport:
+      "🛂 Passeport",
+
+    identityCard:
+      "🪪 Carte d'identité",
+
+    document:
+      "Document",
+
+    sendDocument:
+      "🔐 Envoyer le document",
+
+    uploadHelp:
+      "Formats acceptés : JPG, PNG, PDF. Taille maximale : 10 Mo.",
+
+    uploadInProgress:
+      "Téléchargement en cours...",
+
+    documentSent:
+      "✓ Document envoyé avec succès.",
+
+    reviewText:
+      "Votre vérification est maintenant en cours d'examen.",
+
+    publishTripTitle:
+      "✈️ Publier un voyage",
+
+    tripDescription:
+      "Indiquez les détails de votre voyage.",
+
+    departure:
+      "Départ",
+
+    arrival:
+      "Arrivée",
+
+    departureCity:
+      "Ville de départ",
+
+    arrivalCity:
+      "Ville d'arrivée",
+
+    travelDate:
+      "Date du voyage",
+
+    availableKg:
+      "Kg disponibles",
+
+    priceKg:
+      "Prix €/kg",
+
+    description:
+      "Description",
+
+    ticket:
+      "📄 Billet du voyage",
+
+    ticketHelp:
+      "Téléchargez une photo, une capture d'écran ou un PDF du billet. Le billet est privé et visible uniquement par l'administrateur. Maximum 10 Mo.",
+
+    publish:
+      "Publier",
+
+    requestTitle:
+      "📦 Publier une demande",
+
+    itemDescription:
+      "Que souhaitez-vous transporter ?",
+
+    weight:
+      "Poids kg",
+
+    budget:
+      "Budget €",
+
+    myActivity:
+      "Mon activité",
+
+    myTrips:
+      "Mes voyages",
+
+    manageTrips:
+      "Gérer mes voyages",
+
+    myRequests:
+      "Mes demandes",
+
+    manageRequests:
+      "Gérer mes demandes",
+
+    myReviews:
+      "Mes avis",
+
+    viewReviews:
+      "Voir les évaluations",
+
+    logout:
+      "🚪 Déconnexion",
+
+    backHome:
+      "← Retour à Hez Maak",
+
+    contact:
+      "Contacter",
+
+    admin:
+      "🔐 Admin",
+
+    administration:
+      "ADMINISTRATION",
+
+    adminTitle:
+      "Panneau Hez Maak 🔐",
+
+    adminDescription:
+      "Gestion des vérifications d'identité.",
+
+    pendingRequests:
+      "Demandes en attente",
+
+    everythingOk:
+      "✓ Tout est en ordre",
+
+    noPending:
+      "Aucune vérification en attente.",
+
+    viewDocument:
+      "👁 Voir le document",
+
+    approve:
+      "✓ Approuver",
+
+    reject:
+      "✕ Refuser",
+
+    user:
+      "Utilisateur",
+
+    sent:
+      "Envoyée",
+
+    noTrips:
+      "✈️ Aucun voyage disponible",
+
+    publishFirstTrip:
+      "Publiez le premier voyage.",
+
+    noRequests:
+      "📦 Aucune demande",
+
+    publishFirstRequest:
+      "Publiez une demande.",
+
+    verifiedTrip:
+      "✈️ Voyage vérifié",
+
+    ticketPending:
+      "⏳ Billet en vérification",
+
+    verificationRejected:
+      "⚠️ Vérification refusée",
+
+    kg:
+      "kg",
+
+    contactSoon:
+      "La messagerie sera connectée à la table messages dans le prochain module.",
+
+    reviewsComing:
+      "Le système d'avis sera connecté à la base de données dans le prochain module.",
+
+    editComing:
+      "La modification du profil sera disponible dans le prochain module.",
+
+    noTripsUser:
+      "Vous n'avez encore publié aucun voyage.",
+
+    noRequestsUser:
+      "Vous n'avez encore publié aucune demande."
+
+  },
+
+
+  /* ===================================================
+     العربية التونسية
+  =================================================== */
+
+  tn: {
+
+    navTrips: "السفرات",
+    navRequests: "الطلبات",
+    navHow: "كيفاش تخدم",
+
+    loginRegister:
+      "دخول / تسجيل",
+
+    badge:
+      "🇮🇹 إيطاليا ↔ 🇹🇳 تونس",
+
+    heroTitle:
+      "هزّ اللي يلزم. تواصل. واربح.",
+
+    heroText:
+      "هزّ معاك تربط بين الناس اللي يحبّوا يبعثوا حاجات بين إيطاليا وتونس والمسافرين والناقلين اللي عندهم بلاصة.",
+
+    travelButton:
+      "✈️ أنا مسافر",
+
+    requestButton:
+      "📦 نلوج على شكون",
+
+    verifiedUsers:
+      "مستعملين موثوقين",
+
+    reviews:
+      "التقييمات",
+
+    securePayments:
+      "خلاص آمن",
+
+    routeTitle:
+      "✈️ سفرة وفرصة",
+
+    italy:
+      "إيطاليا",
+
+    tunisia:
+      "تونس",
+
+    routeDescription:
+      "عندك بلاصة في الفاليزة؟ تنجم تعاون شكون وتربح فلوس.",
+
+    howLabel:
+      "كيفاش تخدم",
+
+    howTitle:
+      "ساهلة، آمنة وإنسانية.",
+
+    step1Title:
+      "انشر",
+
+    step1Text:
+      "انشر سفرتك ولا قول شنوّة تحب تبعث.",
+
+    step2Title:
+      "تواصل",
+
+    step2Text:
+      "لقى شخص ماشي لنفس الوجهة.",
+
+    step3Title:
+      "نظّم",
+
+    step3Text:
+      "تواصل مع الشخص الآخر واتفقوا على التفاصيل.",
+
+    step4Title:
+      "قيّم",
+
+    step4Text:
+      "بعد الخدمة خلّي تقييم.",
+
+    tripsLabel:
+      "السفرات الموجودة",
+
+    tripsTitle:
+      "لقى مسافر",
+
+    publishTrip:
+      "+ انشر سفرة",
+
+    requestsLabel:
+      "الطلبات",
+
+    requestsTitle:
+      "شنوّة الناس تلوج عليه؟",
+
+    publishRequest:
+      "+ انشر طلب",
+
+    loading:
+      "جاري التحميل...",
+
+    ctaTitle:
+      "عندك سفرة مبرمجة؟",
+
+    ctaText:
+      "استغل البلاصة الفارغة في الفاليزة متاعك وحوّلها لفرصة تربح منها.",
+
+    ctaButton:
+      "انشر سفرتك",
+
+    footerBrand:
+      "هزّ معاك",
+
+    securityTitle:
+      "الأمان",
+
+    verifyIdentity:
+      "ثبّت هويتك",
+
+    support:
+      "المساعدة",
+
+    loginTitle:
+      "ادخل لهزّ معاك",
+
+    loginText:
+      "ادخل لحسابك.",
+
+    email:
+      "الإيميل",
+
+    password:
+      "كلمة السر",
+
+    login:
+      "دخول",
+
+    noAccount:
+      "ما عندكش حساب؟",
+
+    register:
+      "سجّل",
+
+    createAccount:
+      "اعمل حساب",
+
+    joinCommunity:
+      "انضم لمجتمع هزّ معاك.",
+
+    fullName:
+      "الاسم واللقب",
+
+    accountType:
+      "نوع الحساب",
+
+    private:
+      "👤 شخص عادي",
+
+    traveler:
+      "✈️ مسافر",
+
+    company:
+      "🚚 شركة / ناقل",
+
+    country:
+      "البلاد",
+
+    create:
+      "سجّل",
+
+    alreadyAccount:
+      "عندك حساب؟",
+
+    backToLogin:
+      "ادخل",
+
+    fillFields:
+      "عمّر الخانات الكل.",
+
+    accountCreated:
+      "الحساب تعمل. ثبّت الإيميل متاعك باش تفعّل الحساب.",
+
+    tripPublished:
+      "✓ السفرة تنشرت والتذكرة تبعثت للمراجعة.",
+
+    requestPublished:
+      "✓ الطلب تنشر!",
+
+    profile:
+      "👤 البروفايل متاعي",
+
+    verifiedProfile:
+      "✓ بروفايل موثوق",
+
+    notVerified:
+      "○ البروفايل موش موثوق",
+
+    personalInfo:
+      "المعلومات الشخصية",
+
+    edit:
+      "بدّل",
+
+    countryLabel:
+      "البلاد",
+
+    accountLabel:
+      "نوع الحساب",
+
+    security:
+      "الأمان",
+
+    verifyTitle:
+      "🪪 ثبّت هويتك",
+
+    verifyText:
+      "ثبّت هويتك باش تاخو علامة ✓ وتزيد ثقة الناس فيك.",
+
+    verifyButton:
+      "🪪 ثبّت الهوية",
+
+    verified:
+      "✓ موثوق",
+
+    verifiedIdentity:
+      "✓ هويتك تثبّتت.",
+
+    identityVerified:
+      "الهوية موثوقة",
+
+    pending:
+      "⏳ التثبت جاري",
+
+    rejected:
+      "⚠️ التثبت ترفض",
+
+    documentType:
+      "نوع الوثيقة",
+
+    passport:
+      "🛂 باسبورت",
+
+    identityCard:
+      "🪪 بطاقة تعريف",
+
+    document:
+      "الوثيقة",
+
+    sendDocument:
+      "🔐 ابعث الوثيقة",
+
+    uploadHelp:
+      "الصيغ المقبولة: JPG, PNG, PDF. الحجم الأقصى: 10 ميغا.",
+
+    uploadInProgress:
+      "جاري رفع الملف...",
+
+    documentSent:
+      "✓ الوثيقة تبعثت بنجاح.",
+
+    reviewText:
+      "الوثيقة توّا تحت المراجعة.",
+
+    publishTripTitle:
+      "✈️ انشر سفرة",
+
+    tripDescription:
+      "دخل تفاصيل سفرتك.",
+
+    departure:
+      "الانطلاق",
+
+    arrival:
+      "الوصول",
+
+    departureCity:
+      "مدينة الانطلاق",
+
+    arrivalCity:
+      "مدينة الوصول",
+
+    travelDate:
+      "تاريخ السفر",
+
+    availableKg:
+      "الكيلوغرامات المتوفرة",
+
+    priceKg:
+      "السعر €/كغ",
+
+    description:
+      "الوصف",
+
+    ticket:
+      "📄 تذكرة السفر",
+
+    ticketHelp:
+      "ارفع صورة ولا screenshot ولا PDF للتذكرة. التذكرة خاصة وما يشوفها كان المسؤول للمراجعة. أقصى حجم 10 ميغا.",
+
+    publish:
+      "انشر",
+
+    requestTitle:
+      "📦 انشر طلب",
+
+    itemDescription:
+      "شنوّة تحب تبعث؟",
+
+    weight:
+      "الوزن بالكيلو",
+
+    budget:
+      "الميزانية €",
+
+    myActivity:
+      "النشاط متاعي",
+
+    myTrips:
+      "السفرات متاعي",
+
+    manageTrips:
+      "إدارة السفرات",
+
+    myRequests:
+      "الطلبات متاعي",
+
+    manageRequests:
+      "إدارة الطلبات",
+
+    myReviews:
+      "التقييمات متاعي",
+
+    viewReviews:
+      "شوف التقييمات",
+
+    logout:
+      "🚪 خروج",
+
+    backHome:
+      "← ارجع لهزّ معاك",
+
+    contact:
+      "اتصل",
+
+    admin:
+      "🔐 مسؤول",
+
+    administration:
+      "الإدارة",
+
+    adminTitle:
+      "لوحة هزّ معاك 🔐",
+
+    adminDescription:
+      "إدارة التثبت من الهوية.",
+
+    pendingRequests:
+      "طلبات تستنى في المراجعة",
+
+    everythingOk:
+      "✓ كل شيء تمام",
+
+    noPending:
+      "ما فماش عمليات تثبت تستنى.",
+
+    viewDocument:
+      "👁 شوف الوثيقة",
+
+    approve:
+      "✓ وافق",
+
+    reject:
+      "✕ ارفض",
+
+    user:
+      "المستعمل",
+
+    sent:
+      "تبعت في",
+
+    noTrips:
+      "✈️ ما فماش سفرات متوفرة",
+
+    publishFirstTrip:
+      "انشر أول سفرة.",
+
+    noRequests:
+      "📦 ما فماش طلبات",
+
+    publishFirstRequest:
+      "انشر أول طلب.",
+
+    verifiedTrip:
+      "✈️ سفرة موثوقة",
+
+    ticketPending:
+      "⏳ التذكرة تحت المراجعة",
+
+    verificationRejected:
+      "⚠️ التثبت ما تقبلش",
+
+    kg:
+      "كغ",
+
+    contactSoon:
+      "المراسلة باش تتربط بجدول messages في المرحلة الجاية.",
+
+    reviewsComing:
+      "نظام التقييمات باش يتربط بقاعدة البيانات في المرحلة الجاية.",
+
+    editComing:
+      "تعديل البروفايل باش يكون متوفر في المرحلة الجاية.",
+
+    noTripsUser:
+      "ما نشرت حتى سفرة.",
+
+    noRequestsUser:
+      "ما نشرت حتى طلب."
+
+  }
+
+};
+
+
+/* =====================================================
+   TRANSLATION HELPERS
+===================================================== */
+
+function t(key) {
+
+  const language =
+    translations[currentLanguage] ||
+    translations.it;
+
+  return (
+    language[key] ||
+    translations.it[key] ||
+    key
+  );
+
+}
+
+
+function applyTranslations() {
+
+  const language =
+    translations[currentLanguage] ||
+    translations.it;
+
+
+  document.documentElement.lang =
+    currentLanguage === "tn"
+      ? "ar"
+      : currentLanguage;
+
+
+  document.documentElement.dir =
+    currentLanguage === "tn"
+      ? "rtl"
+      : "ltr";
+
+
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach(element => {
+
+      const key =
+        element.dataset.i18n;
+
+      if (
+        language[key] !== undefined
+      ) {
+
+        element.textContent =
+          language[key];
+
+      }
+
+    });
+
+
+  const button =
+    document.getElementById(
+      "languageButton"
+    );
+
+  if (button) {
+
+    const selected =
+      languages.find(
+        language =>
+          language.code === currentLanguage
+      );
+
+    if (selected) {
+      button.textContent =
+        selected.label;
+    }
+
+  }
+
+
+  localStorage.setItem(
+    "hezmaak_language",
+    currentLanguage
+  );
+
+}
+
+
+/* =====================================================
+   CHANGE LANGUAGE
+===================================================== */
+
+function cycleLanguage() {
+
+  const index =
+    languages.findIndex(
+      language =>
+        language.code === currentLanguage
+    );
+
+  const nextIndex =
+    index === -1
+      ? 0
+      : (index + 1) % languages.length;
+
+  currentLanguage =
+    languages[nextIndex].code;
+
+  applyTranslations();
+
+  /*
+    Ricarica i contenuti dinamici
+    nella nuova lingua.
+  */
+
+  loadTrips();
+  loadRequests();
+
+}
+
+
+/* =====================================================
    START
 ===================================================== */
 
 document.addEventListener(
   "DOMContentLoaded",
   async () => {
+
+    applyTranslations();
 
     await loadUser();
 
@@ -43,10 +1459,14 @@ async function loadUser() {
 
   const {
     data: { user }
-  } = await supabaseClient.auth.getUser();
+  } =
+    await supabaseClient.auth.getUser();
 
-  currentUser = user || null;
+  currentUser =
+    user || null;
+
   updateAdminButton();
+
 }
 
 
@@ -67,7 +1487,7 @@ function updateHeader() {
   if (currentUser) {
 
     button.textContent =
-      "👤 Il mio profilo";
+      t("profile");
 
     button.onclick =
       showProfile;
@@ -75,7 +1495,7 @@ function updateHeader() {
   } else {
 
     button.textContent =
-      "Accedi / Registrati";
+      t("loginRegister");
 
     button.onclick =
       () => openAuth("login");
@@ -97,20 +1517,22 @@ function setupActions() {
     )
     .forEach(button => {
 
-      button.onclick = event => {
+      button.onclick =
+        event => {
 
-        event.preventDefault();
+          event.preventDefault();
 
-        if (!currentUser) {
+          if (!currentUser) {
 
-          openAuth("login");
+            openAuth("login");
 
-          return;
-        }
+            return;
 
-        openTripModal();
+          }
 
-      };
+          openTripModal();
+
+        };
 
     });
 
@@ -121,20 +1543,22 @@ function setupActions() {
     )
     .forEach(button => {
 
-      button.onclick = event => {
+      button.onclick =
+        event => {
 
-        event.preventDefault();
+          event.preventDefault();
 
-        if (!currentUser) {
+          if (!currentUser) {
 
-          openAuth("login");
+            openAuth("login");
 
-          return;
-        }
+            return;
 
-        openRequestModal();
+          }
 
-      };
+          openRequestModal();
+
+        };
 
     });
 
@@ -142,7 +1566,7 @@ function setupActions() {
 
 
 /* =====================================================
-   AUTH
+   AUTH MODAL
 ===================================================== */
 
 function createAuthModal() {
@@ -159,7 +1583,8 @@ function createAuthModal() {
       "div"
     );
 
-  modal.id = "authModal";
+  modal.id =
+    "authModal";
 
 
   modal.innerHTML = `
@@ -180,25 +1605,25 @@ function createAuthModal() {
         <div id="loginView">
 
           <h2>
-            Accedi a Waselni
+            ${t("loginTitle")}
           </h2>
 
           <p>
-            Accedi al tuo account.
+            ${t("loginText")}
           </p>
 
 
           <input
             id="loginEmail"
             type="email"
-            placeholder="Email"
+            placeholder="${t("email")}"
           >
 
 
           <input
             id="loginPassword"
             type="password"
-            placeholder="Password"
+            placeholder="${t("password")}"
           >
 
 
@@ -206,19 +1631,19 @@ function createAuthModal() {
             class="primary auth-button"
             onclick="login()">
 
-            Accedi
+            ${t("login")}
 
           </button>
 
 
           <p class="auth-switch">
 
-            Non hai un account?
+            ${t("noAccount")}
 
             <button
               onclick="showRegister()">
 
-              Registrati
+              ${t("register")}
 
             </button>
 
@@ -233,47 +1658,47 @@ function createAuthModal() {
         >
 
           <h2>
-            Crea account
+            ${t("createAccount")}
           </h2>
 
           <p>
-            Entra nella comunità Waselni.
+            ${t("joinCommunity")}
           </p>
 
 
           <input
             id="registerName"
             type="text"
-            placeholder="Nome e cognome"
+            placeholder="${t("fullName")}"
           >
 
 
           <input
             id="registerEmail"
             type="email"
-            placeholder="Email"
+            placeholder="${t("email")}"
           >
 
 
           <input
             id="registerPassword"
             type="password"
-            placeholder="Password"
+            placeholder="${t("password")}"
           >
 
 
           <select id="registerType">
 
             <option value="private">
-              👤 Privato
+              ${t("private")}
             </option>
 
             <option value="traveler">
-              ✈️ Viaggiatore
+              ${t("traveler")}
             </option>
 
             <option value="company">
-              🚚 Azienda / Trasportatore
+              ${t("company")}
             </option>
 
           </select>
@@ -282,11 +1707,11 @@ function createAuthModal() {
           <select id="registerCountry">
 
             <option value="italy">
-              🇮🇹 Italia
+              🇮🇹 ${t("italy")}
             </option>
 
             <option value="tunisia">
-              🇹🇳 Tunisia
+              🇹🇳 ${t("tunisia")}
             </option>
 
           </select>
@@ -296,19 +1721,19 @@ function createAuthModal() {
             class="primary auth-button"
             onclick="register()">
 
-            Registrati
+            ${t("create")}
 
           </button>
 
 
           <p class="auth-switch">
 
-            Hai già un account?
+            ${t("alreadyAccount")}
 
             <button
               onclick="showLogin()">
 
-              Accedi
+              ${t("backToLogin")}
 
             </button>
 
@@ -322,6 +1747,7 @@ function createAuthModal() {
       </div>
 
     </div>
+
   `;
 
 
@@ -336,9 +1762,24 @@ function openAuth(
   mode = "login"
 ) {
 
+  const modal =
+    document.getElementById(
+      "authModal"
+    );
+
+  if (!modal) {
+
+    createAuthModal();
+
+  }
+
+
   document
-    .getElementById("authModal")
-    .style.display = "block";
+    .getElementById(
+      "authModal"
+    )
+    .style.display =
+    "block";
 
 
   if (mode === "register") {
@@ -356,9 +1797,17 @@ function openAuth(
 
 function closeAuth() {
 
-  document
-    .getElementById("authModal")
-    .style.display = "none";
+  const modal =
+    document.getElementById(
+      "authModal"
+    );
+
+  if (modal) {
+
+    modal.style.display =
+      "none";
+
+  }
 
 }
 
@@ -366,12 +1815,20 @@ function closeAuth() {
 function showLogin() {
 
   document
-    .getElementById("loginView")
-    .style.display = "block";
+    .getElementById(
+      "loginView"
+    )
+    .style.display =
+    "block";
+
 
   document
-    .getElementById("registerView")
-    .style.display = "none";
+    .getElementById(
+      "registerView"
+    )
+    .style.display =
+    "none";
+
 
   clearMessage();
 
@@ -381,12 +1838,20 @@ function showLogin() {
 function showRegister() {
 
   document
-    .getElementById("loginView")
-    .style.display = "none";
+    .getElementById(
+      "loginView"
+    )
+    .style.display =
+    "none";
+
 
   document
-    .getElementById("registerView")
-    .style.display = "block";
+    .getElementById(
+      "registerView"
+    )
+    .style.display =
+    "block";
+
 
   clearMessage();
 
@@ -403,7 +1868,10 @@ function showMessage(
       "authMessage"
     );
 
-  element.textContent = text;
+  if (!element) return;
+
+  element.textContent =
+    text;
 
   element.className =
     error
@@ -420,9 +1888,13 @@ function clearMessage() {
       "authMessage"
     );
 
-  element.textContent = "";
+  if (!element) return;
 
-  element.className = "";
+  element.textContent =
+    "";
+
+  element.className =
+    "";
 
 }
 
@@ -466,7 +1938,7 @@ async function register() {
   ) {
 
     showMessage(
-      "Compila tutti i campi.",
+      t("fillFields"),
       true
     );
 
@@ -516,13 +1988,17 @@ async function register() {
       .from("profiles")
       .upsert({
 
-        id: data.user.id,
+        id:
+          data.user.id,
 
-        full_name: name,
+        full_name:
+          name,
 
-        country: country,
+        country:
+          country,
 
-        user_type: type
+        user_type:
+          type
 
       });
 
@@ -530,7 +2006,7 @@ async function register() {
 
 
   showMessage(
-    "Account creato. Controlla la tua email per confermare l'account."
+    t("accountCreated")
   );
 
 }
@@ -576,17 +2052,65 @@ async function login() {
 
   }
 
-await loadUser();
 
-closeAuth();
+  await loadUser();
 
-updateHeader();
+  closeAuth();
 
-setupActions();
+  updateHeader();
 
-loadTrips();
+  setupActions();
 
-loadRequests();
+  loadTrips();
+
+  loadRequests();
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+async function logout() {
+
+  const {
+    error
+  } =
+    await supabaseClient.auth.signOut();
+
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  currentUser =
+    null;
+
+
+  const profilePage =
+    document.getElementById(
+      "profilePage"
+    );
+
+  if (profilePage) {
+
+    profilePage.remove();
+
+  }
+
+
+  updateHeader();
+
+  setupActions();
+
 }
 
 
@@ -594,70 +2118,95 @@ loadRequests();
    PROFILE
 ===================================================== */
 
-
 async function showProfile() {
 
   if (!currentUser) {
+
     openAuth("login");
+
     return;
+
   }
+
 
   const {
     data: profile,
     error
-  } = await supabaseClient
-    .from("profiles")
-    .select("*")
-    .eq("id", currentUser.id)
-    .single();
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .single();
+
 
   if (error) {
-    console.error(error);
 
     alert(
-      "Errore caricamento profilo: " +
       error.message
     );
 
     return;
+
   }
+
 
   const existing =
-    document.getElementById("profilePage");
+    document.getElementById(
+      "profilePage"
+    );
 
   if (existing) {
+
     existing.remove();
+
   }
+
 
   const name =
     profile.full_name ||
-    "Utente Waselni";
+    "Hez Maak";
+
 
   const country =
     profile.country === "tunisia"
-      ? "🇹🇳 Tunisia"
-      : "🇮🇹 Italia";
+      ? "🇹🇳 " + t("tunisia")
+      : "🇮🇹 " + t("italy");
+
 
   const type =
     profile.user_type === "company"
-      ? "🚚 Azienda / Trasportatore"
+      ? t("company")
       : profile.user_type === "traveler"
-      ? "✈️ Viaggiatore"
-      : "👤 Privato";
+        ? t("traveler")
+        : t("private");
+
 
   const verified =
     profile.is_verified === true;
 
+
   const rating =
-    Number(profile.rating || 0).toFixed(1);
+    Number(
+      profile.rating || 0
+    ).toFixed(1);
+
 
   const reviews =
     profile.reviews_count || 0;
 
-  const page =
-    document.createElement("div");
 
-  page.id = "profilePage";
+  const page =
+    document.createElement(
+      "div"
+    );
+
+  page.id =
+    "profilePage";
+
 
   page.innerHTML = `
 
@@ -665,11 +2214,12 @@ async function showProfile() {
 
       <div class="container">
 
+
         <button
           class="back-button"
           onclick="closeProfilePage()">
 
-          ← Torna a Waselni
+          ${t("backHome")}
 
         </button>
 
@@ -677,36 +2227,43 @@ async function showProfile() {
         <div class="profile-layout">
 
 
-          <!-- SIDEBAR -->
-
           <aside class="profile-sidebar">
+
 
             <div class="profile-avatar">
               👤
             </div>
 
+
             <h2>
               ${escapeHtml(name)}
             </h2>
 
+
             <p class="profile-email">
+
               ${escapeHtml(
                 currentUser.email || ""
               )}
+
             </p>
 
+
             <div class="profile-badge
-              ${verified
-                ? "verified-profile"
-                : "not-verified"}">
+              ${
+                verified
+                  ? "verified-profile"
+                  : "not-verified"
+              }">
 
               ${
                 verified
-                  ? "✓ Profilo verificato"
-                  : "○ Profilo non verificato"
+                  ? t("verifiedProfile")
+                  : t("notVerified")
               }
 
             </div>
+
 
             <div class="profile-rating">
 
@@ -715,7 +2272,7 @@ async function showProfile() {
               </strong>
 
               <span>
-                ${reviews} recensioni
+                ${reviews} ${t("reviews")}
               </span>
 
             </div>
@@ -725,7 +2282,7 @@ async function showProfile() {
               class="primary profile-action"
               onclick="closeProfilePage(); openTripModal();">
 
-              ✈️ Pubblica viaggio
+              ${t("travelButton")}
 
             </button>
 
@@ -734,7 +2291,7 @@ async function showProfile() {
               class="secondary profile-action"
               onclick="closeProfilePage(); openRequestModal();">
 
-              📦 Pubblica richiesta
+              ${t("requestButton")}
 
             </button>
 
@@ -743,31 +2300,32 @@ async function showProfile() {
               class="logout-button"
               onclick="logout();">
 
-              🚪 Esci
+              ${t("logout")}
 
             </button>
+
 
           </aside>
 
 
-          <!-- MAIN -->
 
           <main class="profile-main">
+
 
             <div class="profile-header">
 
               <div>
 
                 <span class="section-label">
-                  IL MIO PROFILO
+                  ${t("profile")}
                 </span>
 
                 <h1>
-                  Ciao, ${escapeHtml(name)} 👋
+                  ${t("profile")} 👋
                 </h1>
 
                 <p>
-                  Gestisci il tuo account Waselni.
+                  ${t("personalInfo")}
                 </p>
 
               </div>
@@ -775,33 +2333,36 @@ async function showProfile() {
             </div>
 
 
-            <!-- INFO -->
 
             <section class="profile-card">
+
 
               <div class="profile-card-title">
 
                 <h3>
-                  Informazioni personali
+                  ${t("personalInfo")}
                 </h3>
+
 
                 <button
                   class="small-button"
                   onclick="editProfile()">
 
-                  Modifica
+                  ${t("edit")}
 
                 </button>
 
               </div>
 
 
+
               <div class="profile-info-grid">
+
 
                 <div>
 
                   <span>
-                    Nome
+                    ${t("fullName")}
                   </span>
 
                   <strong>
@@ -814,7 +2375,7 @@ async function showProfile() {
                 <div>
 
                   <span>
-                    Email
+                    ${t("email")}
                   </span>
 
                   <strong>
@@ -829,7 +2390,7 @@ async function showProfile() {
                 <div>
 
                   <span>
-                    Paese
+                    ${t("countryLabel")}
                   </span>
 
                   <strong>
@@ -842,7 +2403,7 @@ async function showProfile() {
                 <div>
 
                   <span>
-                    Tipo account
+                    ${t("accountLabel")}
                   </span>
 
                   <strong>
@@ -851,24 +2412,29 @@ async function showProfile() {
 
                 </div>
 
+
               </div>
 
             </section>
 
 
-            <!-- VERIFICATION -->
 
-            <section class="profile-card verification-card">
+            <section
+              class="profile-card verification-card"
+            >
+
 
               <div>
 
                 <span class="section-label">
-                  SICUREZZA
+                  ${t("security")}
                 </span>
 
+
                 <h3>
-                  🪪 Verifica la tua identità
+                  ${t("verifyTitle")}
                 </h3>
+
 
                 ${
                   verified
@@ -876,9 +2442,7 @@ async function showProfile() {
                     ? `
 
                       <p class="success-text">
-
-                        ✓ La tua identità è stata verificata.
-
+                        ${t("verifiedIdentity")}
                       </p>
 
                     `
@@ -886,11 +2450,7 @@ async function showProfile() {
                     : `
 
                       <p>
-
-                        Verifica la tua identità per ottenere
-                        il badge ✓ e aumentare la fiducia
-                        degli altri utenti.
-
+                        ${t("verifyText")}
                       </p>
 
                     `
@@ -905,9 +2465,7 @@ async function showProfile() {
                   ? `
 
                     <div class="verification-status">
-
-                      ✓ VERIFICATO
-
+                      ${t("verified")}
                     </div>
 
                   `
@@ -918,26 +2476,28 @@ async function showProfile() {
                       class="primary"
                       onclick="openVerification()">
 
-                      🪪 Verifica identità
+                      ${t("verifyButton")}
 
                     </button>
 
                   `
               }
 
+
             </section>
 
 
-            <!-- MY ACTIVITY -->
 
             <section class="profile-card">
 
+
               <h3>
-                La mia attività
+                ${t("myActivity")}
               </h3>
 
 
               <div class="profile-menu-grid">
+
 
                 <button
                   onclick="showMyTrips()">
@@ -945,11 +2505,11 @@ async function showProfile() {
                   <span>✈️</span>
 
                   <strong>
-                    I miei viaggi
+                    ${t("myTrips")}
                   </strong>
 
                   <small>
-                    Gestisci i tuoi viaggi
+                    ${t("manageTrips")}
                   </small>
 
                 </button>
@@ -961,11 +2521,11 @@ async function showProfile() {
                   <span>📦</span>
 
                   <strong>
-                    Le mie richieste
+                    ${t("myRequests")}
                   </strong>
 
                   <small>
-                    Gestisci le tue richieste
+                    ${t("manageRequests")}
                   </small>
 
                 </button>
@@ -977,11 +2537,11 @@ async function showProfile() {
                   <span>⭐</span>
 
                   <strong>
-                    Le mie recensioni
+                    ${t("myReviews")}
                   </strong>
 
                   <small>
-                    Visualizza le valutazioni
+                    ${t("viewReviews")}
                   </small>
 
                 </button>
@@ -993,18 +2553,21 @@ async function showProfile() {
                   <span>🪪</span>
 
                   <strong>
-                    Verifica identità
+                    ${t("verifyIdentity")}
                   </strong>
 
                   <small>
-                    Stato della verifica
+                    ${t("verifyText")}
                   </small>
 
                 </button>
 
+
               </div>
 
+
             </section>
+
 
           </main>
 
@@ -1016,9 +2579,14 @@ async function showProfile() {
 
   `;
 
-  document.body.appendChild(page);
 
-  document.body.style.overflow = "hidden";
+  document.body.appendChild(
+    page
+  );
+
+
+  document.body.style.overflow =
+    "hidden";
 
 }
 
@@ -1031,45 +2599,18 @@ function closeProfilePage() {
     );
 
   if (page) {
+
     page.remove();
+
   }
 
-  document.body.style.overflow = "";
+
+  document.body.style.overflow =
+    "";
 
 }
-/*==========================LOG OUT ==================================
-async function logout() {
 
-  const {
-    error
-  } = await supabaseClient.auth.signOut();
 
-  if (error) {
-
-    alert(
-      "Errore durante il logout: " +
-      error.message
-    );
-
-    return;
-  }
-
-  currentUser = null;
-
-  const profileModal =
-    document.getElementById(
-      "profileModal"
-    );
-
-  if (profileModal) {
-    profileModal.remove();
-  }
-
-  updateHeader();
-
-  setupActions();
-
-}
 /* =====================================================
    TRIP MODAL
 ===================================================== */
@@ -1091,6 +2632,7 @@ function createTripModal() {
 
       <div class="auth-box">
 
+
         <button
           class="auth-close"
           onclick="closeTripModal()">
@@ -1101,45 +2643,48 @@ function createTripModal() {
 
 
         <h2>
-          ✈️ Pubblica viaggio
+          ${t("publishTripTitle")}
         </h2>
 
+
         <p>
-          Indica il tuo viaggio.
+          ${t("tripDescription")}
         </p>
 
 
         <label>
-          Partenza
+          ${t("departure")}
         </label>
+
 
         <select
           id="tripDepartureCountry">
 
           <option value="italy">
-            🇮🇹 Italia
+            🇮🇹 ${t("italy")}
           </option>
 
           <option value="tunisia">
-            🇹🇳 Tunisia
+            🇹🇳 ${t("tunisia")}
           </option>
 
         </select>
 
 
         <label>
-          Arrivo
+          ${t("arrival")}
         </label>
+
 
         <select
           id="tripArrivalCountry">
 
           <option value="tunisia">
-            🇹🇳 Tunisia
+            🇹🇳 ${t("tunisia")}
           </option>
 
           <option value="italy">
-            🇮🇹 Italia
+            🇮🇹 ${t("italy")}
           </option>
 
         </select>
@@ -1147,13 +2692,13 @@ function createTripModal() {
 
         <input
           id="tripDepartureCity"
-          placeholder="Città di partenza"
+          placeholder="${t("departureCity")}"
         >
 
 
         <input
           id="tripArrivalCity"
-          placeholder="Città di arrivo"
+          placeholder="${t("arrivalCity")}"
         >
 
 
@@ -1168,7 +2713,7 @@ function createTripModal() {
           type="number"
           min="0.1"
           step="0.1"
-          placeholder="Kg disponibili"
+          placeholder="${t("availableKg")}"
         >
 
 
@@ -1177,47 +2722,51 @@ function createTripModal() {
           type="number"
           min="0"
           step="0.01"
-          placeholder="Prezzo €/kg"
+          placeholder="${t("priceKg")}"
         >
 
 
         <textarea
           id="tripDescription"
           rows="4"
-          placeholder="Descrizione"
+          placeholder="${t("description")}"
         ></textarea>
-      <label>
-  📄 Biglietto del viaggio
-</label>
 
-<input
-  id="travelTicket"
-  type="file"
-  accept=".jpg,.jpeg,.png,.pdf"
-  required
->
 
-<small class="upload-help">
-  Carica una foto, screenshot o PDF del biglietto.
-  Il biglietto è privato e sarà visibile solo
-  all'amministratore per la verifica.
-  Massimo 10 MB.
-</small>
+        <label>
+          ${t("ticket")}
+        </label>
+
+
+        <input
+          id="travelTicket"
+          type="file"
+          accept=".jpg,.jpeg,.png,.pdf"
+          required
+        >
+
+
+        <small class="upload-help">
+          ${t("ticketHelp")}
+        </small>
+
 
         <button
           class="primary auth-button"
           onclick="publishTrip()">
 
-          Pubblica viaggio
+          ${t("publish")}
 
         </button>
 
 
         <div id="tripMessage"></div>
 
+
       </div>
 
     </div>
+
   `;
 
 
@@ -1230,18 +2779,34 @@ function createTripModal() {
 
 function openTripModal() {
 
-  document
-    .getElementById("tripModal")
-    .style.display = "block";
+  const modal =
+    document.getElementById(
+      "tripModal"
+    );
+
+  if (modal) {
+
+    modal.style.display =
+      "block";
+
+  }
 
 }
 
 
 function closeTripModal() {
 
-  document
-    .getElementById("tripModal")
-    .style.display = "none";
+  const modal =
+    document.getElementById(
+      "tripModal"
+    );
+
+  if (modal) {
+
+    modal.style.display =
+      "none";
+
+  }
 
 }
 
@@ -1253,34 +2818,43 @@ function closeTripModal() {
 async function publishTrip() {
 
   if (!currentUser) {
+
     openAuth("login");
+
     return;
+
   }
+
 
   const departureCountry =
     document.getElementById(
       "tripDepartureCountry"
     ).value;
 
+
   const arrivalCountry =
     document.getElementById(
       "tripArrivalCountry"
     ).value;
+
 
   const departureCity =
     document.getElementById(
       "tripDepartureCity"
     ).value.trim();
 
+
   const arrivalCity =
     document.getElementById(
       "tripArrivalCity"
     ).value.trim();
 
+
   const date =
     document.getElementById(
       "tripDate"
     ).value;
+
 
   const kg =
     parseFloat(
@@ -1289,6 +2863,7 @@ async function publishTrip() {
       ).value
     );
 
+
   const price =
     parseFloat(
       document.getElementById(
@@ -1296,20 +2871,24 @@ async function publishTrip() {
       ).value
     ) || null;
 
+
   const description =
     document.getElementById(
       "tripDescription"
     ).value.trim();
+
 
   const ticketInput =
     document.getElementById(
       "travelTicket"
     );
 
+
   const message =
     document.getElementById(
       "tripMessage"
     );
+
 
   if (
     !departureCity ||
@@ -1319,26 +2898,35 @@ async function publishTrip() {
   ) {
 
     message.textContent =
-      "Compila tutti i campi obbligatori.";
+      t("fillFields");
 
     message.className =
       "auth-error";
 
     return;
+
   }
 
+
   if (
-    departureCountry === arrivalCountry
+    departureCountry ===
+    arrivalCountry
   ) {
 
     message.textContent =
-      "Partenza e arrivo devono essere in paesi diversi.";
+      currentLanguage === "it"
+        ? "Partenza e arrivo devono essere in paesi diversi."
+        : currentLanguage === "fr"
+          ? "Le départ et l'arrivée doivent être dans des pays différents."
+          : "الانطلاق والوصول لازم يكونوا في بلاد مختلفة.";
 
     message.className =
       "auth-error";
 
     return;
+
   }
+
 
   if (
     !ticketInput ||
@@ -1347,36 +2935,54 @@ async function publishTrip() {
   ) {
 
     message.textContent =
-      "Devi caricare il biglietto del volo.";
+      currentLanguage === "it"
+        ? "Devi caricare il biglietto del volo."
+        : currentLanguage === "fr"
+          ? "Vous devez télécharger votre billet."
+          : "لازمك ترفع تذكرة السفر.";
 
     message.className =
       "auth-error";
 
     return;
+
   }
+
 
   const ticketFile =
     ticketInput.files[0];
 
+
   const maxSize =
     10 * 1024 * 1024;
 
-  if (ticketFile.size > maxSize) {
+
+  if (
+    ticketFile.size >
+    maxSize
+  ) {
 
     message.textContent =
-      "Il biglietto supera il limite di 10 MB.";
+      currentLanguage === "it"
+        ? "Il biglietto supera il limite di 10 MB."
+        : currentLanguage === "fr"
+          ? "Le billet dépasse la limite de 10 Mo."
+          : "التذكرة أكبر من 10 ميغا.";
 
     message.className =
       "auth-error";
 
     return;
+
   }
+
 
   const allowedTypes = [
     "image/jpeg",
     "image/png",
     "application/pdf"
   ];
+
 
   if (
     !allowedTypes.includes(
@@ -1385,19 +2991,31 @@ async function publishTrip() {
   ) {
 
     message.textContent =
-      "Formato non supportato. Usa JPG, PNG o PDF.";
+      currentLanguage === "it"
+        ? "Formato non supportato. Usa JPG, PNG o PDF."
+        : currentLanguage === "fr"
+          ? "Format non pris en charge. Utilisez JPG, PNG ou PDF."
+          : "الصيغة موش مدعومة. استعمل JPG أو PNG أو PDF.";
 
     message.className =
       "auth-error";
 
     return;
+
   }
 
+
   message.textContent =
-    "Caricamento biglietto...";
+    currentLanguage === "it"
+      ? "Caricamento biglietto..."
+      : currentLanguage === "fr"
+        ? "Téléchargement du billet..."
+        : "جاري رفع التذكرة...";
+
 
   message.className =
     "auth-success";
+
 
   const extension =
     ticketFile.name
@@ -1405,86 +3023,98 @@ async function publishTrip() {
       .pop()
       .toLowerCase();
 
+
   const ticketPath =
     `${currentUser.id}/ticket-${Date.now()}.${extension}`;
 
+
   const {
     error: uploadError
-  } = await supabaseClient
-    .storage
-    .from("travel-tickets")
-    .upload(
-      ticketPath,
-      ticketFile,
-      {
-        upsert: false
-      }
-    );
+  } =
+    await supabaseClient
+      .storage
+      .from("travel-tickets")
+      .upload(
+        ticketPath,
+        ticketFile,
+        {
+          upsert: false,
+          contentType:
+            ticketFile.type
+        }
+      );
+
 
   if (uploadError) {
 
-    console.error(uploadError);
+    console.error(
+      uploadError
+    );
 
     message.textContent =
-      "Errore caricamento biglietto: " +
+      "Errore: " +
       uploadError.message;
 
     message.className =
       "auth-error";
 
     return;
+
   }
 
-  message.textContent =
-    "Pubblicazione viaggio...";
 
   const {
     error: tripError
-  } = await supabaseClient
-    .from("trips")
-    .insert({
+  } =
+    await supabaseClient
+      .from("trips")
+      .insert({
 
-      user_id:
-        currentUser.id,
+        user_id:
+          currentUser.id,
 
-      departure_country:
-        departureCountry,
+        departure_country:
+          departureCountry,
 
-      arrival_country:
-        arrivalCountry,
+        arrival_country:
+          arrivalCountry,
 
-      departure_city:
-        departureCity,
+        departure_city:
+          departureCity,
 
-      arrival_city:
-        arrivalCity,
+        arrival_city:
+          arrivalCity,
 
-      travel_date:
-        date,
+        travel_date:
+          date,
 
-      available_kg:
-        kg,
+        available_kg:
+          kg,
 
-      price_per_kg:
-        price,
+        price_per_kg:
+          price,
 
-      description:
-        description,
+        description:
+          description,
 
-      ticket_path:
-        ticketPath,
+        ticket_path:
+          ticketPath,
 
-      verification_status:
-        "pending",
+        verification_status:
+          "pending",
 
-      status:
-        "active"
+        status:
+          "active"
 
-    });
+      });
+
 
   if (tripError) {
 
-    console.error(tripError);
+    console.error(
+      tripError
+    );
+
 
     await supabaseClient
       .storage
@@ -1493,31 +3123,37 @@ async function publishTrip() {
         ticketPath
       ]);
 
+
     message.textContent =
-      "Errore pubblicazione viaggio: " +
+      "Errore: " +
       tripError.message;
 
     message.className =
       "auth-error";
 
     return;
+
   }
 
+
   message.textContent =
-    "✓ Viaggio pubblicato e biglietto inviato per verifica.";
+    t("tripPublished");
 
   message.className =
     "auth-success";
+
 
   setTimeout(
     () => {
 
       closeTripModal();
+
       loadTrips();
 
     },
     1000
   );
+
 }
 
 
@@ -1618,13 +3254,58 @@ function tripCard(trip) {
       "T12:00:00"
     )
     .toLocaleDateString(
-      "it-IT"
+      currentLanguage === "fr"
+        ? "fr-FR"
+        : currentLanguage === "tn"
+          ? "ar-TN"
+          : "it-IT"
     );
+
+
+  let verificationHtml =
+    "";
+
+
+  if (
+    trip.verification_status ===
+    "approved"
+  ) {
+
+    verificationHtml =
+      `
+      <span class="verified-trip">
+        ${t("verifiedTrip")}
+      </span>
+      `;
+
+  } else if (
+    trip.verification_status ===
+    "pending"
+  ) {
+
+    verificationHtml =
+      `
+      <span class="pending-trip">
+        ${t("ticketPending")}
+      </span>
+      `;
+
+  } else {
+
+    verificationHtml =
+      `
+      <span class="rejected-trip">
+        ${t("verificationRejected")}
+      </span>
+      `;
+
+  }
 
 
   return `
 
     <article class="card trip-card">
+
 
       <div class="avatar">
         ✈️
@@ -1635,26 +3316,21 @@ function tripCard(trip) {
 
         ${escapeHtml(
           profile.full_name ||
-          "Utente Waselni"
+          "Hez Maak"
         )}
-${
-  trip.verification_status === "approved"
-    ? `<span class="verified-trip">
-         ✈️ Viaggio verificato
-       </span>`
-    : trip.verification_status === "pending"
-      ? `<span class="pending-trip">
-           ⏳ Biglietto in verifica
-         </span>`
-      : `<span class="rejected-trip">
-           ⚠️ Verifica non approvata
-         </span>`
-}
+
+        ${verificationHtml}
+
+
         ${
           profile.is_verified
-            ? `<span class="verified">
-                ✓ Verificato
-               </span>`
+
+            ? `
+              <span class="verified">
+                ✓ ${t("verified")}
+              </span>
+            `
+
             : ""
         }
 
@@ -1690,26 +3366,34 @@ ${
 
 
       <p>
-        📦 ${trip.available_kg} kg
+        📦 ${trip.available_kg} ${t("kg")}
       </p>
 
 
       ${
         trip.price_per_kg
-          ? `<strong>
-              €${trip.price_per_kg}/kg
-             </strong>`
+
+          ? `
+            <strong>
+              €${trip.price_per_kg}/${t("kg")}
+            </strong>
+          `
+
           : ""
       }
 
 
       ${
         trip.description
-          ? `<p>
+
+          ? `
+            <p>
               ${escapeHtml(
                 trip.description
               )}
-             </p>`
+            </p>
+          `
+
           : ""
       }
 
@@ -1718,23 +3402,26 @@ ${
         currentUser &&
         currentUser.id !== trip.user_id
 
-        ? `<button
-            class="primary"
-            onclick="contactUser('${trip.user_id}')">
+          ? `
+            <button
+              class="primary"
+              onclick="contactUser('${trip.user_id}')">
 
-            Contatta
+              💬 Contatta
 
-           </button>`
+            </button>
+          `
 
-        : ""
-
+          : ""
       }
+
 
     </article>
 
   `;
 
 }
+
 
 
 /* =====================================================
@@ -1758,6 +3445,7 @@ function createRequestModal() {
 
       <div class="auth-box">
 
+
         <button
           class="auth-close"
           onclick="closeRequestModal()">
@@ -1768,7 +3456,7 @@ function createRequestModal() {
 
 
         <h2>
-          📦 Pubblica richiesta
+          ${t("requestTitle")}
         </h2>
 
 
@@ -1776,11 +3464,11 @@ function createRequestModal() {
           id="requestDeparture">
 
           <option value="tunisia">
-            🇹🇳 Tunisia
+            🇹🇳 ${t("tunisia")}
           </option>
 
           <option value="italy">
-            🇮🇹 Italia
+            🇮🇹 ${t("italy")}
           </option>
 
         </select>
@@ -1790,11 +3478,11 @@ function createRequestModal() {
           id="requestArrival">
 
           <option value="italy">
-            🇮🇹 Italia
+            🇮🇹 ${t("italy")}
           </option>
 
           <option value="tunisia">
-            🇹🇳 Tunisia
+            🇹🇳 ${t("tunisia")}
           </option>
 
         </select>
@@ -1802,13 +3490,13 @@ function createRequestModal() {
 
         <input
           id="requestDepartureCity"
-          placeholder="Città di partenza"
+          placeholder="${t("departureCity")}"
         >
 
 
         <input
           id="requestArrivalCity"
-          placeholder="Città di arrivo"
+          placeholder="${t("arrivalCity")}"
         >
 
 
@@ -1821,21 +3509,21 @@ function createRequestModal() {
         <textarea
           id="requestDescription"
           rows="4"
-          placeholder="Cosa vuoi trasportare?"
+          placeholder="${t("itemDescription")}"
         ></textarea>
 
 
         <input
           id="requestWeight"
           type="number"
-          placeholder="Peso kg"
+          placeholder="${t("weight")}"
         >
 
 
         <input
           id="requestBudget"
           type="number"
-          placeholder="Budget €"
+          placeholder="${t("budget")}"
         >
 
 
@@ -1843,16 +3531,18 @@ function createRequestModal() {
           class="primary auth-button"
           onclick="publishRequest()">
 
-          Pubblica richiesta
+          ${t("publish")}
 
         </button>
 
 
         <div id="requestMessage"></div>
 
+
       </div>
 
     </div>
+
   `;
 
 
@@ -1865,24 +3555,34 @@ function createRequestModal() {
 
 function openRequestModal() {
 
-  document
-    .getElementById(
+  const modal =
+    document.getElementById(
       "requestModal"
-    )
-    .style.display =
-    "block";
+    );
+
+  if (modal) {
+
+    modal.style.display =
+      "block";
+
+  }
 
 }
 
 
 function closeRequestModal() {
 
-  document
-    .getElementById(
+  const modal =
+    document.getElementById(
       "requestModal"
-    )
-    .style.display =
-    "none";
+    );
+
+  if (modal) {
+
+    modal.style.display =
+      "none";
+
+  }
 
 }
 
@@ -1893,35 +3593,50 @@ function closeRequestModal() {
 
 async function publishRequest() {
 
+  if (!currentUser) {
+
+    openAuth("login");
+
+    return;
+
+  }
+
+
   const departure =
     document.getElementById(
       "requestDeparture"
     ).value;
+
 
   const arrival =
     document.getElementById(
       "requestArrival"
     ).value;
 
+
   const departureCity =
     document.getElementById(
       "requestDepartureCity"
     ).value.trim();
+
 
   const arrivalCity =
     document.getElementById(
       "requestArrivalCity"
     ).value.trim();
 
+
   const date =
     document.getElementById(
       "requestDate"
     ).value || null;
 
+
   const description =
     document.getElementById(
       "requestDescription"
     ).value.trim();
+
 
   const weight =
     parseFloat(
@@ -1929,6 +3644,7 @@ async function publishRequest() {
         "requestWeight"
       ).value
     ) || null;
+
 
   const budget =
     parseFloat(
@@ -1951,7 +3667,7 @@ async function publishRequest() {
   ) {
 
     message.textContent =
-      "Compila i campi obbligatori.";
+      t("fillFields");
 
     message.className =
       "auth-error";
@@ -1966,7 +3682,11 @@ async function publishRequest() {
   ) {
 
     message.textContent =
-      "I paesi devono essere diversi.";
+      currentLanguage === "it"
+        ? "I paesi devono essere diversi."
+        : currentLanguage === "fr"
+          ? "Les pays doivent être différents."
+          : "البلاد لازم تكون مختلفة.";
 
     message.className =
       "auth-error";
@@ -2030,7 +3750,7 @@ async function publishRequest() {
 
 
   message.textContent =
-    "✓ Richiesta pubblicata!";
+    t("requestPublished");
 
   message.className =
     "auth-success";
@@ -2091,10 +3811,16 @@ async function loadRequests() {
 
   if (error) {
 
+    console.error(
+      error
+    );
+
     container.innerHTML =
-      `<div class="loading">
-        Errore nel caricamento.
-      </div>`;
+      `
+      <div class="loading">
+        ${escapeHtml(error.message)}
+      </div>
+      `;
 
     return;
 
@@ -2104,17 +3830,19 @@ async function loadRequests() {
   if (!data.length) {
 
     container.innerHTML =
-      `<div class="empty-state">
+      `
+      <div class="empty-state">
 
         <h3>
-          📦 Nessuna richiesta
+          ${t("noRequests")}
         </h3>
 
         <p>
-          Pubblica una richiesta.
+          ${t("publishFirstRequest")}
         </p>
 
-      </div>`;
+      </div>
+      `;
 
     return;
 
@@ -2137,18 +3865,33 @@ function requestCard(request) {
 
     <article class="card">
 
+
       <div class="avatar">
         📦
       </div>
+
 
       <h3>
 
         ${escapeHtml(
           request.profiles?.full_name ||
-          "Utente Waselni"
+          "Hez Maak"
         )}
 
+        ${
+          request.profiles?.is_verified
+
+            ? `
+              <span class="verified">
+                ✓ ${t("verified")}
+              </span>
+            `
+
+            : ""
+        }
+
       </h3>
+
 
       <p>
 
@@ -2172,157 +3915,84 @@ function requestCard(request) {
 
       </p>
 
+
       <p>
+
         ${escapeHtml(
           request.item_description
         )}
+
       </p>
+
 
       ${
         request.weight_kg
-          ? `<p>
-              📦 ${request.weight_kg} kg
-             </p>`
+
+          ? `
+            <p>
+              📦 ${request.weight_kg} ${t("kg")}
+            </p>
+          `
+
           : ""
       }
+
 
       ${
         request.budget
-          ? `<strong>
-              Budget €${request.budget}
-             </strong>`
+
+          ? `
+            <strong>
+              ${t("budget")} €${request.budget}
+            </strong>
+          `
+
           : ""
       }
 
-    </article>
+${
+  currentUser &&
+  currentUser.id !== trip.user_id
 
-  `;
+    ? `<button
+        class="primary"
+        onclick="contactUser('${trip.user_id}')">
+
+        💬 Contatta
+
+       </button>`
+
+    : ""
+}
+    </article>`;
 
 }
 
-
-/* =====================================================
-   CONTACT
-===================================================== */
-
+/* ====================================================  CONTACT    
+  =====================================================*/ 
 function contactUser(userId) {
 
   if (!currentUser) {
-
-    openAuth();
-
+    openAuth("login");
     return;
-
   }
 
+  if (!userId) {
+    alert("Impossibile identificare l'utente.");
+    return;
+  }
 
-  alert(
-    "La messaggistica sarà collegata alla tabella messages nel prossimo modulo."
-  );
+  if (userId === currentUser.id) {
+    alert("Non puoi contattare te stesso.");
+    return;
+  }
 
+  alert("Chat in preparazione.");
+  
 }
-
-
 /* =====================================================
-   LANGUAGE
+   MESSAGGING
 ===================================================== */
-
-const languages = [
-  {
-    code: "it",
-    label: "🇮🇹 IT"
-  },
-  {
-    code: "fr",
-    label: "🇫🇷 FR"
-  },
-  {
-    code: "tn",
-    label: "🇹🇳 TN"
-  }
-];
-
-let currentLanguage = 0;
-
-
-function cycleLanguage() {
-
-  currentLanguage++;
-
-  if (
-    currentLanguage >=
-    languages.length
-  ) {
-    currentLanguage = 0;
-  }
-
-
-  document.getElementById(
-    "languageButton"
-  ).textContent =
-    languages[
-      currentLanguage
-    ].label;
-
-
-  const lang =
-    languages[
-      currentLanguage
-    ].code;
-
-
-  translatePage(lang);
-
-}
-
-
-function translatePage(lang) {
-
-  const translations = {
-
-    it: {
-      heroTitle:
-        "Porta ciò che serve. Connettiti. Guadagna.",
-
-      heroText:
-        "Waselni mette in contatto persone che devono ricevere oggetti tra Italia e Tunisia con viaggiatori e trasportatori che hanno spazio disponibile."
-    },
-
-    fr: {
-      heroTitle:
-        "Transportez ce dont les autres ont besoin. Connectez-vous. Gagnez.",
-
-      heroText:
-        "Waselni met en relation les personnes qui souhaitent envoyer des objets entre l'Italie et la Tunisie avec des voyageurs et transporteurs."
-    },
-
-    tn: {
-      heroTitle:
-        "وصّل الحاجة. تواصل. واربح.",
-
-      heroText:
-        "Waselni تربط بين الناس في إيطاليا وتونس لإرسال و نقل الأغراض مع المسافرين والناقلين."
-    }
-
-  };
-
-
-  const t =
-    translations[lang];
-
-
-  document.getElementById(
-    "heroTitle"
-  ).textContent =
-    t.heroTitle;
-
-
-  document.getElementById(
-    "heroText"
-  ).textContent =
-    t.heroText;
-
-}
 
 
 /* =====================================================
@@ -2334,6 +4004,33 @@ function toggleDarkMode() {
   document.body
     .classList
     .toggle("dark");
+
+
+  const isDark =
+    document.body
+      .classList
+      .contains("dark");
+
+
+  localStorage.setItem(
+    "hezmaak_dark",
+    isDark
+      ? "1"
+      : "0"
+  );
+
+}
+
+
+if (
+  localStorage.getItem(
+    "hezmaak_dark"
+  ) === "1"
+) {
+
+  document.body.classList.add(
+    "dark"
+  );
 
 }
 
@@ -2361,15 +4058,18 @@ function toggleMenu() {
 function goHome() {
 
   window.scrollTo({
+
     top: 0,
+
     behavior: "smooth"
+
   });
 
 }
 
 
 /* =====================================================
-   HELPERS
+   FLAGS
 ===================================================== */
 
 function flag(country) {
@@ -2381,34 +4081,48 @@ function flag(country) {
 }
 
 
-function escapeHtml(value) {
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(
+  value
+) {
 
   if (!value)
     return "";
 
+
   return String(value)
+
     .replaceAll(
       "&",
       "&amp;"
     )
+
     .replaceAll(
       "<",
       "&lt;"
     )
+
     .replaceAll(
       ">",
       "&gt;"
     )
+
     .replaceAll(
       '"',
       "&quot;"
     )
+
     .replaceAll(
       "'",
       "&#039;"
     );
 
 }
+
+
 /* =====================================================
    PROFILE PLACEHOLDERS
 ===================================================== */
@@ -2416,112 +4130,1198 @@ function escapeHtml(value) {
 function editProfile() {
 
   alert(
-    "La modifica del profilo sarà disponibile nel prossimo modulo."
+    t("editComing")
   );
 
 }
 
+/* =====================================================
+   I MIEI VIAGGI
+===================================================== */
 
 async function showMyTrips() {
 
+    if (!currentUser) {
+        openAuth("login");
+        return;
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("trips")
+            .select("*")
+            .eq(
+                "user_id",
+                currentUser.id
+            )
+            .order(
+                "travel_date",
+                {
+                    ascending: false
+                }
+            );
+
+
+    if (error) {
+
+        showPopup({
+
+            title:
+                "Errore",
+
+            message:
+                escapeHtml(
+                    error.message
+                ),
+
+            type:
+                "error"
+
+        });
+
+        return;
+
+    }
+
+
+    const old =
+        document.getElementById(
+            "myTripsPage"
+        );
+
+    if (old) {
+        old.remove();
+    }
+
+
+    const page =
+        document.createElement("div");
+
+    page.id =
+        "myTripsPage";
+
+
+    page.innerHTML = `
+
+        <div class="profile-page">
+
+            <div class="container">
+
+                <button
+                    class="back-button"
+                    onclick="closeMyTrips()">
+
+                    ← Torna al profilo
+
+                </button>
+
+
+                <div class="profile-header">
+
+                    <span class="section-label">
+                        LA MIA ATTIVITÀ
+                    </span>
+
+                    <h1>
+                        ✈️ I miei viaggi
+                    </h1>
+
+                    <p>
+                        Gestisci i viaggi che hai pubblicato.
+                    </p>
+
+                </div>
+
+
+                <div class="my-trips-list">
+
+                    ${
+                        data.length
+
+                        ? data
+                            .map(
+                                myTripHTML
+                            )
+                            .join("")
+
+                        : `
+
+                            <div class="profile-card">
+
+                                <h3>
+                                    ✈️ Nessun viaggio
+                                </h3>
+
+                                <p>
+                                    Non hai ancora pubblicato
+                                    nessun viaggio.
+                                </p>
+
+                                <button
+                                    class="primary"
+                                    onclick="closeMyTrips(); openTripModal();">
+
+                                    + Pubblica viaggio
+
+                                </button>
+
+                            </div>
+
+                        `
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(page);
+
+    document.body.style.overflow =
+        "hidden";
+}
+function myTripHTML(trip) {
+
+    const date =
+        trip.travel_date
+            ? new Date(
+                trip.travel_date +
+                "T12:00:00"
+              ).toLocaleDateString(
+                "it-IT"
+              )
+            : "-";
+
+
+    let statusHTML = "";
+
+
+    if (
+        trip.verification_status ===
+        "approved"
+    ) {
+
+        statusHTML = `
+
+            <div class="my-trip-status approved">
+
+                ✓ Biglietto verificato
+
+            </div>
+
+        `;
+
+    }
+
+
+    else if (
+        trip.verification_status ===
+        "rejected"
+    ) {
+
+        statusHTML = `
+
+            <div class="my-trip-status rejected">
+
+                ⚠️ Biglietto non approvato
+
+            </div>
+
+
+            <div class="trip-rejection">
+
+                <strong>
+                    Motivo del rifiuto:
+                </strong>
+
+                <p>
+                    ${escapeHtml(
+                        trip.verification_rejection_reason ||
+                        "Il biglietto non è stato approvato."
+                    )}
+                </p>
+
+            </div>
+
+
+            <button
+                class="primary"
+                onclick="replaceTravelTicket('${trip.id}')">
+
+                🎫 Carica nuovo biglietto
+
+            </button>
+
+        `;
+
+    }
+
+
+    else {
+
+        statusHTML = `
+
+            <div class="my-trip-status pending">
+
+                ⏳ Biglietto in verifica
+
+                <small>
+                    L'amministratore sta controllando
+                    il tuo biglietto.
+                </small>
+
+            </div>
+
+        `;
+
+    }
+
+
+    return `
+
+        <div
+            class="profile-card my-trip-card"
+            id="my-trip-${trip.id}"
+        >
+
+            <div class="my-trip-header">
+
+                <div>
+
+                    <span class="section-label">
+                        VIAGGIO
+                    </span>
+
+
+                    <h3>
+
+                        ${flag(
+                            trip.departure_country
+                        )}
+
+                        ${escapeHtml(
+                            trip.departure_city
+                        )}
+
+                        →
+
+                        ${flag(
+                            trip.arrival_country
+                        )}
+
+                        ${escapeHtml(
+                            trip.arrival_city
+                        )}
+
+                    </h3>
+
+                </div>
+
+
+                ${statusHTML}
+
+            </div>
+
+
+            <div class="profile-info-grid">
+
+                <div>
+
+                    <span>
+                        Data
+                    </span>
+
+                    <strong>
+                        📅 ${date}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Spazio
+                    </span>
+
+                    <strong>
+                        📦 ${trip.available_kg} kg
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Prezzo
+                    </span>
+
+                    <strong>
+
+                        ${
+                            trip.price_per_kg
+                            ? `€${trip.price_per_kg}/kg`
+                            : "Non specificato"
+                        }
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            ${
+                trip.description
+                ? `
+                    <p class="trip-description">
+
+                        ${escapeHtml(
+                            trip.description
+                        )}
+
+                    </p>
+                `
+                : ""
+            }
+
+        </div>
+
+    `;
+
+}
+function closeMyTrips() {
+
+    const page =
+        document.getElementById(
+            "myTripsPage"
+        );
+
+    if (page) {
+        page.remove();
+    }
+
+
+    document.body.style.overflow =
+        "";
+
+
+    showProfile();
+
+}
+/* =====================================================
+   NUOVO BIGLIETTO
+===================================================== */
+
+async function replaceTravelTicket(
+    tripId
+) {
+
+    const old =
+        document.getElementById(
+            "replaceTicketModal"
+        );
+
+    if (old) {
+        old.remove();
+    }
+
+
+    const modal =
+        document.createElement("div");
+
+    modal.id =
+        "replaceTicketModal";
+
+
+    modal.innerHTML = `
+
+        <div class="popup-overlay">
+
+            <div class="popup-box">
+
+                <button
+                    class="popup-close"
+                    onclick="closeReplaceTicket()">
+
+                    ×
+
+                </button>
+
+
+                <div class="popup-icon">
+                    🎫
+                </div>
+
+
+                <h3>
+                    Carica nuovo biglietto
+                </h3>
+
+
+                <p>
+                    Carica il nuovo biglietto
+                    per permettere all'amministratore
+                    di effettuare una nuova verifica.
+                </p>
+
+
+                <input
+                    id="newTravelTicket"
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                >
+
+
+                <small class="upload-help">
+
+                    JPG, PNG o PDF.
+                    Massimo 10 MB.
+
+                </small>
+
+
+                <div
+                    id="replaceTicketMessage">
+                </div>
+
+
+                <div class="popup-buttons">
+
+                    <button
+                        class="secondary"
+                        onclick="closeReplaceTicket()">
+
+                        Annulla
+
+                    </button>
+
+
+                    <button
+                        class="primary"
+                        onclick="uploadNewTravelTicket('${tripId}')">
+
+                        🎫 Invia nuovo biglietto
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        modal
+    );
+
+}
+/* =====================================================
+   UPLOAD NUOVO BIGLIETTO
+===================================================== */
+
+async function uploadNewTravelTicket(
+    tripId
+) {
+
+    if (!currentUser) {
+        return;
+    }
+
+
+    const input =
+        document.getElementById(
+            "newTravelTicket"
+        );
+
+
+    const message =
+        document.getElementById(
+            "replaceTicketMessage"
+        );
+
+
+    if (
+        !input.files ||
+        !input.files.length
+    ) {
+
+        message.innerHTML = `
+
+            <div class="auth-error">
+
+                Seleziona un biglietto.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const file =
+        input.files[0];
+
+
+    const maxSize =
+        10 * 1024 * 1024;
+
+
+    if (file.size > maxSize) {
+
+        message.innerHTML = `
+
+            <div class="auth-error">
+
+                Il file supera i 10 MB.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const allowedTypes = [
+
+        "image/jpeg",
+        "image/png",
+        "application/pdf"
+
+    ];
+
+
+    if (
+        !allowedTypes.includes(
+            file.type
+        )
+    ) {
+
+        message.innerHTML = `
+
+            <div class="auth-error">
+
+                Formato non supportato.
+                Usa JPG, PNG o PDF.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    message.innerHTML = `
+
+        <div class="auth-success">
+
+            Upload in corso...
+
+        </div>
+
+    `;
+
+
+    const extension =
+        file.name
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+
+    const ticketPath =
+        `${currentUser.id}/ticket-${Date.now()}.${extension}`;
+
+
+    const {
+        error: uploadError
+    } =
+        await supabaseClient
+            .storage
+            .from("travel-tickets")
+            .upload(
+                ticketPath,
+                file,
+                {
+                    upsert: false
+                }
+            );
+
+
+    if (uploadError) {
+
+        console.error(uploadError);
+
+        message.innerHTML = `
+
+            <div class="auth-error">
+
+                Errore caricamento:
+                ${escapeHtml(
+                    uploadError.message
+                )}
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const {
+        error: updateError
+    } =
+        await supabaseClient
+            .from("trips")
+            .update({
+
+                ticket_path:
+                    ticketPath,
+
+                verification_status:
+                    "pending",
+
+                verification_rejection_reason:
+                    null
+
+            })
+            .eq(
+                "id",
+                tripId
+            )
+            .eq(
+                "user_id",
+                currentUser.id
+            );
+
+
+    if (updateError) {
+
+        console.error(
+            updateError
+        );
+
+
+        await supabaseClient
+            .storage
+            .from("travel-tickets")
+            .remove([
+                ticketPath
+            ]);
+
+
+        message.innerHTML = `
+
+            <div class="auth-error">
+
+                Errore aggiornamento viaggio:
+                ${escapeHtml(
+                    updateError.message
+                )}
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    message.innerHTML = `
+
+        <div class="auth-success">
+
+            ✓ Nuovo biglietto inviato.
+
+            <br>
+
+            È ora nuovamente in verifica.
+
+        </div>
+
+    `;
+
+
+    setTimeout(
+        () => {
+
+            closeReplaceTicket();
+
+            showMyTrips();
+
+        },
+        1200
+    );
+
+}
+function closeReplaceTicket() {
+
+    const modal =
+        document.getElementById(
+            "replaceTicketModal"
+        );
+
+    if (modal) {
+        modal.remove();
+    }
+
+}
+function myTripHTML(trip) {
+
+  const date =
+    trip.travel_date
+      ? new Date(
+          trip.travel_date +
+          "T12:00:00"
+        ).toLocaleDateString(
+          "it-IT"
+        )
+      : "-";
+
+
+  let verificationHTML = "";
+
+  if (
+    trip.verification_status ===
+    "approved"
+  ) {
+
+    verificationHTML = `
+      <span class="verified-trip">
+        ✓ Biglietto verificato
+      </span>
+    `;
+
+  } else if (
+    trip.verification_status ===
+    "pending"
+  ) {
+
+    verificationHTML = `
+      <span class="pending-trip">
+        ⏳ Biglietto in verifica
+      </span>
+    `;
+
+  } else {
+
+    verificationHTML = `
+      <span class="rejected-trip">
+        ⚠️ Verifica non approvata
+      </span>
+    `;
+
+  }
+
+
+  return `
+
+    <article
+      class="profile-card activity-card"
+      id="trip-${trip.id}">
+
+      <div class="activity-header">
+
+        <div>
+
+          <span class="section-label">
+            VIAGGIO
+          </span>
+
+          <h3>
+
+            ${flag(
+              trip.departure_country
+            )}
+
+            ${escapeHtml(
+              trip.departure_city
+            )}
+
+            →
+
+            ${flag(
+              trip.arrival_country
+            )}
+
+            ${escapeHtml(
+              trip.arrival_city
+            )}
+
+          </h3>
+
+        </div>
+
+        ${verificationHTML}
+
+      </div>
+
+
+      <div class="activity-info">
+
+        <div>
+
+          <span>
+            📅 Data
+          </span>
+
+          <strong>
+            ${date}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            📦 Spazio disponibile
+          </span>
+
+          <strong>
+            ${trip.available_kg} kg
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            💰 Prezzo
+          </span>
+
+          <strong>
+
+            ${
+              trip.price_per_kg
+                ? `€${trip.price_per_kg}/kg`
+                : "Non specificato"
+            }
+
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            📌 Stato
+          </span>
+
+          <strong>
+
+            ${
+              trip.status === "active"
+                ? "🟢 Attivo"
+                : "⚪ Chiuso"
+            }
+
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      ${
+        trip.description
+
+          ? `
+
+            <p class="activity-description">
+
+              ${escapeHtml(
+                trip.description
+              )}
+
+            </p>
+
+          `
+
+          : ""
+      }
+
+
+      <div class="activity-actions">
+
+        <button
+          class="secondary"
+          onclick="
+            editTrip('${trip.id}')
+          ">
+
+          ✏️ Modifica
+
+        </button>
+
+
+        <button
+          class="danger-button"
+          onclick="
+            deleteTrip('${trip.id}')
+          ">
+
+          🗑 Elimina
+
+        </button>
+
+      </div>
+
+    </article>
+
+  `;
+}
+function closeMyTrips() {
+
+  const page =
+    document.getElementById(
+      "myTripsPage"
+    );
+
+  if (page) {
+    page.remove();
+  }
+
+  document.body.style.overflow =
+    "";
+
+}
+/* =====================================================
+   DELETE TRIP
+===================================================== */
+
+async function deleteTrip(tripId) {
+
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const confirmed = confirm(
+    "Sei sicuro di voler eliminare questo viaggio?\n\n" +
+    "Il viaggio e il relativo biglietto verranno eliminati."
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  /*
+    Recuperiamo prima il viaggio
+    per ottenere il percorso del biglietto.
+  */
+
   const {
-    data,
-    error
+    data: trip,
+    error: tripFetchError
   } = await supabaseClient
     .from("trips")
-    .select("*")
-    .eq(
-      "user_id",
-      currentUser.id
-    )
-    .order(
-      "travel_date",
-      {
-        ascending: false
-      }
-    );
+    .select(`
+      id,
+      user_id,
+      ticket_path
+    `)
+    .eq("id", tripId)
+    .eq("user_id", currentUser.id)
+    .single();
 
-  if (error) {
+
+  if (tripFetchError) {
+
+    console.error(tripFetchError);
 
     alert(
-      "Errore: " +
-      error.message
+      "Errore recupero viaggio: " +
+      tripFetchError.message
     );
 
     return;
   }
 
-  if (!data.length) {
+
+  /*
+    Controllo sicurezza:
+    il viaggio deve appartenere
+    all'utente loggato.
+  */
+
+  if (
+    !trip ||
+    trip.user_id !== currentUser.id
+  ) {
 
     alert(
-      "Non hai ancora pubblicato nessun viaggio."
+      "Non puoi eliminare questo viaggio."
     );
 
     return;
   }
 
-  alert(
-    `Hai pubblicato ${data.length} viaggio/i.`
-  );
 
-}
-
-
-async function showMyRequests() {
+  /*
+    Eliminiamo il viaggio dal database.
+  */
 
   const {
-    data,
-    error
+    error: deleteError
   } = await supabaseClient
-    .from("requests")
-    .select("*")
-    .eq(
-      "user_id",
-      currentUser.id
-    )
-    .order(
-      "created_at",
-      {
-        ascending: false
-      }
-    );
+    .from("trips")
+    .delete()
+    .eq("id", tripId)
+    .eq("user_id", currentUser.id);
 
-  if (error) {
+
+  if (deleteError) {
+
+    console.error(deleteError);
 
     alert(
-      "Errore: " +
-      error.message
+      "Errore eliminazione viaggio: " +
+      deleteError.message
     );
 
     return;
   }
 
-  if (!data.length) {
 
-    alert(
-      "Non hai ancora pubblicato nessuna richiesta."
-    );
+  /*
+    Se esiste un biglietto,
+    eliminiamo anche il file Storage.
+  */
 
-    return;
+  if (trip.ticket_path) {
+
+    const {
+      error: storageError
+    } = await supabaseClient
+      .storage
+      .from("travel-tickets")
+      .remove([
+        trip.ticket_path
+      ]);
+
+
+    if (storageError) {
+
+      console.error(
+        "Errore eliminazione biglietto:",
+        storageError
+      );
+
+      /*
+        Il viaggio è comunque stato eliminato.
+        Mostriamo solo un avviso.
+      */
+
+      alert(
+        "Viaggio eliminato, ma non è stato possibile eliminare il biglietto dal deposito."
+      );
+
+    }
   }
 
+
+  /*
+    Rimuoviamo la scheda dalla pagina
+    senza dover ricaricare tutto.
+  */
+
+  const card =
+    document.getElementById(
+      `trip-${tripId}`
+    );
+
+  if (card) {
+    card.remove();
+  }
+
+
+  /*
+    Se non ci sono più viaggi,
+    mostriamo il messaggio vuoto.
+  */
+
+  const list =
+    document.querySelector(
+      ".my-activity-list"
+    );
+
+  if (
+    list &&
+    !list.children.length
+  ) {
+
+    list.innerHTML = `
+
+      <div class="profile-card empty-state">
+
+        <div class="avatar">
+          ✈️
+        </div>
+
+        <h3>
+          Non hai più viaggi pubblicati
+        </h3>
+
+        <p>
+          Pubblica un nuovo viaggio
+          quando vuoi.
+        </p>
+
+        <button
+          class="primary"
+          onclick="
+            closeMyTrips();
+            openTripModal();
+          ">
+
+          + Pubblica viaggio
+
+        </button>
+
+      </div>
+
+    `;
+  }
+
+
+  /*
+    Aggiorniamo anche la homepage.
+  */
+
+  loadTrips();
+
+
   alert(
-    `Hai pubblicato ${data.length} richiesta/e.`
+    "✓ Viaggio eliminato correttamente."
   );
 
 }
-
-
-function showMyReviews() {
-
-  alert(
-    "Il sistema di recensioni verrà collegato al database nel prossimo modulo."
-  );
-
-}
-
-
-async function openVerification() {
+async function showMyRequests() {
 
   if (!currentUser) {
     openAuth("login");
@@ -2529,13 +5329,353 @@ async function openVerification() {
   }
 
   const {
-    data: existing,
+    data,
     error
   } = await supabaseClient
-    .from("verification_requests")
+    .from("requests")
     .select("*")
+    .eq("user_id", currentUser.id)
+    .order("created_at", {
+      ascending: false
+    });
+
+  if (error) {
+
+    console.error(error);
+
+    alert(
+      "Errore caricamento richieste: " +
+      error.message
+    );
+
+    return;
+  }
+
+  const oldPage =
+    document.getElementById("myRequestsPage");
+
+  if (oldPage) {
+    oldPage.remove();
+  }
+
+  const page =
+    document.createElement("div");
+
+  page.id = "myRequestsPage";
+
+  page.innerHTML = `
+
+    <div class="profile-page">
+
+      <div class="container">
+
+        <button
+          class="back-button"
+          onclick="closeMyRequests()">
+
+          ← Torna al profilo
+
+        </button>
+
+        <div class="profile-header">
+
+          <div>
+
+            <span class="section-label">
+              LA MIA ATTIVITÀ
+            </span>
+
+            <h1>
+              📦 Le mie richieste
+            </h1>
+
+            <p>
+              Gestisci le richieste che hai pubblicato.
+            </p>
+
+          </div>
+
+          <button
+            class="primary"
+            onclick="closeMyRequests(); openRequestModal();">
+
+            + Nuova richiesta
+
+          </button>
+
+        </div>
+
+        <div class="my-activity-list">
+
+          ${
+            data.length
+              ? data.map(myRequestCard).join("")
+              : `
+
+                <div class="profile-card empty-state">
+
+                  <div class="avatar">
+                    📦
+                  </div>
+
+                  <h3>
+                    Nessuna richiesta
+                  </h3>
+
+                  <p>
+                    Non hai ancora pubblicato
+                    nessuna richiesta.
+                  </p>
+
+                  <button
+                    class="primary"
+                    onclick="closeMyRequests(); openRequestModal();">
+
+                    Pubblica una richiesta
+
+                  </button>
+
+                </div>
+
+              `
+          }
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(page);
+
+  document.body.style.overflow = "hidden";
+}
+function myRequestCard(request) {
+
+  const date = request.needed_date
+    ? new Date(
+        request.needed_date + "T12:00:00"
+      ).toLocaleDateString("it-IT")
+    : "Non specificata";
+
+  let statusLabel = "Aperta";
+
+  if (request.status === "open") {
+    statusLabel = "🟢 Aperta";
+  } else if (request.status === "closed") {
+    statusLabel = "⚪ Chiusa";
+  } else if (request.status === "cancelled") {
+    statusLabel = "🔴 Annullata";
+  }
+
+  return `
+
+    <div
+      class="profile-card activity-card"
+      id="my-request-${request.id}">
+
+      <div class="activity-card-header">
+
+        <div>
+
+          <span class="section-label">
+            RICHIESTA
+          </span>
+
+          <h3>
+
+            ${flag(request.departure_country)}
+
+            ${escapeHtml(request.departure_city)}
+
+            →
+
+            ${flag(request.arrival_country)}
+
+            ${escapeHtml(request.arrival_city)}
+
+          </h3>
+
+        </div>
+
+        <span class="activity-status">
+          ${statusLabel}
+        </span>
+
+      </div>
+
+
+      <div class="profile-info-grid">
+
+        <div>
+
+          <span>
+            Data necessaria
+          </span>
+
+          <strong>
+            📅 ${date}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Oggetto
+          </span>
+
+          <strong>
+            ${escapeHtml(
+              request.item_description || "-"
+            )}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Peso
+          </span>
+
+          <strong>
+            ${
+              request.weight_kg
+                ? request.weight_kg + " kg"
+                : "-"
+            }
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Budget
+          </span>
+
+          <strong>
+            ${
+              request.budget
+                ? "€" + request.budget
+                : "-"
+            }
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <div class="activity-actions">
+
+        ${
+          request.status === "open"
+
+            ? `
+
+              <button
+                class="danger-button"
+                onclick="deleteMyRequest('${request.id}')">
+
+                🗑 Elimina richiesta
+
+              </button>
+
+            `
+
+            : ""
+
+        }
+
+      </div>
+
+    </div>
+
+  `;
+}
+function closeMyRequests() {
+
+  const page =
+    document.getElementById(
+      "myRequestsPage"
+    );
+
+  if (page) {
+    page.remove();
+  }
+
+  document.body.style.overflow = "";
+
+}
+async function deleteMyRequest(requestId) {
+
+  if (
+    !confirm(
+      "Vuoi davvero eliminare questa richiesta?"
+    )
+  ) {
+    return;
+  }
+
+  const {
+    error
+  } = await supabaseClient
+    .from("requests")
+    .delete()
+    .eq("id", requestId)
+    .eq("user_id", currentUser.id);
+
+  if (error) {
+
+    alert(
+      "Errore eliminazione: " +
+      error.message
+    );
+
+    return;
+  }
+
+  const card =
+    document.getElementById(
+      `my-request-${requestId}`
+    );
+
+  if (card) {
+    card.remove();
+  }
+
+  loadRequests();
+
+}
+async function showMyReviews() {
+
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("reviews")
+    .select(`
+      id,
+      reviewer_id,
+      reviewed_user_id,
+      rating,
+      comment,
+      created_at
+    `)
     .eq(
-      "user_id",
+      "reviewed_user_id",
       currentUser.id
     )
     .order(
@@ -2543,104 +5683,358 @@ async function openVerification() {
       {
         ascending: false
       }
-    )
-    .limit(1)
-    .maybeSingle();
+    );
 
   if (error) {
 
+    console.error(error);
+
     alert(
-      "Errore: " +
+      "Errore caricamento recensioni: " +
       error.message
     );
 
     return;
   }
 
+  const oldPage =
+    document.getElementById(
+      "myReviewsPage"
+    );
+
+  if (oldPage) {
+    oldPage.remove();
+  }
+
+  const page =
+    document.createElement("div");
+
+  page.id =
+    "myReviewsPage";
+
+  page.innerHTML = `
+
+    <div class="profile-page">
+
+      <div class="container">
+
+        <button
+          class="back-button"
+          onclick="closeMyReviews()">
+
+          ← Torna al profilo
+
+        </button>
+
+
+        <div class="profile-header">
+
+          <div>
+
+            <span class="section-label">
+              LA MIA ATTIVITÀ
+            </span>
+
+            <h1>
+              ⭐ Le mie recensioni
+            </h1>
+
+            <p>
+              Le recensioni ricevute dagli altri utenti.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="profile-card">
+
+          <div class="profile-card-title">
+
+            <h3>
+              Le mie valutazioni
+            </h3>
+
+            <strong>
+              ${data.length}
+            </strong>
+
+          </div>
+
+
+          ${
+            data.length
+              ? `
+                <div class="reviews-list">
+
+                  ${data
+                    .map(reviewCard)
+                    .join("")}
+
+                </div>
+              `
+              : `
+
+                <div class="empty-state">
+
+                  <div class="avatar">
+                    ⭐
+                  </div>
+
+                  <h3>
+                    Nessuna recensione
+                  </h3>
+
+                  <p>
+                    Non hai ancora ricevuto recensioni.
+                  </p>
+
+                </div>
+
+              `
+          }
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(page);
+
+  document.body.style.overflow =
+    "hidden";
+}
+function reviewCard(review) {
+
+  const rating =
+    Math.max(
+      1,
+      Math.min(
+        5,
+        Number(review.rating) || 0
+      )
+    );
+
+  const stars =
+    "⭐".repeat(rating);
+
+  const date =
+    review.created_at
+      ? new Date(
+          review.created_at
+        ).toLocaleDateString("it-IT")
+      : "";
+
+  return `
+
+    <div class="review-item">
+
+      <div class="review-header">
+
+        <div>
+
+          <strong>
+            ${stars}
+          </strong>
+
+          <div class="review-date">
+            ${date}
+          </div>
+
+        </div>
+
+        <span>
+          ${rating}/5
+        </span>
+
+      </div>
+
+
+      ${
+        review.comment
+          ? `
+            <p class="review-comment">
+              "${escapeHtml(
+                review.comment
+              )}"
+            </p>
+          `
+          : `
+            <p class="review-comment">
+              Nessun commento.
+            </p>
+          `
+      }
+
+    </div>
+
+  `;
+}
+function closeMyReviews() {
+
+  const page =
+    document.getElementById(
+      "myReviewsPage"
+    );
+
+  if (page) {
+    page.remove();
+  }
+
+  document.body.style.overflow =
+    "";
+}
+/* =====================================================
+   IDENTITY VERIFICATION
+===================================================== */
+
+async function openVerification() {
+
+  if (!currentUser) {
+
+    openAuth("login");
+
+    return;
+
+  }
+
+
+  const {
+    data: existing,
+    error
+  } =
+    await supabaseClient
+      .from("verification_requests")
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      )
+      .limit(1)
+      .maybeSingle();
+
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
 
   const modal =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   modal.id =
     "verificationModal";
 
 
-  let statusHtml = "";
+  let statusHtml =
+    "";
 
 
   if (existing) {
 
-    if (existing.status === "pending") {
 
-      statusHtml = `
+    if (
+      existing.status ===
+      "pending"
+    ) {
+
+      statusHtml =
+        `
 
         <div class="verification-pending">
 
           ⏳
 
           <strong>
-            Verifica in revisione
+            ${t("pending")}
           </strong>
 
           <p>
-            Abbiamo ricevuto il tuo documento.
-            Un amministratore lo controllerà.
+            ${t("reviewText")}
           </p>
 
         </div>
 
-      `;
+        `;
 
     }
 
 
-    if (existing.status === "approved") {
+    if (
+      existing.status ===
+      "approved"
+    ) {
 
-      statusHtml = `
+      statusHtml =
+        `
 
         <div class="verification-approved">
 
           ✓
 
           <strong>
-            Identità verificata
+            ${t("identityVerified")}
           </strong>
 
           <p>
-            Il tuo profilo possiede il badge verificato.
+            ${t("verifiedIdentity")}
           </p>
 
         </div>
 
-      `;
+        `;
 
     }
 
 
-    if (existing.status === "rejected") {
+    if (
+      existing.status ===
+      "rejected"
+    ) {
 
-      statusHtml = `
+      statusHtml =
+        `
 
         <div class="verification-rejected">
 
           ⚠️
 
           <strong>
-            Verifica rifiutata
+            ${t("rejected")}
           </strong>
 
           <p>
+
             ${
               escapeHtml(
                 existing.rejection_reason ||
-                "Il documento non è stato approvato."
+                t("verificationRejected")
               )
             }
+
           </p>
 
         </div>
 
-      `;
+        `;
 
     }
 
@@ -2652,6 +6046,7 @@ async function openVerification() {
     <div class="auth-overlay">
 
       <div class="auth-box verification-modal">
+
 
         <button
           class="auth-close"
@@ -2668,14 +6063,12 @@ async function openVerification() {
 
 
         <h2>
-          Verifica la tua identità
+          ${t("verifyTitle")}
         </h2>
 
 
         <p>
-          Per garantire maggiore sicurezza alla
-          comunità Waselni, chiediamo a tutti gli
-          utenti di verificare la propria identità.
+          ${t("verifyText")}
         </p>
 
 
@@ -2690,8 +6083,9 @@ async function openVerification() {
 
             <div class="verification-form">
 
+
               <label>
-                Tipo di documento
+                ${t("documentType")}
               </label>
 
 
@@ -2699,37 +6093,31 @@ async function openVerification() {
                 id="documentType">
 
                 <option value="passport">
-                  🛂 Passaporto
+                  ${t("passport")}
                 </option>
 
                 <option value="identity_card">
-                  🪪 Carta d'identità
+                  ${t("identityCard")}
                 </option>
 
               </select>
 
 
               <label>
-                Documento
+                ${t("document")}
               </label>
 
 
               <input
                 id="documentFile"
                 type="file"
-                accept="
-                  image/jpeg,
-                  image/png,
-                  application/pdf
-                "
+                accept=".jpg,.jpeg,.png,.pdf"
               >
 
 
               <small class="upload-help">
 
-                Formati accettati:
-                JPG, PNG, PDF.
-                Dimensione massima: 10 MB.
+                ${t("uploadHelp")}
 
               </small>
 
@@ -2743,9 +6131,10 @@ async function openVerification() {
                 class="primary auth-button"
                 onclick="uploadVerificationDocument()">
 
-                🔐 Invia documento
+                ${t("sendDocument")}
 
               </button>
+
 
             </div>
 
@@ -2754,6 +6143,7 @@ async function openVerification() {
           : ""
 
         }
+
 
       </div>
 
@@ -2777,10 +6167,14 @@ function closeVerification() {
     );
 
   if (modal) {
+
     modal.remove();
+
   }
 
 }
+
+
 async function uploadVerificationDocument() {
 
   if (!currentUser) {
@@ -2811,13 +6205,15 @@ async function uploadVerificationDocument() {
     !input.files.length
   ) {
 
-    message.innerHTML = `
+    message.innerHTML =
+      `
       <div class="auth-error">
-        Seleziona un documento.
+        ${t("document")}
       </div>
-    `;
+      `;
 
     return;
+
   }
 
 
@@ -2829,15 +6225,20 @@ async function uploadVerificationDocument() {
     10 * 1024 * 1024;
 
 
-  if (file.size > maxSize) {
+  if (
+    file.size >
+    maxSize
+  ) {
 
-    message.innerHTML = `
+    message.innerHTML =
+      `
       <div class="auth-error">
-        Il documento supera i 10 MB.
+        ${t("uploadHelp")}
       </div>
-    `;
+      `;
 
     return;
+
   }
 
 
@@ -2854,21 +6255,24 @@ async function uploadVerificationDocument() {
     )
   ) {
 
-    message.innerHTML = `
+    message.innerHTML =
+      `
       <div class="auth-error">
         Formato non supportato.
       </div>
-    `;
+      `;
 
     return;
+
   }
 
 
-  message.innerHTML = `
+  message.innerHTML =
+    `
     <div class="auth-success">
-      Upload in corso...
+      ${t("uploadInProgress")}
     </div>
-  `;
+    `;
 
 
   const extension =
@@ -2898,7 +6302,9 @@ async function uploadVerificationDocument() {
         filePath,
         file,
         {
-          upsert: false
+          upsert: false,
+          contentType:
+            file.type
         }
       );
 
@@ -2909,16 +6315,20 @@ async function uploadVerificationDocument() {
       uploadError
     );
 
-    message.innerHTML = `
+
+    message.innerHTML =
+      `
       <div class="auth-error">
-        Errore upload:
+
         ${escapeHtml(
           uploadError.message
         )}
+
       </div>
-    `;
+      `;
 
     return;
+
   }
 
 
@@ -2952,6 +6362,7 @@ async function uploadVerificationDocument() {
       requestError
     );
 
+
     await supabaseClient
       .storage
       .from(
@@ -2962,30 +6373,34 @@ async function uploadVerificationDocument() {
       ]);
 
 
-    message.innerHTML = `
+    message.innerHTML =
+      `
       <div class="auth-error">
-        Errore creazione richiesta:
+
         ${escapeHtml(
           requestError.message
         )}
+
       </div>
-    `;
+      `;
 
     return;
+
   }
 
 
-  message.innerHTML = `
+  message.innerHTML =
+    `
     <div class="auth-success">
 
-      ✓ Documento inviato correttamente.
+      ${t("documentSent")}
 
       <br>
 
-      La verifica è ora in revisione.
+      ${t("reviewText")}
 
     </div>
-  `;
+    `;
 
 
   setTimeout(
@@ -3000,47 +6415,90 @@ async function uploadVerificationDocument() {
   );
 
 }
+
+
+/* =====================================================
+   ADMIN
+===================================================== */
+
 async function openAdminPanel() {
+
+  if (!currentUser) {
+
+    openAuth("login");
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.rpc(
+      "is_admin"
+    );
+
+
+  if (error) {
+
+    console.error(
+      error
+    );
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  if (!data) {
+
+    alert(
+      "Accesso non autorizzato."
+    );
+
+    return;
+
+  }
+
+
+  loadAdminPanel();
+
+}
+
+
+async function loadAdminPanel() {
 
     if (!currentUser) {
         openAuth("login");
         return;
     }
 
+    // Controlla che sia admin
     const {
-        data,
-        error
-    } = await supabaseClient.rpc(
-        "is_admin"
-    );
+        data: isAdmin,
+        error: adminError
+    } = await supabaseClient.rpc("is_admin");
 
-    if (error) {
+    if (adminError || !isAdmin) {
 
-        console.error(error);
-
-        alert(
-            "Errore controllo amministratore."
-        );
-
+        alert("Accesso non autorizzato.");
         return;
     }
 
-    if (!data) {
 
-        alert(
-            "Accesso non autorizzato."
-        );
-
-        return;
-    }
-
-    loadAdminPanel();
-}
-async function loadAdminPanel() {
+    // ==========================================
+    // RICHIESTE DOCUMENTI IDENTITÀ
+    // ==========================================
 
     const {
-        data,
-        error
+        data: verificationRequests,
+        error: verificationError
     } = await supabaseClient
         .from("verification_requests")
         .select(`
@@ -3057,28 +6515,104 @@ async function loadAdminPanel() {
             ascending: true
         });
 
-    if (error) {
-        console.error(error);
+
+    if (verificationError) {
+
+        console.error(
+            "Errore verifiche identità:",
+            verificationError
+        );
 
         alert(
-            "Errore caricamento richieste: " +
-            error.message
+            "Errore caricamento verifiche: " +
+            verificationError.message
         );
 
         return;
     }
 
+
+    // ==========================================
+    // BIGLIETTI VIAGGI
+    // ==========================================
+
+    const {
+        data: pendingTrips,
+        error: tripsError
+    } = await supabaseClient
+        .from("trips")
+        .select(`
+            id,
+            user_id,
+            departure_country,
+            arrival_country,
+            departure_city,
+            arrival_city,
+            travel_date,
+            available_kg,
+            price_per_kg,
+            description,
+            ticket_path,
+            verification_status,
+            created_at
+        `)
+        .eq(
+            "verification_status",
+            "pending"
+        )
+        .not(
+            "ticket_path",
+            "is",
+            null
+        )
+        .order(
+            "created_at",
+            {
+                ascending: true
+            }
+        );
+
+
+    if (tripsError) {
+
+        console.error(
+            "Errore biglietti:",
+            tripsError
+        );
+
+        alert(
+            "Errore caricamento biglietti: " +
+            tripsError.message
+        );
+
+        return;
+    }
+
+
+    // ==========================================
+    // RIMUOVE VECCHIO PANNELLO
+    // ==========================================
+
     const old =
-        document.getElementById("adminPage");
+        document.getElementById(
+            "adminPage"
+        );
 
     if (old) {
         old.remove();
     }
 
+
+    // ==========================================
+    // CREA PAGINA ADMIN
+    // ==========================================
+
     const page =
         document.createElement("div");
 
-    page.id = "adminPage";
+    page.id =
+        "adminPage";
+
 
     page.innerHTML = `
 
@@ -3094,6 +6628,7 @@ async function loadAdminPanel() {
 
                 </button>
 
+
                 <div class="profile-header">
 
                     <span class="section-label">
@@ -3101,52 +6636,166 @@ async function loadAdminPanel() {
                     </span>
 
                     <h1>
-                        Pannello Waselni 🔐
+                        Pannello Hez Maak 🔐
                     </h1>
 
                     <p>
-                        Gestione delle verifiche identità.
+                        Gestione verifiche utenti e viaggi.
                     </p>
 
                 </div>
+
+
+                <!-- ================================= -->
+                <!-- STATISTICHE -->
+                <!-- ================================= -->
 
                 <div class="profile-card">
 
                     <div class="profile-card-title">
 
                         <h3>
-                            Richieste in attesa
+                            📊 Panoramica
                         </h3>
 
-                        <strong>
-                            ${data.length}
-                        </strong>
+                    </div>
+
+
+                    <div class="profile-info-grid">
+
+                        <div>
+
+                            <span>
+                                Verifiche identità
+                            </span>
+
+                            <strong>
+                                ${verificationRequests.length}
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Biglietti da verificare
+                            </span>
+
+                            <strong>
+                                ${pendingTrips.length}
+                            </strong>
+
+                        </div>
 
                     </div>
 
                 </div>
 
-                <div id="adminRequests">
+
+                <!-- ================================= -->
+                <!-- DOCUMENTI IDENTITÀ -->
+                <!-- ================================= -->
+
+                <div class="profile-header">
+
+                    <span class="section-label">
+                        IDENTITÀ
+                    </span>
+
+                    <h2>
+                        🪪 Verifiche identità
+                    </h2>
+
+                </div>
+
+
+                <div id="adminVerificationRequests">
 
                     ${
-                        data.length
-                        ? data.map(
-                            request =>
-                                adminRequestHTML(request)
-                          ).join("")
+                        verificationRequests.length
+
+                        ? verificationRequests
+                            .map(
+                                request =>
+                                    adminRequestHTML(request)
+                            )
+                            .join("")
+
                         : `
+
                             <div class="profile-card">
 
                                 <h3>
-                                    ✓ Tutto in ordine
+                                    ✓ Nessuna verifica identità
                                 </h3>
 
                                 <p>
-                                    Non ci sono verifiche
-                                    in attesa.
+                                    Non ci sono documenti
+                                    in attesa di verifica.
                                 </p>
 
                             </div>
+
+                        `
+                    }
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- BIGLIETTI -->
+                <!-- ================================= -->
+
+                <div
+                    class="profile-header"
+                    style="margin-top:40px;"
+                >
+
+                    <span class="section-label">
+                        VIAGGI
+                    </span>
+
+                    <h2>
+                        🎫 Verifica biglietti
+                    </h2>
+
+                    <p>
+                        Controlla i biglietti caricati
+                        dagli utenti prima di approvare
+                        il viaggio.
+                    </p>
+
+                </div>
+
+
+                <div id="adminTicketRequests">
+
+                    ${
+                        pendingTrips.length
+
+                        ? pendingTrips
+                            .map(
+                                trip =>
+                                    adminTripHTML(trip)
+                            )
+                            .join("")
+
+                        : `
+
+                            <div class="profile-card">
+
+                                <h3>
+                                    ✓ Nessun biglietto in attesa
+                                </h3>
+
+                                <p>
+                                    Tutti i biglietti sono stati
+                                    verificati.
+                                </p>
+
+                            </div>
+
                         `
                     }
 
@@ -3155,112 +6804,227 @@ async function loadAdminPanel() {
             </div>
 
         </div>
+
     `;
+
 
     document.body.appendChild(page);
 
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow =
+        "hidden";
 }
-function adminRequestHTML(request) {
+function adminTripHTML(trip) {
 
-    const type =
-        request.document_type === "passport"
-            ? "🛂 Passaporto"
-            : "🪪 Carta d'identità";
+    const departureFlag =
+        flag(trip.departure_country);
+
+    const arrivalFlag =
+        flag(trip.arrival_country);
+
 
     const date =
-        new Date(
-            request.created_at
-        ).toLocaleString("it-IT");
+        trip.travel_date
+            ? new Date(
+                trip.travel_date + "T12:00:00"
+              ).toLocaleDateString("it-IT")
+            : "-";
+
 
     return `
 
         <div
             class="profile-card admin-request"
-            id="request-${request.id}">
+            id="admin-trip-${trip.id}"
+        >
 
             <div>
 
                 <span class="section-label">
-                    RICHIESTA VERIFICA
+                    BIGLIETTO DA VERIFICARE
                 </span>
 
+
                 <h3>
-                    ${type}
+                    ✈️
+
+                    ${escapeHtml(
+                        trip.departure_city || ""
+                    )}
+
+                    →
+
+                    ${escapeHtml(
+                        trip.arrival_city || ""
+                    )}
                 </h3>
 
+
                 <p>
-                    Utente:
+
+                    ${departureFlag}
+
+                    ${escapeHtml(
+                        trip.departure_country || ""
+                    )}
+
+                    →
+
+                    ${arrivalFlag}
+
+                    ${escapeHtml(
+                        trip.arrival_country || ""
+                    )}
+
+                </p>
+
+
+                <p>
+
+                    📅
+
+                    <strong>
+                        ${date}
+                    </strong>
+
+                </p>
+
+
+                <p>
+
+                    📦 Spazio disponibile:
+
+                    <strong>
+                        ${trip.available_kg || 0} kg
+                    </strong>
+
+                </p>
+
+
+                ${
+                    trip.price_per_kg
+                    ? `
+                        <p>
+                            💰 €${trip.price_per_kg}/kg
+                        </p>
+                    `
+                    : ""
+                }
+
+
+                <p>
+
+                    👤 User ID:
+
                     <br>
 
                     <code>
-                        ${escapeHtml(request.user_id)}
+                        ${escapeHtml(
+                            trip.user_id
+                        )}
                     </code>
+
                 </p>
 
-                <p>
-                    Inviata: ${date}
-                </p>
+
+                ${
+                    trip.description
+                    ? `
+                        <p>
+                            📝
+                            ${escapeHtml(
+                                trip.description
+                            )}
+                        </p>
+                    `
+                    : ""
+                }
 
             </div>
 
+
             <div class="admin-actions">
+
+
+                <!-- VISUALIZZA BIGLIETTO -->
 
                 <button
                     class="secondary"
-                    onclick="viewVerificationDocument('${request.document_path}')">
+                    onclick="viewTravelTicket('${escapeHtml(
+                        trip.ticket_path
+                    )}')"
+                >
 
-                    👁 Visualizza documento
+                    👁 Visualizza biglietto
 
                 </button>
+
+
+                <!-- APPROVA -->
 
                 <button
                     class="primary"
-                    onclick="approveVerification('${request.id}', '${request.user_id}')">
+                    onclick="approveTravelTicket('${trip.id}')"
+                >
 
-                    ✓ Approva
+                    ✓ Approva biglietto
 
                 </button>
 
+
+                <!-- RIFIUTA -->
+
                 <button
                     class="danger-button"
-                    onclick="rejectVerification('${request.id}')">
+                    onclick="rejectTravelTicket('${trip.id}')"
+                >
 
                     ✕ Rifiuta
 
                 </button>
 
+
             </div>
 
         </div>
+
     `;
 }
-async function viewVerificationDocument(
-    path
-) {
+async function viewTravelTicket(path) {
+
+    if (!path) {
+
+        alert(
+            "Questo viaggio non ha un biglietto."
+        );
+
+        return;
+    }
+
 
     const {
         data,
         error
     } = await supabaseClient
         .storage
-        .from(
-            "verification-documents"
-        )
+        .from("travel-tickets")
         .createSignedUrl(
             path,
             300
         );
 
+
     if (error) {
 
+        console.error(error);
+
         alert(
-            "Impossibile aprire il documento: " +
+            "Impossibile aprire il biglietto: " +
             error.message
         );
 
         return;
     }
+
 
     window.open(
         data.signedUrl,
@@ -3268,273 +7032,1162 @@ async function viewVerificationDocument(
         "noopener,noreferrer"
     );
 }
-async function approveVerification(
-    requestId,
-    userId
-) {
+async function approveTicket(ticketId) {
 
-    if (
-        !confirm(
-            "Confermi di aver verificato il documento?"
-        )
-    ) {
-        return;
+  const confirmed = confirm(
+    "✈️ Confermi di aver verificato il biglietto?\n\n" +
+    "Il viaggio verrà approvato e sarà considerato verificato."
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  if (!currentUser) {
+    alert("Devi essere autenticato come amministratore.");
+    return;
+  }
+
+  try {
+
+    // ==========================================
+    // 1. APPROVA IL BIGLIETTO
+    // ==========================================
+
+    const { data, error } = await supabaseClient
+      .from("trips")
+      .update({
+        verification_status: "approved"
+      })
+      .eq("id", ticketId)
+      .select()
+      .single();
+
+    if (error) {
+
+      console.error(
+        "Errore approvazione biglietto:",
+        error
+      );
+
+      alert(
+        "❌ Errore durante l'approvazione:\n\n" +
+        error.message
+      );
+
+      return;
     }
 
 
-    const {
-        error: requestError
-    } = await supabaseClient
-        .from(
-            "verification_requests"
-        )
-        .update({
-
-            status:
-                "approved",
-
-            reviewed_at:
-                new Date().toISOString(),
-
-            reviewed_by:
-                currentUser.id
-
-        })
-        .eq(
-            "id",
-            requestId
-        );
-
-
-    if (requestError) {
-
-        alert(
-            "Errore: " +
-            requestError.message
-        );
-
-        return;
-    }
-
-
-    const {
-        error: profileError
-    } = await supabaseClient
-        .from("profiles")
-        .update({
-
-            is_verified:
-                true
-
-        })
-        .eq(
-            "id",
-            userId
-        );
-
-
-    if (profileError) {
-
-        alert(
-            "Richiesta approvata, ma errore aggiornamento profilo: " +
-            profileError.message
-        );
-
-        return;
-    }
-
+    // ==========================================
+    // 2. CONFERMA
+    // ==========================================
 
     alert(
-        "✓ Utente verificato."
+      "✓ Biglietto approvato!\n\n" +
+      "Il viaggio è ora verificato."
     );
 
 
-    loadAdminPanel();
+    // ==========================================
+    // 3. RICARICA PANNELLO ADMIN
+    // ==========================================
+
+    await loadAdminTicketPanel();
+
+    // aggiorna anche i viaggi pubblici
+    await loadTrips();
+
+  } catch (error) {
+
+    console.error(
+      "Errore inatteso approvazione:",
+      error
+    );
+
+    alert(
+      "❌ Si è verificato un errore:\n\n" +
+      error.message
+    );
+
+  }
+
 }
-async function rejectVerification(
-    requestId
+/* =====================================================
+   RIFIUTA BIGLIETTO
+===================================================== */
+
+async function rejectTravelTicket(
+    tripId
 ) {
 
-    const reason =
-        prompt(
-            "Perché stai rifiutando il documento?"
-        );
+    showRejectTicketPopup(
+        tripId
+    );
+
+}
+/* =====================================================
+   CONFERMA RIFIUTO BIGLIETTO
+===================================================== */
+function showRejectTicketPopup(ticketId) {
+
+  // Rimuove eventuale popup precedente
+  const existing =
+    document.getElementById("rejectTicketPopup");
+
+  if (existing) {
+    existing.remove();
+  }
 
 
-    if (!reason) {
-        return;
-    }
+  const popup =
+    document.createElement("div");
 
+  popup.id = "rejectTicketPopup";
+
+  popup.innerHTML = `
+
+    <div class="ticket-popup-overlay">
+
+      <div class="ticket-popup">
+
+        <button
+          class="ticket-popup-close"
+          onclick="closeRejectTicketPopup()">
+
+          ×
+
+        </button>
+
+
+        <div class="ticket-popup-icon">
+          ⚠️
+        </div>
+
+
+        <h2>
+          Rifiuta biglietto
+        </h2>
+
+
+        <p>
+          Indica il motivo per cui il biglietto
+          non può essere approvato.
+        </p>
+
+
+        <textarea
+          id="ticketRejectionReason"
+          rows="4"
+          placeholder="Es. Il biglietto non è leggibile..."
+        ></textarea>
+
+
+        <div
+          id="ticketRejectMessage">
+        </div>
+
+
+        <div class="ticket-popup-actions">
+
+          <button
+            class="secondary"
+            onclick="closeRejectTicketPopup()">
+
+            Annulla
+
+          </button>
+
+
+          <button
+            class="danger-button"
+            onclick="confirmRejectTravelTicket('${ticketId}')">
+
+            ✕ Rifiuta biglietto
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.body.appendChild(popup);
+
+}
+
+
+function closeRejectTicketPopup() {
+
+  const popup =
+    document.getElementById(
+      "rejectTicketPopup"
+    );
+
+  if (popup) {
+    popup.remove();
+  }
+
+}
+async function confirmRejectTravelTicket(ticketId) {
+
+  const reasonElement =
+    document.getElementById(
+      "ticketRejectionReason"
+    );
+
+  const message =
+    document.getElementById(
+      "ticketRejectMessage"
+    );
+
+
+  const reason =
+    reasonElement
+      ? reasonElement.value.trim()
+      : "";
+
+
+  if (!reason) {
+
+    message.innerHTML = `
+      <div class="auth-error">
+        Inserisci il motivo del rifiuto.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  message.innerHTML = `
+    <div class="auth-success">
+      Rifiuto del biglietto in corso...
+    </div>
+  `;
+
+
+  try {
 
     const {
-        error
+      error
     } = await supabaseClient
-        .from(
-            "verification_requests"
-        )
-        .update({
+      .from("trips")
+      .update({
 
-            status:
-                "rejected",
+        verification_status:
+          "rejected",
 
-            rejection_reason:
-                reason,
+        rejection_reason:
+          reason
 
-            reviewed_at:
-                new Date().toISOString(),
-
-            reviewed_by:
-                currentUser.id
-
-        })
-        .eq(
-            "id",
-            requestId
-        );
+      })
+      .eq(
+        "id",
+        ticketId
+      );
 
 
     if (error) {
 
-        alert(
-            "Errore: " +
-            error.message
-        );
+      console.error(
+        "Errore rifiuto biglietto:",
+        error
+      );
 
-        return;
+      message.innerHTML = `
+        <div class="auth-error">
+          Errore:
+          ${escapeHtml(error.message)}
+        </div>
+      `;
+
+      return;
+
     }
+
+
+    closeRejectTicketPopup();
 
 
     alert(
-        "Richiesta rifiutata."
+      "✓ Biglietto rifiutato."
     );
 
 
-    loadAdminPanel();
+    await loadAdminTicketPanel();
+
+    await loadTrips();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    message.innerHTML = `
+      <div class="auth-error">
+        Errore imprevisto:
+        ${escapeHtml(error.message)}
+      </div>
+    `;
+
+  }
+
 }
+function adminRequestHTML(
+  request
+) {
+
+  const type =
+    request.document_type ===
+    "passport"
+
+      ? t("passport")
+
+      : t("identityCard");
+
+
+  const date =
+    new Date(
+      request.created_at
+    )
+    .toLocaleString(
+      currentLanguage === "fr"
+        ? "fr-FR"
+        : currentLanguage === "tn"
+          ? "ar-TN"
+          : "it-IT"
+    );
+
+
+  return `
+
+    <div
+      class="profile-card admin-request"
+      id="request-${request.id}"
+    >
+
+
+      <div>
+
+        <span class="section-label">
+          ${t("pendingRequests")}
+        </span>
+
+
+        <h3>
+          ${type}
+        </h3>
+
+
+        <p>
+
+          ${t("user")}:
+
+          <br>
+
+          <code>
+            ${escapeHtml(
+              request.user_id
+            )}
+          </code>
+
+        </p>
+
+
+        <p>
+          ${t("sent")}: ${date}
+        </p>
+
+
+      </div>
+
+
+      <div class="admin-actions">
+
+
+        <button
+          class="secondary"
+          onclick="viewVerificationDocument('${request.document_path}')">
+
+          ${t("viewDocument")}
+
+        </button>
+
+
+        <button
+          class="primary"
+          onclick="approveVerification('${request.id}', '${request.user_id}')">
+
+          ${t("approve")}
+
+        </button>
+
+
+        <button
+          class="danger-button"
+          onclick="rejectVerification('${request.id}')">
+
+          ${t("reject")}
+
+        </button>
+
+
+      </div>
+
+
+    </div>
+
+  `;
+
+}
+
+
+async function viewVerificationDocument(
+  path
+) {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from(
+        "verification-documents"
+      )
+      .createSignedUrl(
+        path,
+        300
+      );
+
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  window.open(
+    data.signedUrl,
+    "_blank",
+    "noopener,noreferrer"
+  );
+
+}
+
+
+/* =====================================================
+   APPROVE VERIFICATION
+===================================================== */
+
+async function approveVerification(
+  requestId,
+  userId
+) {
+
+  if (
+    !confirm(
+      currentLanguage === "it"
+        ? "Confermi di aver verificato il documento?"
+        : currentLanguage === "fr"
+          ? "Confirmez-vous avoir vérifié le document ?"
+          : "متأكد اللي تحب توافق على الوثيقة؟"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  const {
+    error: requestError
+  } =
+    await supabaseClient
+      .from(
+        "verification_requests"
+      )
+      .update({
+
+        status:
+          "approved",
+
+        reviewed_at:
+          new Date().toISOString(),
+
+        reviewed_by:
+          currentUser.id
+
+      })
+      .eq(
+        "id",
+        requestId
+      );
+
+
+  if (requestError) {
+
+    alert(
+      requestError.message
+    );
+
+    return;
+
+  }
+
+
+  const {
+    error: profileError
+  } =
+    await supabaseClient
+      .from("profiles")
+      .update({
+
+        is_verified:
+          true
+
+      })
+      .eq(
+        "id",
+        userId
+      );
+
+
+  if (profileError) {
+
+    alert(
+      profileError.message
+    );
+
+    return;
+
+  }
+
+
+  alert(
+    currentLanguage === "it"
+      ? "✓ Utente verificato."
+      : currentLanguage === "fr"
+        ? "✓ Utilisateur vérifié."
+        : "✓ المستعمل ولى موثوق."
+  );
+
+
+  loadAdminPanel();
+
+}
+
+
+/* =====================================================
+   REJECT VERIFICATION
+===================================================== */
+
+async function rejectVerification(
+  requestId
+) {
+
+  const reason =
+    prompt(
+      currentLanguage === "it"
+        ? "Perché stai rifiutando il documento?"
+        : currentLanguage === "fr"
+          ? "Pourquoi refusez-vous le document ?"
+          : "علاش تحب ترفض الوثيقة؟"
+    );
+
+
+  if (!reason) {
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from(
+        "verification_requests"
+      )
+      .update({
+
+        status:
+          "rejected",
+
+        rejection_reason:
+          reason,
+
+        reviewed_at:
+          new Date().toISOString(),
+
+        reviewed_by:
+          currentUser.id
+
+      })
+      .eq(
+        "id",
+        requestId
+      );
+
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  alert(
+    currentLanguage === "it"
+      ? "Richiesta rifiutata."
+      : currentLanguage === "fr"
+        ? "Demande refusée."
+        : "الطلب ترفض."
+  );
+
+
+  loadAdminPanel();
+
+}
+
+
+/* =====================================================
+   CLOSE ADMIN
+===================================================== */
+
 function closeAdminPanel() {
 
-    const page =
-        document.getElementById(
-            "adminPage"
-        );
+  const page =
+    document.getElementById(
+      "adminPage"
+    );
 
-    if (page) {
-        page.remove();
-    }
+  if (page) {
 
-    document.body.style.overflow =
-        "";
+    page.remove();
+
+  }
+
+
+  document.body.style.overflow =
+    "";
+
 }
+
+
+/* =====================================================
+   ADMIN BUTTON
+===================================================== */
+
 async function updateAdminButton() {
 
-    if (!currentUser) {
-        removeAdminButton();
-        return;
+  if (!currentUser) {
+
+    removeAdminButton();
+
+    return;
+
+  }
+
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.rpc(
+        "is_admin"
+      );
+
+
+    if (error) {
+
+      console.error(
+        "Errore controllo admin:",
+        error
+      );
+
+      removeAdminButton();
+
+      return;
+
     }
 
-    try {
 
-        const { data, error } =
-            await supabaseClient.rpc("is_admin");
+    if (data === true) {
 
-        if (error) {
-            console.error(
-                "Errore controllo admin:",
-                error
-            );
+      showAdminButton();
 
-            removeAdminButton();
-            return;
-        }
+    } else {
 
-        if (data === true) {
-            showAdminButton();
-        } else {
-            removeAdminButton();
-        }
-
-    } catch (error) {
-
-        console.error(error);
-        removeAdminButton();
+      removeAdminButton();
 
     }
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+    removeAdminButton();
+
+  }
+
 }
 
 
 function showAdminButton() {
 
-    let button =
-        document.getElementById(
-            "adminHeaderButton"
-        );
+  let button =
+    document.getElementById(
+      "adminHeaderButton"
+    );
 
-    if (button) {
-        return;
-    }
 
-    button =
-        document.createElement("button");
+  if (button) {
 
-    button.id =
-        "adminHeaderButton";
+    return;
 
-    button.type =
-        "button";
+  }
 
-    button.className =
-        "admin-header-button";
 
-    button.innerHTML =
-        "🔐 Admin";
+  button =
+    document.createElement(
+      "button"
+    );
 
-    button.onclick =
-        openAdminPanel;
 
-    /*
-      Prova a inserirlo vicino
-      al pulsante del profilo.
-    */
+  button.id =
+    "adminHeaderButton";
 
-    const profileButton =
-        document.querySelector(
-            '[onclick*="showProfile"]'
-        );
 
-    if (profileButton &&
-        profileButton.parentElement) {
+  button.type =
+    "button";
 
-        profileButton.parentElement
-            .appendChild(button);
 
-    } else {
+  button.className =
+    "admin-header-button";
 
-        /*
-          Fallback:
-          lo mette nell'header.
-        */
 
-        const header =
-            document.querySelector(
-                "header"
-            );
+  button.innerHTML =
+    t("admin");
 
-        if (header) {
-            header.appendChild(button);
-        }
 
-    }
+  button.onclick =
+    openAdminPanel;
+
+
+  const nav =
+    document.getElementById(
+      "mainNav"
+    );
+
+
+  if (nav) {
+
+    nav.appendChild(
+      button
+    );
+
+  }
+
 }
 
 
 function removeAdminButton() {
 
-    const button =
+  const button =
+    document.getElementById(
+      "adminHeaderButton"
+    );
+
+
+  if (button) {
+
+    button.remove();
+
+  }}
+/* =====================================================
+   POPUP SISTEMA
+===================================================== */
+
+function showPopup({
+    title = "",
+    message = "",
+    type = "info",
+    confirmText = "OK",
+    cancelText = null,
+    onConfirm = null
+}) {
+
+    const old =
+        document.getElementById("systemPopup");
+
+    if (old) {
+        old.remove();
+    }
+
+
+    const popup =
+        document.createElement("div");
+
+    popup.id =
+        "systemPopup";
+
+
+    let icon = "ℹ️";
+
+    if (type === "success") {
+        icon = "✓";
+    }
+
+    if (type === "error") {
+        icon = "⚠️";
+    }
+
+    if (type === "warning") {
+        icon = "⚠️";
+    }
+
+
+    popup.innerHTML = `
+
+        <div class="popup-overlay">
+
+            <div class="popup-box ${type}">
+
+                <button
+                    class="popup-close"
+                    onclick="closeSystemPopup()">
+
+                    ×
+
+                </button>
+
+
+                <div class="popup-icon">
+                    ${icon}
+                </div>
+
+
+                <h3>
+                    ${escapeHtml(title)}
+                </h3>
+
+
+                <p>
+                    ${message}
+                </p>
+
+
+                <div class="popup-buttons">
+
+                    ${
+                        cancelText
+                        ? `
+                            <button
+                                class="secondary"
+                                onclick="closeSystemPopup()">
+
+                                ${escapeHtml(cancelText)}
+
+                            </button>
+                        `
+                        : ""
+                    }
+
+
+                    <button
+                        class="primary"
+                        id="popupConfirmButton">
+
+                        ${escapeHtml(confirmText)}
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(popup);
+
+
+    const confirmButton =
         document.getElementById(
-            "adminHeaderButton"
+            "popupConfirmButton"
         );
 
-    if (button) {
-        button.remove();
-    }
+
+    confirmButton.onclick =
+        async () => {
+
+            if (onConfirm) {
+
+                confirmButton.disabled =
+                    true;
+
+                confirmButton.textContent =
+                    "Attendi...";
+
+                await onConfirm();
+
+            }
+
+        };
+
+
+    // Chiudi cliccando fuori
+
+    popup
+        .querySelector(".popup-overlay")
+        .addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target.classList
+                        .contains("popup-overlay")
+                ) {
+
+                    closeSystemPopup();
+
+                }
+
+            }
+        );
 }
+
+
+function closeSystemPopup() {
+
+    const popup =
+        document.getElementById(
+            "systemPopup"
+        );
+
+    if (popup) {
+        popup.remove();
+    }
+
+}
+   /* =====================================================
+   POPUP RIFIUTO BIGLIETTO
+===================================================== */
+
+function showRejectTicketPopup(
+    tripId
+) {
+
+    const old =
+        document.getElementById(
+            "systemPopup"
+        );
+
+    if (old) {
+        old.remove();
+    }
+
+
+    const popup =
+        document.createElement("div");
+
+    popup.id =
+        "systemPopup";
+
+
+    popup.innerHTML = `
+
+        <div class="popup-overlay">
+
+            <div class="popup-box warning">
+
+                <button
+                    class="popup-close"
+                    onclick="closeSystemPopup()">
+
+                    ×
+
+                </button>
+
+
+                <div class="popup-icon">
+                    ⚠️
+                </div>
+
+
+                <h3>
+                    Rifiuta biglietto
+                </h3>
+
+
+                <p>
+                    Indica all'utente perché
+                    il biglietto non può essere approvato.
+                </p>
+
+
+                <textarea
+                    id="rejectTicketReason"
+                    class="popup-textarea"
+                    rows="5"
+                    placeholder="Es. Il biglietto non è leggibile..."
+                ></textarea>
+
+
+                <div class="popup-buttons">
+
+                    <button
+                        class="secondary"
+                        onclick="closeSystemPopup()">
+
+                        Annulla
+
+                    </button>
+
+
+                    <button
+                        class="danger-button"
+                        id="confirmRejectTicket">
+
+                        ✕ Rifiuta biglietto
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(popup);
+
+
+    document
+        .getElementById(
+            "confirmRejectTicket"
+        )
+        .onclick =
+        () => {
+
+            rejectTravelTicketConfirmed(
+                tripId
+            );
+
+        };
+
+}
+
+// =====================================================
+// ADMIN - VERIFICA BIGLIETTI VIAGGIO
+// =====================================================
+
+window.approveTravelTicket = async function(ticketId) {
+
+  if (!currentUser) {
+    alert("Devi essere autenticato.");
+    return;
+  }
+
+  const conferma = confirm(
+    "✈️ Approva biglietto\n\n" +
+    "Confermi che il biglietto è valido?"
+  );
+
+  if (!conferma) {
+    return;
+  }
+
+  try {
+
+    const { error } = await supabaseClient
+      .from("trips")
+      .update({
+        verification_status: "approved",
+        rejection_reason: null
+      })
+      .eq("id", ticketId);
+
+    if (error) {
+
+      console.error(
+        "Errore approvazione biglietto:",
+        error
+      );
+
+      alert(
+        "❌ Errore approvazione:\n\n" +
+        error.message
+      );
+
+      return;
+    }
+
+    alert(
+      "✓ Biglietto approvato!\n\n" +
+      "Il viaggio è stato verificato."
+    );
+
+    if (
+      typeof loadAdminTicketPanel === "function"
+    ) {
+      await loadAdminTicketPanel();
+    }
+
+    if (
+      typeof loadTrips === "function"
+    ) {
+      await loadTrips();
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "❌ Errore:\n\n" +
+      error.message
+    );
+
+  }
+
+};
+window.rejectTravelTicket = function(ticketId) {
+
+  if (
+    typeof showRejectTicketPopup === "function"
+  ) {
+    showRejectTicketPopup(ticketId);
+  } else {
+
+    alert(
+      "Errore: popup rifiuto biglietto non disponibile."
+    );
+
+  }
+
+};
