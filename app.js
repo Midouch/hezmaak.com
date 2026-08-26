@@ -3266,7 +3266,8 @@ function tripCard(trip) {
     );
 
 
-  let verificationHtml = "";
+  let verificationHtml =
+    "";
 
 
   if (
@@ -3274,30 +3275,33 @@ function tripCard(trip) {
     "approved"
   ) {
 
-    verificationHtml = `
+    verificationHtml =
+      `
       <span class="verified-trip">
         ${t("verifiedTrip")}
       </span>
-    `;
+      `;
 
   } else if (
     trip.verification_status ===
     "pending"
   ) {
 
-    verificationHtml = `
+    verificationHtml =
+      `
       <span class="pending-trip">
         ${t("ticketPending")}
       </span>
-    `;
+      `;
 
   } else {
 
-    verificationHtml = `
+    verificationHtml =
+      `
       <span class="rejected-trip">
         ${t("verificationRejected")}
       </span>
-    `;
+      `;
 
   }
 
@@ -3305,6 +3309,7 @@ function tripCard(trip) {
   return `
 
     <article class="card trip-card">
+
 
       <div class="avatar">
         ✈️
@@ -3320,13 +3325,16 @@ function tripCard(trip) {
 
         ${verificationHtml}
 
+
         ${
           profile.is_verified
+
             ? `
               <span class="verified">
                 ✓ ${t("verified")}
               </span>
             `
+
             : ""
         }
 
@@ -3368,46 +3376,31 @@ function tripCard(trip) {
 
       ${
         trip.price_per_kg
+
           ? `
             <strong>
               €${trip.price_per_kg}/${t("kg")}
             </strong>
           `
+
           : ""
       }
 
 
       ${
         trip.description
+
           ? `
             <p>
-              ${escapeHtml(trip.description)}
+              ${escapeHtml(
+                trip.description
+              )
+              }
             </p>
           `
+
           : ""
       }
-
-
-      ${
-        currentUser &&
-        currentUser.id !== trip.user_id
-          ? `
-            <button
-              class="primary"
-              onclick="contactUser('${trip.user_id}')">
-
-              💬 Contatta
-
-            </button>
-          `
-          : ""
-      }
-
-    </article>
-
-  `;
-
-}
 
 
       ${
@@ -3431,6 +3424,30 @@ function tripCard(trip) {
   `;
 
 }
+
+
+
+      ${
+                currentUser &&
+        currentUser.id !== trip.user_id
+
+        ? `<button
+            class="primary"
+            onclick="contactUser('${trip.user_id}')">
+
+            Contatta
+
+           </button>`
+
+        : ""
+
+      }
+
+    </article>
+
+  `;
+
+
 /* =====================================================
    REQUEST MODAL
 ===================================================== */
