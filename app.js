@@ -4492,7 +4492,7 @@ function myTripHTML(trip) {
                     </p>
                 `
                 : ""
-            }
+           
 
         </div>
 
