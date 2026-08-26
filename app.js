@@ -4483,7 +4483,7 @@ function myTripHTML(trip) {
             ${
                 trip.description
                 ? `
-                    <p class="trip-description">
+                    <p class="">
 
                         ${escapeHtml(
                             trip.description
@@ -4492,7 +4492,7 @@ function myTripHTML(trip) {
                     </p>
                 `
                 : ""
-           
+           }
 
         </div>
 
