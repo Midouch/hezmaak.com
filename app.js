@@ -3394,7 +3394,8 @@ function tripCard(trip) {
             <p>
               ${escapeHtml(
                 trip.description
-              )}
+              )
+              }
             </p>
           `
 
