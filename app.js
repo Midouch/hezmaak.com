@@ -4352,13 +4352,6 @@ async function openConversation(otherUserId, tripId = null, requestId = null) {
 }
 
 
-function closeChat() {
-  const modal = document.getElementById("chatModal");
-  if (modal) {
-    modal.remove();
-  }
-}
-
 
 
 
@@ -8560,4 +8553,13 @@ window.rejectTravelTicket = function(ticketId) {
   }
 
 };
+function closeChat() {
+  const modal = document.getElementById("chatModal");
+  if (!modal) return;
+
+  modal.style.opacity = "0";
+  modal.style.transition = "opacity 0.25s";
+
+  setTimeout(() => modal.remove(), 250);
+}
 
