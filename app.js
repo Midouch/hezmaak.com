@@ -4218,6 +4218,8 @@ if (msg.sender_id !== currentUser.id) {
     return;
   }
 }
+
+}
 let typingTimeout;
 
 function setupTyping(conversationId, otherUserName) {
@@ -4252,11 +4254,6 @@ function setupTyping(conversationId, otherUserName) {
     })
     .subscribe();
 }
-
-
-   
-}
-
 
 
 
@@ -8571,7 +8568,7 @@ for (const conv of conversations) {
     .from("messages")
     .select("*")
     .eq("conversation_id", conv.id)
-    .eq("read", false)
+    .is("read", false)
     .neq("sender_id", currentUser.id);
 
   const isUnread = unreadMessages && unreadMessages.length > 0;
@@ -8622,7 +8619,7 @@ async function updateUnreadCount() {
   const { data } = await supabaseClient
     .from("messages")
     .select("*")
-    .eq("read", false)
+    .is("read", false)
     .neq("sender_id", currentUser.id);
 
   const count = data.length;
