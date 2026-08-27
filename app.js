@@ -3990,16 +3990,11 @@ async function getUserName(userId) {
 /* =====================================================
    MESSAGGING
 ===================================================== */
-
-
-
-
 function openChatModal(conversationId, otherUserName, otherUserId, tripId, requestId) {
 
   const modal = document.createElement("div");
   modal.id = "chatModal";
   modal.className = "chat-modal";
- setupTyping(conversationId, otherUserName);
 
   modal.innerHTML = `
     <div class="chat-box">
@@ -4010,12 +4005,12 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
       </div>
 
       <div id="chatMessages" class="chat-messages"></div>
-      setupTyping(conversationId, otherUserName);
+
       <div id="typingIndicator" class="typing"></div>
 
       <div class="chat-input">
         <input id="chatText" type="text" placeholder="Scrivi un messaggio...">
-        <button onclick="sendMessage(${conversationId}, '${otherUserId}', ${tripId}, ${requestId})">Invia</button>
+        <button onclick="sendMessage('${conversationId}', '${otherUserId}', '${tripId}', '${requestId}')">Invia</button>
       </div>
 
     </div>
@@ -4027,144 +4022,17 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
     loadMessages(conversationId);
     subscribeToMessages(conversationId);
   }
-   document.querySelectorAll(".notify-badge").forEach(b => b.remove());
-}
 
-async function loadMessages(conversationId) {
+  // Rimuove badge notifiche
+  document.querySelectorAll(".notify-badge").forEach(b => b.remove());
 
-  const { data: messages } =
-    await supabaseClient
-      .from("messages")
-      .select("*")
-      .eq("conversation_id", conversationId)
-      .order("created_at", { ascending: true });
-
-  const box = document.getElementById("chatMessages");
-  box.innerHTML = "";
-
-  for (const msg of messages) {
-
-    const group = document.createElement("div");
-    group.className = "msg-group";
-
-    const row = document.createElement("div");
-    row.className = msg.sender_id === currentUser.id ? "msg-row me" : "msg-row";
-
-    // Avatar dell'altro utente
-    if (msg.sender_id !== currentUser.id) {
-      const avatar = document.createElement("img");
-      avatar.src = msg.sender_avatar || "/img/default-avatar.png";
-      avatar.className = "msg-avatar";
-      row.appendChild(avatar);
-    }
-
-    // Messaggio
-    const div = document.createElement("div");
-    div.className =
-      msg.sender_id === currentUser.id
-        ? "msg msg-me"
-        : "msg msg-other";
-
-    div.textContent = msg.message;
-    row.appendChild(div);
-
-    group.appendChild(row);
-
-    // Orario
-    const time = document.createElement("div");
-    time.className = "msg-time";
-    time.textContent = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    group.appendChild(time);
-
-    // Spunte WhatsApp
-    if (msg.sender_id === currentUser.id) {
-      const status = document.createElement("div");
-      status.className = "msg-status";
-      status.textContent = msg.read ? "✓✓ letto" : "✓ inviato";
-      group.appendChild(status);
-    }
-
-    box.appendChild(group);
-  }
-
-  box.scrollTop = box.scrollHeight;
+  // 🔥 setupTyping DEVE essere chiamato SOLO QUI
+  setupTyping(conversationId, otherUserName);
 }
 
 
+/*==================================*/
 
-async function sendMessage(conversationId, otherUserId, tripId, requestId) {
-
-  const input = document.getElementById("chatText");
-  const text = input.value.trim();
-
-  if (!text) return;
-
-  // Se la conversazione NON esiste → creala ora
-  if (!conversationId) {
-
-    const { data: newConv } =
-      await supabaseClient
-        .from("conversations")
-        .insert([
-          {
-            participant_1: currentUser.id,
-            participant_2: otherUserId,
-            trip_id: tripId,
-            request_id: requestId
-          }
-        ])
-        .select()
-        .single();
-
-    conversationId = newConv.id;
-
-    // Attiva realtime
-    subscribeToMessages(conversationId);
-  }
-
-  // Invia messaggio
-  await supabaseClient
-    .from("messages")
-    .insert([
-      {
-        conversation_id: conversationId,
-        sender_id: currentUser.id,
-        message: text
-      }
-    ]);
-
-  input.value = "";
-
-  loadMessages(conversationId);
-}
-
-
-function showNotificationBadge(button) {
-  if (!button.querySelector(".notify-badge")) {
-    const badge = document.createElement("span");
-    badge.className = "notify-badge";
-    badge.textContent = "1";
-    button.appendChild(badge);
-  }
-}
-function showToast(message) {
-  const toast = document.createElement("div");
-  toast.style.position = "fixed";
-  toast.style.bottom = "20px";
-  toast.style.left = "50%";
-  toast.style.transform = "translateX(-50%)";
-  toast.style.background = "#0066ff";
-  toast.style.color = "#fff";
-  toast.style.padding = "12px 18px";
-  toast.style.borderRadius = "10px";
-  toast.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
-  toast.style.zIndex = "999999";
-  toast.textContent = message;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => toast.remove(), 3000);
-}
 function subscribeToMessages(conversationId) {
 
   supabaseClient
@@ -4183,15 +4051,13 @@ function subscribeToMessages(conversationId) {
 
         if (msg.sender_id !== currentUser.id) {
 
-          // Mostra toast
           showToast("Nuovo messaggio ricevuto");
 
-          // Badge sul pulsante “Contatta”
           const buttons = document.querySelectorAll('[data-action="contact"]');
           buttons.forEach(btn => showNotificationBadge(btn));
 
-          // Evidenzia messaggio non letto
           const box = document.getElementById("chatMessages");
+
           if (box) {
             const div = document.createElement("div");
             div.className = "msg msg-other msg-unread";
@@ -4206,33 +4072,24 @@ function subscribeToMessages(conversationId) {
       }
     )
     .subscribe();
-if (msg.sender_id !== currentUser.id) {
-
-  const box = document.getElementById("chatMessages");
-
-  if (box) {
-    const div = document.createElement("div");
-    div.className = "msg msg-other msg-unread";
-    div.textContent = msg.message;
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
-    return;
-  }
 }
+/*======================================*/
 
-}
 let typingTimeout;
 
 function setupTyping(conversationId, otherUserName) {
+
   const input = document.getElementById("chatText");
 
   input.addEventListener("input", () => {
+
     supabaseClient
       .from("typing")
       .insert({ conversation_id: conversationId, user_id: currentUser.id })
       .then(() => {});
 
     clearTimeout(typingTimeout);
+
     typingTimeout = setTimeout(() => {
       supabaseClient
         .from("typing")
@@ -4244,69 +4101,23 @@ function setupTyping(conversationId, otherUserName) {
 
   supabaseClient
     .channel(`typing_${conversationId}`)
-    .on("postgres_changes", { event: "*", schema: "public", table: "typing" }, payload => {
-      const typingBox = document.getElementById("typingIndicator");
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "typing" },
+      payload => {
 
-      if (payload.eventType === "INSERT" && payload.new.user_id !== currentUser.id) {
-        typingBox.textContent = `${otherUserName} sta scrivendo…`;
-      } else {
-        typingBox.textContent = "";
+        const typingBox = document.getElementById("typingIndicator");
+
+        if (payload.eventType === "INSERT" && payload.new.user_id !== currentUser.id) {
+          typingBox.textContent = `${otherUserName} sta scrivendo…`;
+        } else {
+          typingBox.textContent = "";
+        }
       }
-    })
+    )
     .subscribe();
 }
-
-
-
-async function openConversation(otherUserId, tripId = null, requestId = null) {
-
-  if (!currentUser) {
-    openAuth("login");
-    return;
-  }
-
-  const otherUserName = await getUserName(otherUserId);
-
-  let query = supabaseClient
-    .from("conversations")
-    .select("*")
-    .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
-    .or(`participant_1.eq.${otherUserId},participant_2.eq.${otherUserId}`);
-
-  // tripId
-  if (tripId !== null) {
-    query = query.eq("trip_id", tripId);
-  } else {
-    query = query.is("trip_id", null);
-  }
-
-  // requestId
-  if (requestId !== null) {
-    query = query.eq("request_id", requestId);
-  } else {
-    query = query.is("request_id", null);
-  }
-
-  const { data: existing, error } = await query;
-
-  if (error) {
-    console.error("Errore Supabase:", error);
-    return;
-  }
-
-  let conversation = existing && existing.length > 0 ? existing[0] : null;
-
-  openChatModal(
-    conversation ? conversation.id : null,
-    otherUserName,
-    otherUserId,
-    tripId,
-    requestId
-  );
-}
-
-
-
+/*===========================================0*/
 
 
 
@@ -8555,52 +8366,51 @@ async function openMessages() {
       <div class="chat-messages" style="height:400px; overflow-y:auto;">
   `;
 
-for (const conv of conversations) {
+  for (const conv of conversations) {
 
-  const otherUserId =
-    conv.participant_1 === currentUser.id
-      ? conv.participant_2
-      : conv.participant_1;
+    const otherUserId =
+      conv.participant_1 === currentUser.id
+        ? conv.participant_2
+        : conv.participant_1;
 
-  const otherUserName = await getUserName(otherUserId);
+    const otherUserName = await getUserName(otherUserId);
 
-  // 🔥 Controlla se ci sono messaggi non letti
-  const { data: unreadMessages } = await supabaseClient
-    .from("messages")
-    .select("*")
-    .eq("conversation_id", conv.id)
-    .is("read", false)
-    .neq("sender_id", currentUser.id);
-
-  const isUnread = unreadMessages && unreadMessages.length > 0;
-
-  // 🔥 Recupera ultimo messaggio
-  const { data: lastMsg } =
-    await supabaseClient
+    // 🔥 Messaggi non letti
+    const { data: unreadMessages } = await supabaseClient
       .from("messages")
       .select("*")
       .eq("conversation_id", conv.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .is("read", false)
+      .neq("sender_id", currentUser.id);
 
-  const preview =
-    lastMsg?.message
-      ? lastMsg.message.substring(0, 40) + "..."
-      : "Nessun messaggio";
+    const isUnread = unreadMessages && unreadMessages.length > 0;
 
-  // 🔥 HTML della conversazione con evidenziazione
-  html += `
-    <div class="conversation-item ${isUnread ? "unread" : ""}"
-         onclick="openConversation('${otherUserId}', ${conv.trip_id}, ${conv.request_id})">
+    // 🔥 Ultimo messaggio
+    const { data: lastMsg } =
+      await supabaseClient
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", conv.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-      <strong>${otherUserName}</strong><br>
-      <span>${preview}</span>
+    const preview =
+      lastMsg?.message
+        ? lastMsg.message.substring(0, 40) + "..."
+        : "Nessun messaggio";
 
-    </div>
-  `;
-}
+    // 🔥 HTML della conversazione con evidenziazione
+    html += `
+      <div class="conversation-item ${isUnread ? "unread" : ""}"
+           onclick="openConversation('${otherUserId}', '${conv.trip_id}', '${conv.request_id}')">
 
+        <strong>${otherUserName}</strong><br>
+        <span>${preview}</span>
+
+      </div>
+    `;
+  }
 
   html += `
       </div>
@@ -8609,13 +8419,19 @@ for (const conv of conversations) {
 
   modal.innerHTML = html;
   document.body.appendChild(modal);
+
+  // Aggiorna contatore non letti
+  updateUnreadCount();
 }
 
 
+
+/*============================*/
 function closeMessages() {
   const modal = document.getElementById("messagesModal");
   if (modal) modal.remove();
 }
+/*============================*/
 async function updateUnreadCount() {
   const { data } = await supabaseClient
     .from("messages")
@@ -8624,5 +8440,6 @@ async function updateUnreadCount() {
     .neq("sender_id", currentUser.id);
 
   const count = data.length;
-  document.getElementById("unreadCount").textContent = count > 0 ? `(${count})` : "";
+  document.getElementById("unreadCount").textContent =
+    count > 0 ? `(${count})` : "";
 }
