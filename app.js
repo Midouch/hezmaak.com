@@ -2498,6 +2498,10 @@ async function showProfile() {
 
               <div class="profile-menu-grid">
 
+              <button onclick="openMessages()" class="profile-button">
+  💬 Messaggi <span id="unreadCount"></span>
+</button>
+
 
                 <button
                   onclick="showMyTrips()">
@@ -8633,4 +8637,15 @@ function closeChat() {
   modal.style.transition = "opacity 0.25s";
 
   setTimeout(() => modal.remove(), 250);
+}
+async function updateUnreadCount() {
+  const { data } = await supabaseClient
+    .from("messages")
+    .select("*")
+    .is("read", false)
+    .neq("sender_id", currentUser.id);
+
+  const count = data.length;
+  document.getElementById("unreadCount").textContent =
+    count > 0 ? `(${count})` : "";
 }
