@@ -2498,8 +2498,8 @@ async function showProfile() {
 
               <div class="profile-menu-grid">
 
-               <button onclick="openMessages()" class="profile-button">
-  💬 Messaggi
+           <button onclick="openMessages()" class="profile-button">
+  💬 Messaggi <span id="unreadCount"></span>
 </button>
 
                 <button
@@ -3999,6 +3999,7 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
   const modal = document.createElement("div");
   modal.id = "chatModal";
   modal.className = "chat-modal";
+ setupTyping(conversationId, otherUserName);
 
   modal.innerHTML = `
     <div class="chat-box">
@@ -4009,6 +4010,7 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
       </div>
 
       <div id="chatMessages" class="chat-messages"></div>
+      <div id="typingIndicator" class="typing"></div>
 
       <div class="chat-input">
         <input id="chatText" type="text" placeholder="Scrivi un messaggio...">
@@ -4039,26 +4041,54 @@ async function loadMessages(conversationId) {
   const box = document.getElementById("chatMessages");
   box.innerHTML = "";
 
-  messages.forEach(msg => {
+  for (const msg of messages) {
 
     const group = document.createElement("div");
     group.className = "msg-group";
 
-    const div = document.createElement("div");
+    const row = document.createElement("div");
+    row.className = msg.sender_id === currentUser.id ? "msg-row me" : "msg-row";
 
+    // Avatar dell'altro utente
+    if (msg.sender_id !== currentUser.id) {
+      const avatar = document.createElement("img");
+      avatar.src = msg.sender_avatar || "/img/default-avatar.png";
+      avatar.className = "msg-avatar";
+      row.appendChild(avatar);
+    }
+
+    // Messaggio
+    const div = document.createElement("div");
     div.className =
       msg.sender_id === currentUser.id
         ? "msg msg-me"
         : "msg msg-other";
 
     div.textContent = msg.message;
+    row.appendChild(div);
 
-    group.appendChild(div);
+    group.appendChild(row);
+
+    // Orario
+    const time = document.createElement("div");
+    time.className = "msg-time";
+    time.textContent = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    group.appendChild(time);
+
+    // Spunte WhatsApp
+    if (msg.sender_id === currentUser.id) {
+      const status = document.createElement("div");
+      status.className = "msg-status";
+      status.textContent = msg.read ? "✓✓ letto" : "✓ inviato";
+      group.appendChild(status);
+    }
+
     box.appendChild(group);
-  });
+  }
 
   box.scrollTop = box.scrollHeight;
 }
+
 
 
 async function sendMessage(conversationId, otherUserId, tripId, requestId) {
@@ -4175,6 +4205,56 @@ function subscribeToMessages(conversationId) {
       }
     )
     .subscribe();
+if (msg.sender_id !== currentUser.id) {
+
+  const box = document.getElementById("chatMessages");
+
+  if (box) {
+    const div = document.createElement("div");
+    div.className = "msg msg-other msg-unread";
+    div.textContent = msg.message;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+    return;
+  }
+}
+let typingTimeout;
+
+function setupTyping(conversationId, otherUserName) {
+  const input = document.getElementById("chatText");
+
+  input.addEventListener("input", () => {
+    supabaseClient
+      .from("typing")
+      .insert({ conversation_id: conversationId, user_id: currentUser.id })
+      .then(() => {});
+
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      supabaseClient
+        .from("typing")
+        .delete()
+        .eq("conversation_id", conversationId)
+        .eq("user_id", currentUser.id);
+    }, 2000);
+  });
+
+  supabaseClient
+    .channel(`typing_${conversationId}`)
+    .on("postgres_changes", { event: "*", schema: "public", table: "typing" }, payload => {
+      const typingBox = document.getElementById("typingIndicator");
+
+      if (payload.eventType === "INSERT" && payload.new.user_id !== currentUser.id) {
+        typingBox.textContent = `${otherUserName} sta scrivendo…`;
+      } else {
+        typingBox.textContent = "";
+      }
+    })
+    .subscribe();
+}
+
+
+   
 }
 
 
@@ -8477,39 +8557,52 @@ async function openMessages() {
       <div class="chat-messages" style="height:400px; overflow-y:auto;">
   `;
 
-  for (const conv of conversations) {
+for (const conv of conversations) {
 
-    const otherUserId =
-      conv.participant_1 === currentUser.id
-        ? conv.participant_2
-        : conv.participant_1;
+  const otherUserId =
+    conv.participant_1 === currentUser.id
+      ? conv.participant_2
+      : conv.participant_1;
 
-    const otherUserName = await getUserName(otherUserId);
+  const otherUserName = await getUserName(otherUserId);
 
-    // Recupera ultimo messaggio
-    const { data: lastMsg } =
-      await supabaseClient
-        .from("messages")
-        .select("*")
-        .eq("conversation_id", conv.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+  // 🔥 Controlla se ci sono messaggi non letti
+  const { data: unreadMessages } = await supabaseClient
+    .from("messages")
+    .select("*")
+    .eq("conversation_id", conv.id)
+    .eq("read", false)
+    .neq("sender_id", currentUser.id);
 
-    const preview =
-      lastMsg?.message
-        ? lastMsg.message.substring(0, 40) + "..."
-        : "Nessun messaggio";
+  const isUnread = unreadMessages && unreadMessages.length > 0;
 
-    html += `
-      <div class="conversation-item"
-           onclick="openChatModal(${conv.id}, '${otherUserName}')"
-           style="padding:12px; border-bottom:1px solid #ddd; cursor:pointer;">
-        <strong>${otherUserName}</strong><br>
-        <span style="color:#666; font-size:14px;">${preview}</span>
-      </div>
-    `;
-  }
+  // 🔥 Recupera ultimo messaggio
+  const { data: lastMsg } =
+    await supabaseClient
+      .from("messages")
+      .select("*")
+      .eq("conversation_id", conv.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+  const preview =
+    lastMsg?.message
+      ? lastMsg.message.substring(0, 40) + "..."
+      : "Nessun messaggio";
+
+  // 🔥 HTML della conversazione con evidenziazione
+  html += `
+    <div class="conversation-item ${isUnread ? "unread" : ""}"
+         onclick="openConversation('${otherUserId}', ${conv.trip_id}, ${conv.request_id})">
+
+      <strong>${otherUserName}</strong><br>
+      <span>${preview}</span>
+
+    </div>
+  `;
+}
+
 
   html += `
       </div>
@@ -8524,4 +8617,14 @@ async function openMessages() {
 function closeMessages() {
   const modal = document.getElementById("messagesModal");
   if (modal) modal.remove();
+}
+async function updateUnreadCount() {
+  const { data } = await supabaseClient
+    .from("messages")
+    .select("*")
+    .eq("read", false)
+    .neq("sender_id", currentUser.id);
+
+  const count = data.length;
+  document.getElementById("unreadCount").textContent = count > 0 ? `(${count})` : "";
 }
