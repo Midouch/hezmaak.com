@@ -2499,8 +2499,8 @@ async function showProfile() {
               <div class="profile-menu-grid">
 
               <button onclick="openMessages()" class="profile-button">
-  💬 Messaggi <span id="unreadCount"></span>
-</button>
+                 💬 Messaggi <span id="unreadCount"></span>
+              </button>
 
 
                 <button
@@ -2594,6 +2594,100 @@ async function showProfile() {
 
 }
 
+/*=============================*/
+async function openMessages() {
+
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const { data: conversations, error } =
+    await supabaseClient
+      .from("conversations")
+      .select("*")
+      .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
+      .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    alert("Errore nel caricamento dei messaggi.");
+    return;
+  }
+
+  const modal = document.createElement("div");
+  modal.id = "messagesModal";
+  modal.className = "chat-modal";
+
+  let html = `
+    <div class="chat-box">
+      <div class="chat-header">
+        <span>Messaggi</span>
+        <button class="chat-close" onclick="closeMessages()">×</button>
+      </div>
+
+      <div class="chat-messages" style="height:400px; overflow-y:auto;">
+  `;
+
+  for (const conv of conversations) {
+
+    const otherUserId =
+      conv.participant_1 === currentUser.id
+        ? conv.participant_2
+        : conv.participant_1;
+
+    const otherUserName = await getUserName(otherUserId);
+
+    const { data: unreadMessages } = await supabaseClient
+      .from("messages")
+      .select("*")
+      .eq("conversation_id", conv.id)
+      .is("read", false)
+      .neq("sender_id", currentUser.id);
+
+    const isUnread = unreadMessages && unreadMessages.length > 0;
+
+    const { data: lastMsg } =
+      await supabaseClient
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", conv.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    const preview =
+      lastMsg?.message
+        ? lastMsg.message.substring(0, 40) + "..."
+        : "Nessun messaggio";
+
+    html += `
+      <div class="conversation-item ${isUnread ? "unread" : ""}"
+           onclick="openConversation('${otherUserId}', '${conv.trip_id}', '${conv.request_id}')">
+
+        <strong>${otherUserName}</strong><br>
+        <span>${preview}</span>
+
+      </div>
+    `;
+  }
+
+  html += `
+      </div>
+    </div>
+  `;
+
+  modal.innerHTML = html;
+  document.body.appendChild(modal);
+
+  updateUnreadCount();
+}
+
+
+
+
+
+/*======================*/
 
 function closeProfilePage() {
 
@@ -4253,99 +4347,7 @@ function setupTyping(conversationId, otherUserName) {
 }
 
 /*=================*/
-async function openMessages() {
 
-  if (!currentUser) {
-    openAuth("login");
-    return;
-  }
-
-  // Recupera tutte le conversazioni dell’utente
-  const { data: conversations, error } =
-    await supabaseClient
-      .from("conversations")
-      .select("*")
-      .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
-      .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error(error);
-    alert("Errore nel caricamento dei messaggi.");
-    return;
-  }
-
-  // Costruisci la UI
-  const modal = document.createElement("div");
-  modal.id = "messagesModal";
-  modal.className = "chat-modal";
-
-  let html = `
-    <div class="chat-box">
-      <div class="chat-header">
-        <span>Messaggi</span>
-        <button class="chat-close" onclick="closeMessages()">×</button>
-      </div>
-
-      <div class="chat-messages" style="height:400px; overflow-y:auto;">
-  `;
-
-  for (const conv of conversations) {
-
-    const otherUserId =
-      conv.participant_1 === currentUser.id
-        ? conv.participant_2
-        : conv.participant_1;
-
-    const otherUserName = await getUserName(otherUserId);
-
-    // 🔥 Messaggi non letti
-    const { data: unreadMessages } = await supabaseClient
-      .from("messages")
-      .select("*")
-      .eq("conversation_id", conv.id)
-      .is("read", false)
-      .neq("sender_id", currentUser.id);
-
-    const isUnread = unreadMessages && unreadMessages.length > 0;
-
-    // 🔥 Ultimo messaggio
-    const { data: lastMsg } =
-      await supabaseClient
-        .from("messages")
-        .select("*")
-        .eq("conversation_id", conv.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-    const preview =
-      lastMsg?.message
-        ? lastMsg.message.substring(0, 40) + "..."
-        : "Nessun messaggio";
-
-    // 🔥 HTML della conversazione con evidenziazione
-    html += `
-      <div class="conversation-item ${isUnread ? "unread" : ""}"
-           onclick="openConversation('${otherUserId}', '${conv.trip_id}', '${conv.request_id}')">
-
-        <strong>${otherUserName}</strong><br>
-        <span>${preview}</span>
-
-      </div>
-    `;
-  }
-
-  html += `
-      </div>
-    </div>
-  `;
-
-  modal.innerHTML = html;
-  document.body.appendChild(modal);
-
-  // Aggiorna contatore non letti
-  updateUnreadCount();
-}
 
 /*=================*/
 function closeMessages() {
