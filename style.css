@@ -2023,3 +2023,44 @@ html[dir="rtl"] select {
   background: #ffe48a !important;
   border-left: 4px solid #ffb300;
 }
+/* Modal responsive */
+.chat-modal {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 380px;
+  max-width: 100%;
+  height: 480px;
+  max-height: 100%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .chat-modal {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .chat-header {
+    padding: 16px;
+    font-size: 18px;
+  }
+
+  .chat-input input {
+    font-size: 16px;
+  }
+
+  .msg {
+    max-width: 85%;
+    font-size: 16px;
+  }
+}
+.msg-group {
+  margin-bottom: 4px;
+}
