@@ -4024,6 +4024,7 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
     loadMessages(conversationId);
     subscribeToMessages(conversationId);
   }
+   document.querySelectorAll(".notify-badge").forEach(b => b.remove());
 }
 
 async function loadMessages(conversationId) {
@@ -4149,14 +4150,25 @@ function subscribeToMessages(conversationId) {
 
         const msg = payload.new;
 
-        // Se il messaggio è dell'altro utente → notifica
         if (msg.sender_id !== currentUser.id) {
 
+          // Mostra toast
           showToast("Nuovo messaggio ricevuto");
 
           // Badge sul pulsante “Contatta”
           const buttons = document.querySelectorAll('[data-action="contact"]');
           buttons.forEach(btn => showNotificationBadge(btn));
+
+          // Evidenzia messaggio non letto
+          const box = document.getElementById("chatMessages");
+          if (box) {
+            const div = document.createElement("div");
+            div.className = "msg msg-other msg-unread";
+            div.textContent = msg.message;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+            return;
+          }
         }
 
         loadMessages(conversationId);
@@ -4164,6 +4176,7 @@ function subscribeToMessages(conversationId) {
     )
     .subscribe();
 }
+
 
 
 
