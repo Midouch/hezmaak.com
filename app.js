@@ -2498,9 +2498,6 @@ async function showProfile() {
 
               <div class="profile-menu-grid">
 
-               <button onclick="openMessages()" class="profile-button">
-  💬 Messaggi
-</button>
 
                 <button
                   onclick="showMyTrips()">
@@ -3406,17 +3403,23 @@ ${
     !currentUser ||
     currentUser.id !== trip.user_id
   )
+
     ? `
       <button
         class="primary"
-        onclick="openConversation('${trip.user_id}', ${trip.id}, null)"
-      >
+        onclick="contactUser(
+          '${trip.user_id}',
+          ${trip.id},
+          null
+        )">
+
         💬 Contatta
+
       </button>
     `
+
     : ""
 }
-
 
 
     </article>
@@ -3949,22 +3952,28 @@ function requestCard(request) {
           : ""
       }
 
-${
+ ${
   (
     !currentUser ||
     currentUser.id !== request.user_id
   )
+
     ? `
       <button
         class="primary"
-        onclick="openConversation('${request.user_id}', null, ${request.id})"
-      >
+        onclick="contactUser(
+          '${request.user_id}',
+          null,
+          ${request.id}
+        )">
+
         💬 Contatta
+
       </button>
     `
+
     : ""
 }
-
 
     </article>
 
@@ -3985,8 +3994,174 @@ async function getUserName(userId) {
 
 /* ====================================================  CONTACT    
   =====================================================*/ 
+async function contactUser(
+  userId,
+  tripId = null,
+  requestId = null
+) {
+
+  if (!currentUser) {
+
+    openAuth("login");
+
+    return;
+
+  }
 
 
+  if (!userId) {
+
+    alert(
+      "Impossibile identificare l'utente."
+    );
+
+    return;
+
+  }
+
+
+  if (userId === currentUser.id) {
+
+    alert(
+      "Non puoi contattare te stesso."
+    );
+
+    return;
+
+  }
+
+
+  const participant1 =
+    currentUser.id < userId
+      ? currentUser.id
+      : userId;
+
+
+  const participant2 =
+    currentUser.id < userId
+      ? userId
+      : currentUser.id;
+
+
+  let query =
+    supabaseClient
+      .from("conversations")
+      .select("*")
+      .eq(
+        "participant_1",
+        participant1
+      )
+      .eq(
+        "participant_2",
+        participant2
+      );
+
+
+  if (tripId) {
+
+    query =
+      query.eq(
+        "trip_id",
+        tripId
+      );
+
+  }
+
+
+  if (requestId) {
+
+    query =
+      query.eq(
+        "request_id",
+        requestId
+      );
+
+  }
+
+
+  const {
+    data: existingConversation,
+    error: searchError
+  } =
+    await query
+      .maybeSingle();
+
+
+  if (searchError) {
+
+    console.error(
+      searchError
+    );
+
+    alert(
+      "Errore nella ricerca della conversazione: " +
+      searchError.message
+    );
+
+    return;
+
+  }
+
+
+  let conversation =
+    existingConversation;
+
+
+  if (!conversation) {
+
+    const {
+      data: newConversation,
+      error: createError
+    } =
+      await supabaseClient
+        .from("conversations")
+        .insert({
+
+          participant_1:
+            participant1,
+
+          participant_2:
+            participant2,
+
+          trip_id:
+            tripId,
+
+          request_id:
+            requestId
+
+        })
+        .select()
+        .single();
+
+
+    if (createError) {
+
+      console.error(
+        createError
+      );
+
+      alert(
+        "Errore nella creazione della conversazione: " +
+        createError.message
+      );
+
+      return;
+
+    }
+
+
+    conversation =
+      newConversation;
+
+  }
+
+
+  openChatModal(
+    conversation.id,
+    userId
+  );
+
+}
 /* =====================================================
    MESSAGGING
 ===================================================== */
@@ -3994,7 +4169,7 @@ async function getUserName(userId) {
 
 
 
-function openChatModal(conversationId, otherUserName, otherUserId, tripId, requestId) {
+function openChatModal(conversationId, otherUserName = "Utente") {
 
   const modal = document.createElement("div");
   modal.id = "chatModal";
@@ -4012,7 +4187,7 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
 
       <div class="chat-input">
         <input id="chatText" type="text" placeholder="Scrivi un messaggio...">
-        <button onclick="sendMessage(${conversationId}, '${otherUserId}', ${tripId}, ${requestId})">Invia</button>
+        <button onclick="sendMessage(${conversationId})">Invia</button>
       </div>
 
     </div>
@@ -4020,12 +4195,9 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
 
   document.body.appendChild(modal);
 
-  if (conversationId) {
-    loadMessages(conversationId);
-    subscribeToMessages(conversationId);
-  }
+  loadMessages(conversationId);
+  subscribeToMessages(conversationId);
 }
-
 
 async function loadMessages(conversationId) {
 
@@ -4055,37 +4227,13 @@ async function loadMessages(conversationId) {
 
   box.scrollTop = box.scrollHeight;
 }
-async function sendMessage(conversationId, otherUserId, tripId, requestId) {
+async function sendMessage(conversationId) {
 
   const input = document.getElementById("chatText");
   const text = input.value.trim();
 
   if (!text) return;
 
-  // Se la conversazione NON esiste → creala ora
-  if (!conversationId) {
-
-    const { data: newConv } =
-      await supabaseClient
-        .from("conversations")
-        .insert([
-          {
-            participant_1: currentUser.id,
-            participant_2: otherUserId,
-            trip_id: tripId,
-            request_id: requestId
-          }
-        ])
-        .select()
-        .single();
-
-    conversationId = newConv.id;
-
-    // Attiva realtime
-    subscribeToMessages(conversationId);
-  }
-
-  // Invia messaggio
   await supabaseClient
     .from("messages")
     .insert([
@@ -4100,8 +4248,6 @@ async function sendMessage(conversationId, otherUserId, tripId, requestId) {
 
   loadMessages(conversationId);
 }
-
-
 function showNotificationBadge(button) {
   if (!button.querySelector(".notify-badge")) {
     const badge = document.createElement("span");
@@ -4169,46 +4315,44 @@ async function openConversation(otherUserId, tripId = null, requestId = null) {
     return;
   }
 
+  // Recupera il nome del destinatario
   const otherUserName = await getUserName(otherUserId);
 
-  let query = supabaseClient
-    .from("conversations")
-    .select("*")
-    .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
-    .or(`participant_1.eq.${otherUserId},participant_2.eq.${otherUserId}`);
+  // Cerca conversazione esistente
+  const { data: existing } =
+    await supabaseClient
+      .from("conversations")
+      .select("*")
+      .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
+      .or(`participant_1.eq.${otherUserId},participant_2.eq.${otherUserId}`)
+      .eq("trip_id", tripId)
+      .eq("request_id", requestId);
 
-  // tripId
-  if (tripId !== null) {
-    query = query.eq("trip_id", tripId);
+  let conversation;
+
+  if (existing && existing.length > 0) {
+    conversation = existing[0];
   } else {
-    query = query.is("trip_id", null);
+    const { data: created } =
+      await supabaseClient
+        .from("conversations")
+        .insert([
+          {
+            participant_1: currentUser.id,
+            participant_2: otherUserId,
+            trip_id: tripId,
+            request_id: requestId
+          }
+        ])
+        .select()
+        .single();
+
+    conversation = created;
   }
 
-  // requestId
-  if (requestId !== null) {
-    query = query.eq("request_id", requestId);
-  } else {
-    query = query.is("request_id", null);
-  }
-
-  const { data: existing, error } = await query;
-
-  if (error) {
-    console.error("Errore Supabase:", error);
-    return;
-  }
-
-  let conversation = existing && existing.length > 0 ? existing[0] : null;
-
-  openChatModal(
-    conversation ? conversation.id : null,
-    otherUserName,
-    otherUserId,
-    tripId,
-    requestId
-  );
+  // Apri la chat con il NOME (non UUID)
+  openChatModal(conversation.id, otherUserName);
 }
-
 
 
 
@@ -8422,88 +8566,3 @@ function closeChat() {
   setTimeout(() => modal.remove(), 250);
 }
 
-/*===================== OPEN MESSAGE IN PROFILE =======================*/
-async function openMessages() {
-
-  if (!currentUser) {
-    openAuth("login");
-    return;
-  }
-
-  // Recupera tutte le conversazioni dell’utente
-  const { data: conversations, error } =
-    await supabaseClient
-      .from("conversations")
-      .select("*")
-      .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
-      .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error(error);
-    alert("Errore nel caricamento dei messaggi.");
-    return;
-  }
-
-  // Costruisci la UI
-  const modal = document.createElement("div");
-  modal.id = "messagesModal";
-  modal.className = "chat-modal";
-
-  let html = `
-    <div class="chat-box">
-      <div class="chat-header">
-        <span>Messaggi</span>
-        <button class="chat-close" onclick="closeMessages()">×</button>
-      </div>
-
-      <div class="chat-messages" style="height:400px; overflow-y:auto;">
-  `;
-
-  for (const conv of conversations) {
-
-    const otherUserId =
-      conv.participant_1 === currentUser.id
-        ? conv.participant_2
-        : conv.participant_1;
-
-    const otherUserName = await getUserName(otherUserId);
-
-    // Recupera ultimo messaggio
-    const { data: lastMsg } =
-      await supabaseClient
-        .from("messages")
-        .select("*")
-        .eq("conversation_id", conv.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-    const preview =
-      lastMsg?.message
-        ? lastMsg.message.substring(0, 40) + "..."
-        : "Nessun messaggio";
-
-    html += `
-      <div class="conversation-item"
-           onclick="openChatModal(${conv.id}, '${otherUserName}')"
-           style="padding:12px; border-bottom:1px solid #ddd; cursor:pointer;">
-        <strong>${otherUserName}</strong><br>
-        <span style="color:#666; font-size:14px;">${preview}</span>
-      </div>
-    `;
-  }
-
-  html += `
-      </div>
-    </div>
-  `;
-
-  modal.innerHTML = html;
-  document.body.appendChild(modal);
-}
-
-
-function closeMessages() {
-  const modal = document.getElementById("messagesModal");
-  if (modal) modal.remove();
-}
