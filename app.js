@@ -4010,6 +4010,7 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
       </div>
 
       <div id="chatMessages" class="chat-messages"></div>
+      setupTyping(conversationId, otherUserName);
       <div id="typingIndicator" class="typing"></div>
 
       <div class="chat-input">
