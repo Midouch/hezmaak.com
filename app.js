@@ -4155,6 +4155,19 @@ async function contactUser(
 /* =====================================================
    MESSAGGING
 ===================================================== */
+async function getUserName(userId) {
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("full_name")
+    .eq("id", userId)
+    .single();
+
+  if (error || !data) return "Utente";
+  return data.full_name;
+}
+
+
+
 function openChatModal(conversationId, otherUserName = "Utente") {
 
   const modal = document.createElement("div");
@@ -4184,6 +4197,7 @@ function openChatModal(conversationId, otherUserName = "Utente") {
   loadMessages(conversationId);
   subscribeToMessages(conversationId);
 }
+
 async function loadMessages(conversationId) {
 
   const { data: messages } =
@@ -4290,13 +4304,17 @@ function subscribeToMessages(conversationId) {
     )
     .subscribe();
 }
-async function openConversation(otherUserId, tripId = null, requestId = null, otherUserName = "Utente") {
+async function openConversation(otherUserId, tripId = null, requestId = null) {
 
   if (!currentUser) {
     openAuth("login");
     return;
   }
 
+  // 1. Recupera il nome del destinatario
+  const otherUserName = await getUserName(otherUserId);
+
+  // 2. Cerca conversazione esistente
   const { data: existing } =
     await supabaseClient
       .from("conversations")
@@ -4311,6 +4329,7 @@ async function openConversation(otherUserId, tripId = null, requestId = null, ot
   if (existing && existing.length > 0) {
     conversation = existing[0];
   } else {
+    // 3. Creane una nuova
     const { data: created } =
       await supabaseClient
         .from("conversations")
@@ -4328,9 +4347,17 @@ async function openConversation(otherUserId, tripId = null, requestId = null, ot
     conversation = created;
   }
 
+  // 4. Apri la chat con il NOME del destinatario
   openChatModal(conversation.id, otherUserName);
 }
 
+
+function closeChat() {
+  const modal = document.getElementById("chatModal");
+  if (modal) {
+    modal.remove();
+  }
+}
 
 
 
