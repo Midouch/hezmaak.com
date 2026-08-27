@@ -4146,7 +4146,7 @@ async function contactUser(
   }
 
 
-  openChat(
+  openChatModal(
     conversation.id,
     userId
   );
@@ -4155,6 +4155,186 @@ async function contactUser(
 /* =====================================================
    MESSAGGING
 ===================================================== */
+function openChatModal(conversationId, otherUserName = "Utente") {
+
+  const modal = document.createElement("div");
+  modal.id = "chatModal";
+  modal.className = "chat-modal";
+
+  modal.innerHTML = `
+    <div class="chat-box">
+
+      <div class="chat-header">
+        <span>${otherUserName}</span>
+        <button class="chat-close" onclick="closeChat()">×</button>
+      </div>
+
+      <div id="chatMessages" class="chat-messages"></div>
+
+      <div class="chat-input">
+        <input id="chatText" type="text" placeholder="Scrivi un messaggio...">
+        <button onclick="sendMessage(${conversationId})">Invia</button>
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  loadMessages(conversationId);
+  subscribeToMessages(conversationId);
+}
+async function loadMessages(conversationId) {
+
+  const { data: messages } =
+    await supabaseClient
+      .from("messages")
+      .select("*")
+      .eq("conversation_id", conversationId)
+      .order("created_at", { ascending: true });
+
+  const box = document.getElementById("chatMessages");
+  box.innerHTML = "";
+
+  messages.forEach(msg => {
+
+    const div = document.createElement("div");
+
+    div.className =
+      msg.sender_id === currentUser.id
+        ? "msg msg-me"
+        : "msg msg-other";
+
+    div.textContent = msg.message;
+
+    box.appendChild(div);
+  });
+
+  box.scrollTop = box.scrollHeight;
+}
+async function sendMessage(conversationId) {
+
+  const input = document.getElementById("chatText");
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  await supabaseClient
+    .from("messages")
+    .insert([
+      {
+        conversation_id: conversationId,
+        sender_id: currentUser.id,
+        message: text
+      }
+    ]);
+
+  input.value = "";
+
+  loadMessages(conversationId);
+}
+function showNotificationBadge(button) {
+  if (!button.querySelector(".notify-badge")) {
+    const badge = document.createElement("span");
+    badge.className = "notify-badge";
+    badge.textContent = "1";
+    button.appendChild(badge);
+  }
+}
+function showToast(message) {
+  const toast = document.createElement("div");
+  toast.style.position = "fixed";
+  toast.style.bottom = "20px";
+  toast.style.left = "50%";
+  toast.style.transform = "translateX(-50%)";
+  toast.style.background = "#0066ff";
+  toast.style.color = "#fff";
+  toast.style.padding = "12px 18px";
+  toast.style.borderRadius = "10px";
+  toast.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+  toast.style.zIndex = "999999";
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.remove(), 3000);
+}
+function subscribeToMessages(conversationId) {
+
+  supabaseClient
+    .channel(`conversation_${conversationId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "messages",
+        filter: `conversation_id=eq.${conversationId}`
+      },
+      payload => {
+
+        const msg = payload.new;
+
+        // Se il messaggio è dell'altro utente → notifica
+        if (msg.sender_id !== currentUser.id) {
+
+          showToast("Nuovo messaggio ricevuto");
+
+          // Badge sul pulsante “Contatta”
+          const buttons = document.querySelectorAll('[data-action="contact"]');
+          buttons.forEach(btn => showNotificationBadge(btn));
+        }
+
+        loadMessages(conversationId);
+      }
+    )
+    .subscribe();
+}
+async function openConversation(otherUserId, tripId = null, requestId = null, otherUserName = "Utente") {
+
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const { data: existing } =
+    await supabaseClient
+      .from("conversations")
+      .select("*")
+      .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
+      .or(`participant_1.eq.${otherUserId},participant_2.eq.${otherUserId}`)
+      .eq("trip_id", tripId)
+      .eq("request_id", requestId);
+
+  let conversation;
+
+  if (existing && existing.length > 0) {
+    conversation = existing[0];
+  } else {
+    const { data: created } =
+      await supabaseClient
+        .from("conversations")
+        .insert([
+          {
+            participant_1: currentUser.id,
+            participant_2: otherUserId,
+            trip_id: tripId,
+            request_id: requestId
+          }
+        ])
+        .select()
+        .single();
+
+    conversation = created;
+  }
+
+  openChatModal(conversation.id, otherUserName);
+}
+
+
+
+
+
 
 
 /* =====================================================
@@ -8353,306 +8533,4 @@ window.rejectTravelTicket = function(ticketId) {
   }
 
 };
-async function openChat(
-  conversationId,
-  otherUserId
-) {
 
-  const oldChat =
-    document.getElementById(
-      "chatModal"
-    );
-
-  if (oldChat) {
-    oldChat.remove();
-  }
-
-
-  const modal =
-    document.createElement(
-      "div"
-    );
-
-  modal.id =
-    "chatModal";
-
-
-  modal.innerHTML = `
-
-    <div class="auth-overlay">
-
-      <div class="auth-box chat-box">
-
-
-        <button
-          class="auth-close"
-          onclick="closeChat()">
-
-          ×
-
-        </button>
-
-
-        <h2>
-          💬 Chat
-        </h2>
-
-
-        <div
-          id="chatMessages"
-          class="chat-messages">
-
-          <div class="loading">
-            Caricamento messaggi...
-          </div>
-
-        </div>
-
-
-        <div class="chat-input-area">
-
-          <textarea
-            id="chatInput"
-            placeholder="Scrivi un messaggio..."
-            rows="2"
-          ></textarea>
-
-
-          <button
-            class="primary"
-            onclick="sendMessage(
-              ${conversationId},
-              '${otherUserId}'
-            )">
-
-            Invia
-
-          </button>
-
-        </div>
-
-
-      </div>
-
-    </div>
-
-  `;
-
-
-  document.body.appendChild(
-    modal
-  );
-
-
-  await loadMessages(
-    conversationId,
-    otherUserId
-  );
-
-}
-function closeChat() {
-
-  const modal =
-    document.getElementById(
-      "chatModal"
-    );
-
-  if (modal) {
-
-    modal.remove();
-
-  }
-
-}
-async function loadMessages(
-  conversationId,
-  otherUserId
-) {
-
-  const container =
-    document.getElementById(
-      "chatMessages"
-    );
-
-  if (!container) return;
-
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("messages")
-      .select("*")
-      .eq(
-        "conversation_id",
-        conversationId
-      )
-      .order(
-        "created_at",
-        {
-          ascending: true
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      error
-    );
-
-    container.innerHTML =
-      `
-      <div class="auth-error">
-        Errore caricamento messaggi:
-        ${escapeHtml(
-          error.message
-        )}
-      </div>
-      `;
-
-    return;
-
-  }
-
-
-  if (!data.length) {
-
-    container.innerHTML =
-      `
-      <div class="empty-chat">
-
-        👋
-
-        <p>
-          Inizia la conversazione.
-        </p>
-
-      </div>
-      `;
-
-    return;
-
-  }
-
-
-  container.innerHTML =
-    data
-      .map(
-        message => {
-
-          const isMine =
-            message.sender_id ===
-            currentUser.id;
-
-
-          return `
-
-            <div
-              class="chat-message
-              ${
-                isMine
-                  ? "chat-message-mine"
-                  : "chat-message-other"
-              }">
-
-              ${escapeHtml(
-                message.message
-              )}
-
-            </div>
-
-          `;
-
-        }
-      )
-      .join("");
-
-
-  container.scrollTop =
-    container.scrollHeight;
-
-}
-async function sendMessage(
-  conversationId,
-  otherUserId
-) {
-
-  if (!currentUser) {
-
-    openAuth("login");
-
-    return;
-
-  }
-
-
-  const input =
-    document.getElementById(
-      "chatInput"
-    );
-
-  if (!input) return;
-
-
-  const text =
-    input.value.trim();
-
-
-  if (!text) return;
-
-
-  input.disabled =
-    true;
-
-
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("messages")
-      .insert({
-
-        conversation_id:
-          conversationId,
-
-        sender_id:
-          currentUser.id,
-
-        message:
-          text
-
-      });
-
-
-  input.disabled =
-    false;
-
-
-  if (error) {
-
-    console.error(
-      error
-    );
-
-    alert(
-      "Errore invio messaggio: " +
-      error.message
-    );
-
-    return;
-
-  }
-
-
-  input.value =
-    "";
-
-
-  await loadMessages(
-    conversationId,
-    otherUserId
-  );
-
-}
