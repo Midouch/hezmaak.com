@@ -4165,11 +4165,7 @@ async function contactUser(
 /* =====================================================
    MESSAGGING
 ===================================================== */
-
-
-
-
-function openChatModal(conversationId, otherUserName = "Utente") {
+function openChatModal(conversationId, otherUserName, otherUserId, tripId, requestId) {
 
   const modal = document.createElement("div");
   modal.id = "chatModal";
@@ -4185,9 +4181,11 @@ function openChatModal(conversationId, otherUserName = "Utente") {
 
       <div id="chatMessages" class="chat-messages"></div>
 
+      <div id="typingIndicator" class="typing"></div>
+
       <div class="chat-input">
         <input id="chatText" type="text" placeholder="Scrivi un messaggio...">
-        <button onclick="sendMessage(${conversationId})">Invia</button>
+        <button onclick="sendMessage('${conversationId}', '${otherUserId}', '${tripId}', '${requestId}')">Invia</button>
       </div>
 
     </div>
@@ -4195,10 +4193,68 @@ function openChatModal(conversationId, otherUserName = "Utente") {
 
   document.body.appendChild(modal);
 
-  loadMessages(conversationId);
-  subscribeToMessages(conversationId);
+  if (conversationId) {
+    loadMessages(conversationId);
+    subscribeToMessages(conversationId);
+  }
+
+  // Rimuove badge notifiche
+  document.querySelectorAll(".notify-badge").forEach(b => b.remove());
+
+  // Attiva typing indicator
+  setupTyping(conversationId, otherUserName);
+}
+/*=================*/
+let typingTimeout;
+
+function setupTyping(conversationId, otherUserName) {
+
+  const input = document.getElementById("chatText");
+
+  input.addEventListener("input", () => {
+
+    supabaseClient
+      .from("typing")
+      .insert({ conversation_id: conversationId, user_id: currentUser.id })
+      .then(() => {});
+
+    clearTimeout(typingTimeout);
+
+    typingTimeout = setTimeout(() => {
+      supabaseClient
+        .from("typing")
+        .delete()
+        .eq("conversation_id", conversationId)
+        .eq("user_id", currentUser.id);
+    }, 2000);
+  });
+
+  supabaseClient
+    .channel(`typing_${conversationId}`)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "typing" },
+      payload => {
+
+        const typingBox = document.getElementById("typingIndicator");
+
+        if (payload.eventType === "INSERT" && payload.new.user_id !== currentUser.id) {
+          typingBox.textContent = `${otherUserName} sta scrivendo…`;
+        } else {
+          typingBox.textContent = "";
+        }
+      }
+    )
+    .subscribe();
 }
 
+/*=================*/
+
+
+
+
+
+/*=================*/
 async function loadMessages(conversationId) {
 
   const { data: messages } =
@@ -4274,6 +4330,7 @@ function showToast(message) {
 
   setTimeout(() => toast.remove(), 3000);
 }
+/*===================================*/
 function subscribeToMessages(conversationId) {
 
   supabaseClient
@@ -4290,14 +4347,23 @@ function subscribeToMessages(conversationId) {
 
         const msg = payload.new;
 
-        // Se il messaggio è dell'altro utente → notifica
         if (msg.sender_id !== currentUser.id) {
 
           showToast("Nuovo messaggio ricevuto");
 
-          // Badge sul pulsante “Contatta”
           const buttons = document.querySelectorAll('[data-action="contact"]');
           buttons.forEach(btn => showNotificationBadge(btn));
+
+          const box = document.getElementById("chatMessages");
+
+          if (box) {
+            const div = document.createElement("div");
+            div.className = "msg msg-other msg-unread";
+            div.textContent = msg.message;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+            return;
+          }
         }
 
         loadMessages(conversationId);
@@ -4307,8 +4373,11 @@ function subscribeToMessages(conversationId) {
 }
 
 
-
+/*===================================*/
 async function openConversation(otherUserId, tripId = null, requestId = null) {
+  if (tripId === "null") tripId = null;
+if (requestId === "null") requestId = null;
+
 
   if (!currentUser) {
     openAuth("login");
@@ -8565,4 +8634,3 @@ function closeChat() {
 
   setTimeout(() => modal.remove(), 250);
 }
-
