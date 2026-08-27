@@ -3402,7 +3402,7 @@ function tripCard(trip) {
 
 
       ${
-        currentUser ||
+        currentUser &&
         currentUser.id !== trips.user_id
 
           ? `
@@ -3954,7 +3954,7 @@ function requestCard(request) {
       }
 
 ${
-  !currentUser || currentUser.id !== requests.user_id
+  !currentUser && currentUser.id !== requests.user_id
     ? `
       <button
         class="primary"
