@@ -3139,130 +3139,181 @@ tripCard
 
 function tripCard(trip) {
 
-const profile =
-trip.profiles || {};
-
-const date =
-new Date(
-trip.travel_date +
-"T12:00:00"
-)
-.toLocaleDateString(
-"it-IT"
-);
-
-return `
-
-<article class="card trip-card">
-
-  <div class="avatar">
-    ✈️
-  </div>
+  const profile =
+    trip.profiles || {};
 
 
-  <h3>
-
-    ${escapeHtml(
-      profile.full_name ||
-      "Utente Waselni"
-    )}
-
-${
-trip.verification_status === "approved"
-? <span class="verified-trip">
-         ✈️ Viaggio verificato
-       </span>
-: trip.verification_status === "pending"
-? <span class="pending-trip">
-           ⏳ Biglietto in verifica
-         </span>
-: <span class="rejected-trip">
-           ⚠️ Verifica non approvata
-         </span>
-}
-${
-profile.is_verified
-? <span class="verified">
-                ✓ Verificato
-               </span>
-: ""
-}
-
-  </h3>
+  const date =
+    new Date(
+      trip.travel_date +
+      "T12:00:00"
+    )
+    .toLocaleDateString(
+      currentLanguage === "fr"
+        ? "fr-FR"
+        : currentLanguage === "tn"
+          ? "ar-TN"
+          : "it-IT"
+    );
 
 
-  <p>
-
-    ${flag(
-      trip.departure_country
-    )}
-
-    ${escapeHtml(
-      trip.departure_city
-    )}
-
-    →
-
-    ${flag(
-      trip.arrival_country
-    )}
-
-    ${escapeHtml(
-      trip.arrival_city
-    )}
-
-  </p>
+  let verificationHtml =
+    "";
 
 
-  <p>
-    📅 ${date}
-  </p>
+  if (
+    trip.verification_status ===
+    "approved"
+  ) {
 
+    verificationHtml =
+      `
+      <span class="verified-trip">
+        ${t("verifiedTrip")}
+      </span>
+      `;
 
-  <p>
-    📦 ${trip.available_kg} kg
-  </p>
+  } else if (
+    trip.verification_status ===
+    "pending"
+  ) {
 
+    verificationHtml =
+      `
+      <span class="pending-trip">
+        ${t("ticketPending")}
+      </span>
+      `;
 
-  ${
-    trip.price_per_kg
-      ? `<strong>
-          €${trip.price_per_kg}/kg
-         </strong>`
-      : ""
-  }
+  } else {
 
-
-  ${
-    trip.description
-      ? `<p>
-          ${escapeHtml(
-            trip.description
-          )}
-         </p>`
-      : ""
-  }
-
-
-  ${
-    currentUser &&
-    currentUser.id !== trip.user_id
-
-    ? `<button
-        class="primary"
-        onclick="contactUser('${trip.user_id}')">
-
-        Contatta
-
-       </button>`
-
-    : ""
+    verificationHtml =
+      `
+      <span class="rejected-trip">
+        ${t("verificationRejected")}
+      </span>
+      `;
 
   }
 
-</article>
 
-`;
+  return `
+
+    <article class="card trip-card">
+
+
+      <div class="avatar">
+        ✈️
+      </div>
+
+
+      <h3>
+
+        ${escapeHtml(
+          profile.full_name ||
+          "Hez Maak"
+        )}
+
+        ${verificationHtml}
+
+
+        ${
+          profile.is_verified
+
+            ? `
+              <span class="verified">
+                ✓ ${t("verified")}
+              </span>
+            `
+
+            : ""
+        }
+
+      </h3>
+
+
+      <p>
+
+        ${flag(
+          trip.departure_country
+        )}
+
+        ${escapeHtml(
+          trip.departure_city
+        )}
+
+        →
+
+        ${flag(
+          trip.arrival_country
+        )}
+
+        ${escapeHtml(
+          trip.arrival_city
+        )}
+
+      </p>
+
+
+      <p>
+        📅 ${date}
+      </p>
+
+
+      <p>
+        📦 ${trip.available_kg} ${t("kg")}
+      </p>
+
+
+      ${
+        trip.price_per_kg
+
+          ? `
+            <strong>
+              €${trip.price_per_kg}/${t("kg")}
+            </strong>
+          `
+
+          : ""
+      }
+
+
+      ${
+        trip.description
+
+          ? `
+            <p>
+              ${escapeHtml(
+                trip.description
+              )}
+            </p>
+          `
+
+          : ""
+      }
+
+
+      ${
+        currentUser &&
+        currentUser.id !== trip.user_id
+
+          ? `
+            <button
+              class="primary"
+              onclick="contactUser('${trip.user_id}')">
+
+              💬 Contatta
+
+            </button>
+          `
+
+          : ""
+      }
+
+
+    </article>
+
+  `;
 
 }
 
