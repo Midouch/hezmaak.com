@@ -4018,13 +4018,14 @@ async function contactUser(
     return;
   }
 
-  // 🔥 Recupera il nome del destinatario
+  // Recupera nome destinatario
   const otherUserName = await getUserName(userId);
 
   // Ordina i partecipanti
   const participant1 = currentUser.id < userId ? currentUser.id : userId;
   const participant2 = currentUser.id < userId ? userId : currentUser.id;
 
+  // Cerca conversazione esistente
   let query = supabaseClient
     .from("conversations")
     .select("*")
@@ -4034,18 +4035,20 @@ async function contactUser(
   if (tripId) query = query.eq("trip_id", tripId);
   if (requestId) query = query.eq("request_id", requestId);
 
-  const { data: existingConversation, error: searchError } =
+  const { data: existingConversation } =
     await query.maybeSingle();
-
-  if (searchError) {
-    console.error(searchError);
-    alert("Errore nella ricerca della conversazione: " + searchError.message);
-    return;
-  }
 
   let conversation = existingConversation;
 
+  // 🔥 NON creare nuova conversazione se esiste già
   if (!conversation) {
+
+    // 🔥 crea SOLO se tripId o requestId sono presenti
+    if (!tripId && !requestId) {
+      alert("Questa chat esiste già.");
+      return;
+    }
+
     const { data: newConversation, error: createError } =
       await supabaseClient
         .from("conversations")
@@ -4060,16 +4063,17 @@ async function contactUser(
 
     if (createError) {
       console.error(createError);
-      alert("Errore nella creazione della conversazione: " + createError.message);
+      alert("Errore nella creazione della conversazione.");
       return;
     }
 
     conversation = newConversation;
   }
 
-  // 🔥 APRI LA CHAT CON IL NOME, NON L’UUID
+  // Apri la chat con il nome
   openChatModal(conversation.id, otherUserName);
 }
+
 
 /* =====================================================
    MESSAGGING
