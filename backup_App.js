@@ -3399,7 +3399,9 @@ function tripCard(trip) {
 
 
       ${
-          !currentUser || currentUser.id !== trip.user_id
+        currentUser &&
+        currentUser.id !== trip.user_id
+
           ? `
             <button
               class="primary"
