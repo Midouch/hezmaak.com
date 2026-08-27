@@ -3980,7 +3980,17 @@ function requestCard(request) {
   `;
 
 }
+/* ================= RECUPERO NOME UTENTE=============*/
+async function getUserName(userId) {
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("full_name")
+    .eq("id", userId)
+    .single();
 
+  if (error || !data) return "Utente";
+  return data.full_name;
+}
 
 /* ====================================================  CONTACT    
   =====================================================*/ 
@@ -4155,16 +4165,7 @@ async function contactUser(
 /* =====================================================
    MESSAGGING
 ===================================================== */
-async function getUserName(userId) {
-  const { data, error } = await supabaseClient
-    .from("profiles")
-    .select("full_name")
-    .eq("id", userId)
-    .single();
 
-  if (error || !data) return "Utente";
-  return data.full_name;
-}
 
 
 
@@ -4304,6 +4305,9 @@ function subscribeToMessages(conversationId) {
     )
     .subscribe();
 }
+
+
+
 async function openConversation(otherUserId, tripId = null, requestId = null) {
 
   if (!currentUser) {
@@ -4311,10 +4315,10 @@ async function openConversation(otherUserId, tripId = null, requestId = null) {
     return;
   }
 
-  // 1. Recupera il nome del destinatario
+  // Recupera il nome del destinatario
   const otherUserName = await getUserName(otherUserId);
 
-  // 2. Cerca conversazione esistente
+  // Cerca conversazione esistente
   const { data: existing } =
     await supabaseClient
       .from("conversations")
@@ -4329,7 +4333,6 @@ async function openConversation(otherUserId, tripId = null, requestId = null) {
   if (existing && existing.length > 0) {
     conversation = existing[0];
   } else {
-    // 3. Creane una nuova
     const { data: created } =
       await supabaseClient
         .from("conversations")
@@ -4347,7 +4350,7 @@ async function openConversation(otherUserId, tripId = null, requestId = null) {
     conversation = created;
   }
 
-  // 4. Apri la chat con il NOME del destinatario
+  // Apri la chat con il NOME (non UUID)
   openChatModal(conversation.id, otherUserName);
 }
 
