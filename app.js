@@ -3406,23 +3406,17 @@ ${
     !currentUser ||
     currentUser.id !== trip.user_id
   )
-
     ? `
       <button
         class="primary"
-        onclick="contactUser(
-          '${trip.user_id}',
-          ${trip.id},
-          null
-        )">
-
+        onclick="openConversation('${trip.user_id}', ${trip.id}, null)"
+      >
         💬 Contatta
-
       </button>
     `
-
     : ""
 }
+
 
 
     </article>
@@ -3955,28 +3949,22 @@ function requestCard(request) {
           : ""
       }
 
- ${
+${
   (
     !currentUser ||
     currentUser.id !== request.user_id
   )
-
     ? `
       <button
         class="primary"
-        onclick="contactUser(
-          '${request.user_id}',
-          null,
-          ${request.id}
-        )">
-
+        onclick="openConversation('${request.user_id}', null, ${request.id})"
+      >
         💬 Contatta
-
       </button>
     `
-
     : ""
 }
+
 
     </article>
 
@@ -3997,82 +3985,6 @@ async function getUserName(userId) {
 
 /* ====================================================  CONTACT    
   =====================================================*/ 
-async function contactUser(
-  userId,
-  tripId = null,
-  requestId = null
-) {
-
-  if (!currentUser) {
-    openAuth("login");
-    return;
-  }
-
-  if (!userId) {
-    alert("Impossibile identificare l'utente.");
-    return;
-  }
-
-  if (userId === currentUser.id) {
-    alert("Non puoi contattare te stesso.");
-    return;
-  }
-
-  // Recupera nome destinatario
-  const otherUserName = await getUserName(userId);
-
-  // Ordina i partecipanti
-  const participant1 = currentUser.id < userId ? currentUser.id : userId;
-  const participant2 = currentUser.id < userId ? userId : currentUser.id;
-
-  // Cerca conversazione esistente
-  let query = supabaseClient
-    .from("conversations")
-    .select("*")
-    .eq("participant_1", participant1)
-    .eq("participant_2", participant2);
-
-  if (tripId) query = query.eq("trip_id", tripId);
-  if (requestId) query = query.eq("request_id", requestId);
-
-  const { data: existingConversation } =
-    await query.maybeSingle();
-
-  let conversation = existingConversation;
-
-  // 🔥 NON creare nuova conversazione se esiste già
-  if (!conversation) {
-
-    // 🔥 crea SOLO se tripId o requestId sono presenti
-    if (!tripId && !requestId) {
-      alert("Questa chat esiste già.");
-      return;
-    }
-
-    const { data: newConversation, error: createError } =
-      await supabaseClient
-        .from("conversations")
-        .insert({
-          participant_1: participant1,
-          participant_2: participant2,
-          trip_id: tripId,
-          request_id: requestId
-        })
-        .select()
-        .single();
-
-    if (createError) {
-      console.error(createError);
-      alert("Errore nella creazione della conversazione.");
-      return;
-    }
-
-    conversation = newConversation;
-  }
-
-  // Apri la chat con il nome
-  openChatModal(conversation.id, otherUserName);
-}
 
 
 /* =====================================================
