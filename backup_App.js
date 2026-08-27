@@ -3398,22 +3398,24 @@ function tripCard(trip) {
       }
 
 
-      ${
-        currentUser &&
-        currentUser.id !== trip.user_id
+ ${
+  (
+    !currentUser ||
+    currentUser.id !== trip.user_id
+  )
 
-          ? `
-            <button
-              class="primary"
-              onclick="contactUser('${trip.user_id}')">
+    ? `
+      <button
+        class="primary"
+        onclick="contactUser('${trip.user_id}')">
 
-              💬 Contatta
+        💬 Contatta
 
-            </button>
-          `
+      </button>
+    `
 
-          : ""
-      }
+    : ""
+}
 
 
     </article>
@@ -3857,19 +3859,19 @@ async function loadRequests() {
       .join("");
 
 }
-
-
 function requestCard(request) {
+
+  const canContact =
+    !currentUser ||
+    currentUser.id !== request.user_id;
 
   return `
 
     <article class="card">
 
-
       <div class="avatar">
         📦
       </div>
-
 
       <h3>
 
@@ -3891,7 +3893,6 @@ function requestCard(request) {
         }
 
       </h3>
-
 
       <p>
 
@@ -3915,7 +3916,6 @@ function requestCard(request) {
 
       </p>
 
-
       <p>
 
         ${escapeHtml(
@@ -3923,7 +3923,6 @@ function requestCard(request) {
         )}
 
       </p>
-
 
       ${
         request.weight_kg
@@ -3937,7 +3936,6 @@ function requestCard(request) {
           : ""
       }
 
-
       ${
         request.budget
 
@@ -3950,23 +3948,28 @@ function requestCard(request) {
           : ""
       }
 
-${
-  currentUser &&
-  currentUser.id !== trip.user_id
+      ${
+        canContact
 
-    ? `<button
-        class="primary"
-        onclick="contactUser('${trip.user_id}')">
+          ? `
+            <button
+              class="primary"
+              onclick="contactUser('${request.user_id}')">
 
-        💬 Contatta
+              💬 Contatta
 
-       </button>`
+            </button>
+          `
 
-    : ""
+          : ""
+      }
+
+    </article>
+
+  `;
+
 }
-    </article>`;
 
-}
 
 /* ====================================================  CONTACT    
   =====================================================*/ 
