@@ -3200,11 +3200,13 @@ async function loadTrips() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
 
     container.innerHTML =
       `<div class="loading">
-        Errore nel caricamento.
+        ${escapeHtml(error.message)}
       </div>`;
 
     return;
@@ -3215,17 +3217,19 @@ async function loadTrips() {
   if (!data.length) {
 
     container.innerHTML =
-      `<div class="empty-state">
+      `
+      <div class="empty-state">
 
         <h3>
-          ✈️ Nessun viaggio disponibile
+          ${t("noTrips")}
         </h3>
 
         <p>
-          Pubblica il primo viaggio.
+          ${t("publishFirstTrip")}
         </p>
 
-      </div>`;
+      </div>
+      `;
 
     return;
 
@@ -3396,25 +3400,31 @@ function tripCard(trip) {
 
           : ""
       }
-
-
-${
-  !currentUser || currentUser.id !== trip.user_id
-    ? `<button
-        class="primary"
-        onclick="contactUser('${trip.user_id}')">
-        💬 Contatta
-      </button>`
-    : ""
 }
+
+      ${
+        currentUser &&
+        currentUser.id !==
+          trip.user_id
+}
+          `
+? `<button
+    class="primary"
+    onclick="contactUser('${trip.user_id}', ${trip.id}, null)">
+
+    💬 Contatta
+
+   </button>`
+          `
+
+          : ""
+      }
 
 
     </article>
 
-  `;
-
+ 
 }
-
 
 
 /* =====================================================
@@ -3944,21 +3954,24 @@ function requestCard(request) {
       }
 
 ${
-  !currentUser || currentUser.id !== trip.user_id
-    ? `<button
+  !currentUser || currentUser.id !== request.user_id
+    ? `
+      <button
         class="primary"
-        onclick="contactUser('${trip.user_id}')">
+        onclick="contactUser('${request.user_id}')">
+
         💬 Contatta
-      </button>`
+
+      </button>
+    `
     : ""
 }
     </article>`;
 
 }
 
-/* ====================================================  CONTACT    
-  =====================================================*/ 
-function contactUser(userId) {
+/* ====================================================  CONTACT      =====================================================*/ 
+  function contactUser(userId) {
 
   if (!currentUser) {
     openAuth("login");
@@ -3976,7 +3989,6 @@ function contactUser(userId) {
   }
 
   alert("Chat in preparazione.");
-  
 }
 /* =====================================================
    MESSAGGING
@@ -7811,7 +7823,7 @@ function removeAdminButton() {
 
     button.remove();
 
-  }}
+  }
 /* =====================================================
    POPUP SISTEMA
 ===================================================== */
@@ -8089,7 +8101,7 @@ function showRejectTicketPopup(
         };
 
 }
-
+}
 // =====================================================
 // ADMIN - VERIFICA BIGLIETTI VIAGGIO
 // =====================================================
