@@ -3951,17 +3951,12 @@ function requestCard(request) {
       }
 
 ${
-  currentUser &&
-  currentUser.id !== trip.user_id
-
+  !currentUser || currentUser.id !== trip.user_id
     ? `<button
         class="primary"
         onclick="contactUser('${trip.user_id}')">
-
         💬 Contatta
-
-       </button>`
-
+      </button>`
     : ""
 }
     </article>`;
