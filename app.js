@@ -4171,21 +4171,44 @@ async function openConversation(otherUserId, tripId = null, requestId = null) {
 
   const otherUserName = await getUserName(otherUserId);
 
-  // Cerca conversazione esistente
-  const { data: existing } =
-    await supabaseClient
-      .from("conversations")
-      .select("*")
-      .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
-      .or(`participant_1.eq.${otherUserId},participant_2.eq.${otherUserId}`)
-      .eq("trip_id", tripId)
-      .eq("request_id", requestId);
+  let query = supabaseClient
+    .from("conversations")
+    .select("*")
+    .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
+    .or(`participant_1.eq.${otherUserId},participant_2.eq.${otherUserId}`);
+
+  // tripId
+  if (tripId !== null) {
+    query = query.eq("trip_id", tripId);
+  } else {
+    query = query.is("trip_id", null);
+  }
+
+  // requestId
+  if (requestId !== null) {
+    query = query.eq("request_id", requestId);
+  } else {
+    query = query.is("request_id", null);
+  }
+
+  const { data: existing, error } = await query;
+
+  if (error) {
+    console.error("Errore Supabase:", error);
+    return;
+  }
 
   let conversation = existing && existing.length > 0 ? existing[0] : null;
 
-  // Apri la chat SENZA creare conversazione
-  openChatModal(conversation ? conversation.id : null, otherUserName, otherUserId, tripId, requestId);
+  openChatModal(
+    conversation ? conversation.id : null,
+    otherUserName,
+    otherUserId,
+    tripId,
+    requestId
+  );
 }
+
 
 
 
