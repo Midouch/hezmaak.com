@@ -2498,6 +2498,9 @@ async function showProfile() {
 
               <div class="profile-menu-grid">
 
+               <button onclick="openMessages()" class="profile-button">
+  💬 Messaggi
+</button>
 
                 <button
                   onclick="showMyTrips()">
@@ -8472,3 +8475,88 @@ function closeChat() {
   setTimeout(() => modal.remove(), 250);
 }
 
+/*===================== OPEN MESSAGE IN PROFILE =======================*/
+async function openMessages() {
+
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  // Recupera tutte le conversazioni dell’utente
+  const { data: conversations, error } =
+    await supabaseClient
+      .from("conversations")
+      .select("*")
+      .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
+      .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    alert("Errore nel caricamento dei messaggi.");
+    return;
+  }
+
+  // Costruisci la UI
+  const modal = document.createElement("div");
+  modal.id = "messagesModal";
+  modal.className = "chat-modal";
+
+  let html = `
+    <div class="chat-box">
+      <div class="chat-header">
+        <span>Messaggi</span>
+        <button class="chat-close" onclick="closeMessages()">×</button>
+      </div>
+
+      <div class="chat-messages" style="height:400px; overflow-y:auto;">
+  `;
+
+  for (const conv of conversations) {
+
+    const otherUserId =
+      conv.participant_1 === currentUser.id
+        ? conv.participant_2
+        : conv.participant_1;
+
+    const otherUserName = await getUserName(otherUserId);
+
+    // Recupera ultimo messaggio
+    const { data: lastMsg } =
+      await supabaseClient
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", conv.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    const preview =
+      lastMsg?.message
+        ? lastMsg.message.substring(0, 40) + "..."
+        : "Nessun messaggio";
+
+    html += `
+      <div class="conversation-item"
+           onclick="openChatModal(${conv.id}, '${otherUserName}')"
+           style="padding:12px; border-bottom:1px solid #ddd; cursor:pointer;">
+        <strong>${otherUserName}</strong><br>
+        <span style="color:#666; font-size:14px;">${preview}</span>
+      </div>
+    `;
+  }
+
+  html += `
+      </div>
+    </div>
+  `;
+
+  modal.innerHTML = html;
+  document.body.appendChild(modal);
+}
+
+
+function closeMessages() {
+  const modal = document.getElementById("messagesModal");
+  if (modal) modal.remove();
+}
