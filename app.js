@@ -2684,9 +2684,6 @@ async function openMessages() {
 }
 
 
-
-
-
 /*======================*/
 
 function closeProfilePage() {
@@ -4483,53 +4480,47 @@ function subscribeToMessages(conversationId) {
 
 /*===================================*/
 async function openConversation(otherUserId, tripId = null, requestId = null) {
-  if (tripId === "null") tripId = null;
-if (requestId === "null") requestId = null;
 
+  if (tripId === "null") tripId = null;
+  if (requestId === "null") requestId = null;
 
   if (!currentUser) {
     openAuth("login");
     return;
   }
 
-  // Recupera il nome del destinatario
   const otherUserName = await getUserName(otherUserId);
 
-  // Cerca conversazione esistente
-  const { data: existing } =
-    await supabaseClient
-      .from("conversations")
-      .select("*")
-      .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
-      .or(`participant_1.eq.${otherUserId},participant_2.eq.${otherUserId}`)
-      .eq("trip_id", tripId)
-      .eq("request_id", requestId);
+  let query = supabaseClient
+    .from("conversations")
+    .select("*")
+    .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
+    .or(`participant_1.eq.${otherUserId},participant_2.eq.${otherUserId}`);
 
-  let conversation;
+  if (tripId !== null) query = query.eq("trip_id", tripId);
+  else query = query.is("trip_id", null);
 
-  if (existing && existing.length > 0) {
-    conversation = existing[0];
-  } else {
-    const { data: created } =
-      await supabaseClient
-        .from("conversations")
-        .insert([
-          {
-            participant_1: currentUser.id,
-            participant_2: otherUserId,
-            trip_id: tripId,
-            request_id: requestId
-          }
-        ])
-        .select()
-        .single();
+  if (requestId !== null) query = query.eq("request_id", requestId);
+  else query = query.is("request_id", null);
 
-    conversation = created;
+  const { data: existing, error } = await query;
+
+  if (error) {
+    console.error("Errore Supabase:", error);
+    return;
   }
 
-  // Apri la chat con il NOME (non UUID)
-  openChatModal(conversation.id, otherUserName);
+  let conversation = existing && existing.length > 0 ? existing[0] : null;
+
+  openChatModal(
+    conversation ? conversation.id : null,
+    otherUserName,
+    otherUserId,
+    tripId,
+    requestId
+  );
 }
+
 
 
 
