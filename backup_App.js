@@ -3200,13 +3200,11 @@ async function loadTrips() {
 
   if (error) {
 
-    console.error(
-      error
-    );
+    console.error(error);
 
     container.innerHTML =
       `<div class="loading">
-        ${escapeHtml(error.message)}
+        Errore nel caricamento.
       </div>`;
 
     return;
@@ -3217,19 +3215,17 @@ async function loadTrips() {
   if (!data.length) {
 
     container.innerHTML =
-      `
-      <div class="empty-state">
+      `<div class="empty-state">
 
         <h3>
-          ${t("noTrips")}
+          ✈️ Nessun viaggio disponibile
         </h3>
 
         <p>
-          ${t("publishFirstTrip")}
+          Pubblica il primo viaggio.
         </p>
 
-      </div>
-      `;
+      </div>`;
 
     return;
 
@@ -3400,21 +3396,20 @@ function tripCard(trip) {
 
           : ""
       }
-}
+
 
       ${
         currentUser &&
-        currentUser.id !==
-          trip.user_id
-}
-          `
-? `<button
-    class="primary"
-    onclick="contactUser('${trip.user_id}', ${trip.id}, null)">
+        currentUser.id !== trip.user_id
 
-    💬 Contatta
+          ? `
+            <button
+              class="primary"
+              onclick="contactUser('${trip.user_id}')">
 
-   </button>`
+              💬 Contatta
+
+            </button>
           `
 
           : ""
@@ -3423,8 +3418,10 @@ function tripCard(trip) {
 
     </article>
 
- 
+  `;
+
 }
+
 
 
 /* =====================================================
@@ -3971,8 +3968,9 @@ ${
 
 }
 
-/* ====================================================  CONTACT      =====================================================*/ 
-  function contactUser(userId) {
+/* ====================================================  CONTACT    
+  =====================================================*/ 
+function contactUser(userId) {
 
   if (!currentUser) {
     openAuth("login");
@@ -3990,6 +3988,7 @@ ${
   }
 
   alert("Chat in preparazione.");
+  
 }
 /* =====================================================
    MESSAGGING
@@ -7824,7 +7823,7 @@ function removeAdminButton() {
 
     button.remove();
 
-  }
+  }}
 /* =====================================================
    POPUP SISTEMA
 ===================================================== */
@@ -8102,7 +8101,7 @@ function showRejectTicketPopup(
         };
 
 }
-}
+
 // =====================================================
 // ADMIN - VERIFICA BIGLIETTI VIAGGIO
 // =====================================================
