@@ -4026,7 +4026,6 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
   }
 }
 
-
 async function loadMessages(conversationId) {
 
   const { data: messages } =
@@ -4041,6 +4040,9 @@ async function loadMessages(conversationId) {
 
   messages.forEach(msg => {
 
+    const group = document.createElement("div");
+    group.className = "msg-group";
+
     const div = document.createElement("div");
 
     div.className =
@@ -4050,11 +4052,14 @@ async function loadMessages(conversationId) {
 
     div.textContent = msg.message;
 
-    box.appendChild(div);
+    group.appendChild(div);
+    box.appendChild(group);
   });
 
   box.scrollTop = box.scrollHeight;
 }
+
+
 async function sendMessage(conversationId, otherUserId, tripId, requestId) {
 
   const input = document.getElementById("chatText");
