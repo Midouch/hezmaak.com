@@ -3401,7 +3401,7 @@ function tripCard(trip) {
 
 
 ${
-  !currentUser || currentUser.id !== trip.user_id
+  currentUser || currentUser.id !== trip.user_id
     ? `<button
         class="primary"
         onclick="contactUser('${trip.user_id}')">
@@ -3945,11 +3945,11 @@ function requestCard(request) {
 
 ${
   currentUser ||
-  currentUser.id !== trip.user_id
+  currentUser.id !== request.user_id
 
     ? `<button
         class="primary"
-        onclick="contactUser('${trip.user_id}')">
+        onclick="contactUser('${request.user_id}')">
 
         💬 Contatta
 
