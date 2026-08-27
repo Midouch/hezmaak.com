@@ -3248,12 +3248,12 @@ async function loadTrips() {
 function tripCard(trip) {
 
   const profile =
-    trip.profiles || {};
+    trips.profiles || {};
 
 
   const date =
     new Date(
-      trip.travel_date +
+      trips.travel_date +
       "T12:00:00"
     )
     .toLocaleDateString(
@@ -3270,7 +3270,7 @@ function tripCard(trip) {
 
 
   if (
-    trip.verification_status ===
+    trips.verification_status ===
     "approved"
   ) {
 
@@ -3282,7 +3282,7 @@ function tripCard(trip) {
       `;
 
   } else if (
-    trip.verification_status ===
+    trips.verification_status ===
     "pending"
   ) {
 
@@ -3343,21 +3343,21 @@ function tripCard(trip) {
       <p>
 
         ${flag(
-          trip.departure_country
+          trips.departure_country
         )}
 
         ${escapeHtml(
-          trip.departure_city
+          trips.departure_city
         )}
 
         →
 
         ${flag(
-          trip.arrival_country
+          trips.arrival_country
         )}
 
         ${escapeHtml(
-          trip.arrival_city
+          trips.arrival_city
         )}
 
       </p>
@@ -3369,16 +3369,16 @@ function tripCard(trip) {
 
 
       <p>
-        📦 ${trip.available_kg} ${t("kg")}
+        📦 ${trips.available_kg} ${t("kg")}
       </p>
 
 
       ${
-        trip.price_per_kg
+        trips.price_per_kg
 
           ? `
             <strong>
-              €${trip.price_per_kg}/${t("kg")}
+              €${trips.price_per_kg}/${t("kg")}
             </strong>
           `
 
@@ -3387,12 +3387,12 @@ function tripCard(trip) {
 
 
       ${
-        trip.description
+        trips.description
 
           ? `
             <p>
               ${escapeHtml(
-                trip.description
+                trips.description
               )}
             </p>
           `
@@ -3403,12 +3403,12 @@ function tripCard(trip) {
 
       ${
         currentUser ||
-        currentUser.id !== trip.user_id
+        currentUser.id !== trips.user_id
 
           ? `
             <button
               class="primary"
-              onclick="contactUser('${trip.user_id}')">
+              onclick="contactUser('${trips.user_id}')">
 
               💬 Contatta
 
@@ -4293,9 +4293,9 @@ async function showMyTrips() {
 function myTripHTML(trip) {
 
     const date =
-        trip.travel_date
+        trips.travel_date
             ? new Date(
-                trip.travel_date +
+                trips.travel_date +
                 "T12:00:00"
               ).toLocaleDateString(
                 "it-IT"
@@ -4307,7 +4307,7 @@ function myTripHTML(trip) {
 
 
     if (
-        trip.verification_status ===
+        trips.verification_status ===
         "approved"
     ) {
 
@@ -4325,7 +4325,7 @@ function myTripHTML(trip) {
 
 
     else if (
-        trip.verification_status ===
+        trips.verification_status ===
         "rejected"
     ) {
 
@@ -4346,7 +4346,7 @@ function myTripHTML(trip) {
 
                 <p>
                     ${escapeHtml(
-                        trip.verification_rejection_reason ||
+                        trips.verification_rejection_reason ||
                         "Il biglietto non è stato approvato."
                     )}
                 </p>
@@ -4356,7 +4356,7 @@ function myTripHTML(trip) {
 
             <button
                 class="primary"
-                onclick="replaceTravelTicket('${trip.id}')">
+                onclick="replaceTravelTicket('${trips.id}')">
 
                 🎫 Carica nuovo biglietto
 
@@ -4391,7 +4391,7 @@ function myTripHTML(trip) {
 
         <div
             class="profile-card my-trip-card"
-            id="my-trip-${trip.id}"
+            id="my-trip-${trips.id}"
         >
 
             <div class="my-trip-header">
@@ -4406,21 +4406,21 @@ function myTripHTML(trip) {
                     <h3>
 
                         ${flag(
-                            trip.departure_country
+                            trips.departure_country
                         )}
 
                         ${escapeHtml(
-                            trip.departure_city
+                            trips.departure_city
                         )}
 
                         →
 
                         ${flag(
-                            trip.arrival_country
+                            trips.arrival_country
                         )}
 
                         ${escapeHtml(
-                            trip.arrival_city
+                            trips.arrival_city
                         )}
 
                     </h3>
@@ -4455,7 +4455,7 @@ function myTripHTML(trip) {
                     </span>
 
                     <strong>
-                        📦 ${trip.available_kg} kg
+                        📦 ${trips.available_kg} kg
                     </strong>
 
                 </div>
@@ -4470,8 +4470,8 @@ function myTripHTML(trip) {
                     <strong>
 
                         ${
-                            trip.price_per_kg
-                            ? `€${trip.price_per_kg}/kg`
+                            trips.price_per_kg
+                            ? `€${trips.price_per_kg}/kg`
                             : "Non specificato"
                         }
 
@@ -4483,12 +4483,12 @@ function myTripHTML(trip) {
 
 
             ${
-                trip.description
+                trips.description
                 ? `
                     <p class="trip-description">
 
                         ${escapeHtml(
-                            trip.description
+                            trips.description
                         )}
 
                     </p>
@@ -4892,9 +4892,9 @@ function closeReplaceTicket() {
 function myTripHTML(trip) {
 
   const date =
-    trip.travel_date
+    trips.travel_date
       ? new Date(
-          trip.travel_date +
+          trips.travel_date +
           "T12:00:00"
         ).toLocaleDateString(
           "it-IT"
@@ -4905,7 +4905,7 @@ function myTripHTML(trip) {
   let verificationHTML = "";
 
   if (
-    trip.verification_status ===
+    trips.verification_status ===
     "approved"
   ) {
 
@@ -4916,7 +4916,7 @@ function myTripHTML(trip) {
     `;
 
   } else if (
-    trip.verification_status ===
+    trips.verification_status ===
     "pending"
   ) {
 
@@ -4941,7 +4941,7 @@ function myTripHTML(trip) {
 
     <article
       class="profile-card activity-card"
-      id="trip-${trip.id}">
+      id="trip-${trips.id}">
 
       <div class="activity-header">
 
@@ -4954,21 +4954,21 @@ function myTripHTML(trip) {
           <h3>
 
             ${flag(
-              trip.departure_country
+              trips.departure_country
             )}
 
             ${escapeHtml(
-              trip.departure_city
+              trips.departure_city
             )}
 
             →
 
             ${flag(
-              trip.arrival_country
+              trips.arrival_country
             )}
 
             ${escapeHtml(
-              trip.arrival_city
+              trips.arrival_city
             )}
 
           </h3>
@@ -5002,7 +5002,7 @@ function myTripHTML(trip) {
           </span>
 
           <strong>
-            ${trip.available_kg} kg
+            ${trips.available_kg} kg
           </strong>
 
         </div>
@@ -5017,8 +5017,8 @@ function myTripHTML(trip) {
           <strong>
 
             ${
-              trip.price_per_kg
-                ? `€${trip.price_per_kg}/kg`
+              trips.price_per_kg
+                ? `€${trips.price_per_kg}/kg`
                 : "Non specificato"
             }
 
@@ -5036,7 +5036,7 @@ function myTripHTML(trip) {
           <strong>
 
             ${
-              trip.status === "active"
+              trips.status === "active"
                 ? "🟢 Attivo"
                 : "⚪ Chiuso"
             }
@@ -5049,14 +5049,14 @@ function myTripHTML(trip) {
 
 
       ${
-        trip.description
+        trips.description
 
           ? `
 
             <p class="activity-description">
 
               ${escapeHtml(
-                trip.description
+                trips.description
               )}
 
             </p>
@@ -5072,7 +5072,7 @@ function myTripHTML(trip) {
         <button
           class="secondary"
           onclick="
-            editTrip('${trip.id}')
+            editTrip('${trips.id}')
           ">
 
           ✏️ Modifica
@@ -5083,7 +5083,7 @@ function myTripHTML(trip) {
         <button
           class="danger-button"
           onclick="
-            deleteTrip('${trip.id}')
+            deleteTrip('${trips.id}')
           ">
 
           🗑 Elimina
@@ -5173,7 +5173,7 @@ async function deleteTrip(tripId) {
 
   if (
     !trip ||
-    trip.user_id !== currentUser.id
+    trips.user_id !== currentUser.id
   ) {
 
     alert(
@@ -5215,7 +5215,7 @@ async function deleteTrip(tripId) {
     eliminiamo anche il file Storage.
   */
 
-  if (trip.ticket_path) {
+  if (trips.ticket_path) {
 
     const {
       error: storageError
@@ -5223,7 +5223,7 @@ async function deleteTrip(tripId) {
       .storage
       .from("travel-tickets")
       .remove([
-        trip.ticket_path
+        trips.ticket_path
       ]);
 
 
@@ -6818,16 +6818,16 @@ async function loadAdminPanel() {
 function adminTripHTML(trip) {
 
     const departureFlag =
-        flag(trip.departure_country);
+        flag(trips.departure_country);
 
     const arrivalFlag =
-        flag(trip.arrival_country);
+        flag(trips.arrival_country);
 
 
     const date =
-        trip.travel_date
+        trips.travel_date
             ? new Date(
-                trip.travel_date + "T12:00:00"
+                trips.travel_date + "T12:00:00"
               ).toLocaleDateString("it-IT")
             : "-";
 
@@ -6836,7 +6836,7 @@ function adminTripHTML(trip) {
 
         <div
             class="profile-card admin-request"
-            id="admin-trip-${trip.id}"
+            id="admin-trip-${trips.id}"
         >
 
             <div>
@@ -6850,13 +6850,13 @@ function adminTripHTML(trip) {
                     ✈️
 
                     ${escapeHtml(
-                        trip.departure_city || ""
+                        trips.departure_city || ""
                     )}
 
                     →
 
                     ${escapeHtml(
-                        trip.arrival_city || ""
+                        trips.arrival_city || ""
                     )}
                 </h3>
 
@@ -6866,7 +6866,7 @@ function adminTripHTML(trip) {
                     ${departureFlag}
 
                     ${escapeHtml(
-                        trip.departure_country || ""
+                        trips.departure_country || ""
                     )}
 
                     →
@@ -6874,7 +6874,7 @@ function adminTripHTML(trip) {
                     ${arrivalFlag}
 
                     ${escapeHtml(
-                        trip.arrival_country || ""
+                        trips.arrival_country || ""
                     )}
 
                 </p>
@@ -6896,17 +6896,17 @@ function adminTripHTML(trip) {
                     📦 Spazio disponibile:
 
                     <strong>
-                        ${trip.available_kg || 0} kg
+                        ${trips.available_kg || 0} kg
                     </strong>
 
                 </p>
 
 
                 ${
-                    trip.price_per_kg
+                    trips.price_per_kg
                     ? `
                         <p>
-                            💰 €${trip.price_per_kg}/kg
+                            💰 €${trips.price_per_kg}/kg
                         </p>
                     `
                     : ""
@@ -6921,7 +6921,7 @@ function adminTripHTML(trip) {
 
                     <code>
                         ${escapeHtml(
-                            trip.user_id
+                            trips.user_id
                         )}
                     </code>
 
@@ -6929,12 +6929,12 @@ function adminTripHTML(trip) {
 
 
                 ${
-                    trip.description
+                    trips.description
                     ? `
                         <p>
                             📝
                             ${escapeHtml(
-                                trip.description
+                                trips.description
                             )}
                         </p>
                     `
@@ -6952,7 +6952,7 @@ function adminTripHTML(trip) {
                 <button
                     class="secondary"
                     onclick="viewTravelTicket('${escapeHtml(
-                        trip.ticket_path
+                        trips.ticket_path
                     )}')"
                 >
 
@@ -6965,7 +6965,7 @@ function adminTripHTML(trip) {
 
                 <button
                     class="primary"
-                    onclick="approveTravelTicket('${trip.id}')"
+                    onclick="approveTravelTicket('${trips.id}')"
                 >
 
                     ✓ Approva biglietto
@@ -6977,7 +6977,7 @@ function adminTripHTML(trip) {
 
                 <button
                     class="danger-button"
-                    onclick="rejectTravelTicket('${trip.id}')"
+                    onclick="rejectTravelTicket('${trips.id}')"
                 >
 
                     ✕ Rifiuta
