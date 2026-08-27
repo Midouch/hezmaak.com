@@ -1927,18 +1927,6 @@ html[dir="rtl"] select {
   line-height: 1.4;
 }
 
-.msg-me {
-  background: #0066ff;
-  color: white;
-  margin-left: auto;
-}
-
-.msg-other {
-  background: #e5e5e5;
-  color: #333;
-  margin-right: auto;
-}
-
 .chat-input {
   display: flex;
   padding: 10px;
@@ -1980,4 +1968,45 @@ html[dir="rtl"] select {
 }
 .conversation-item:hover {
   background: #f0f0f0;
+}
+/* Container messaggi */
+.chat-messages {
+  padding: 12px;
+  background: #f5f5f5;
+  overflow-y: auto;
+}
+
+/* Messaggio base */
+.msg {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  margin-bottom: 10px;
+  font-size: 15px;
+  line-height: 1.4;
+  display: inline-block;
+}
+
+/* Messaggi dell'utente (destra) */
+.msg-me {
+  background: #0084ff;
+  color: white;
+  margin-left: auto;
+  text-align: right;
+  border-bottom-right-radius: 4px;
+}
+
+/* Messaggi dell'altro utente (sinistra) */
+.msg-other {
+  background: #e6e6e6;
+  color: #333;
+  margin-right: auto;
+  text-align: left;
+  border-bottom-left-radius: 4px;
+}
+
+/* Spaziatura tra gruppi di messaggi */
+.msg-group {
+  display: flex;
+  flex-direction: column;
 }
