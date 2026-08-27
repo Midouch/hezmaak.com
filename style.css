@@ -1978,3 +1978,6 @@ html[dir="rtl"] select {
   opacity: 1;
   transition: opacity 0.25s;
 }
+.conversation-item:hover {
+  background: #f0f0f0;
+}
