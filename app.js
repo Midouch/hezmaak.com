@@ -3994,7 +3994,7 @@ async function getUserName(userId) {
 
 
 
-function openChatModal(conversationId, otherUserName = "Utente") {
+function openChatModal(conversationId, otherUserName, otherUserId, tripId, requestId) {
 
   const modal = document.createElement("div");
   modal.id = "chatModal";
@@ -4012,7 +4012,7 @@ function openChatModal(conversationId, otherUserName = "Utente") {
 
       <div class="chat-input">
         <input id="chatText" type="text" placeholder="Scrivi un messaggio...">
-        <button onclick="sendMessage(${conversationId})">Invia</button>
+        <button onclick="sendMessage(${conversationId}, '${otherUserId}', ${tripId}, ${requestId})">Invia</button>
       </div>
 
     </div>
@@ -4020,9 +4020,12 @@ function openChatModal(conversationId, otherUserName = "Utente") {
 
   document.body.appendChild(modal);
 
-  loadMessages(conversationId);
-  subscribeToMessages(conversationId);
+  if (conversationId) {
+    loadMessages(conversationId);
+    subscribeToMessages(conversationId);
+  }
 }
+
 
 async function loadMessages(conversationId) {
 
@@ -4052,13 +4055,37 @@ async function loadMessages(conversationId) {
 
   box.scrollTop = box.scrollHeight;
 }
-async function sendMessage(conversationId) {
+async function sendMessage(conversationId, otherUserId, tripId, requestId) {
 
   const input = document.getElementById("chatText");
   const text = input.value.trim();
 
   if (!text) return;
 
+  // Se la conversazione NON esiste → creala ora
+  if (!conversationId) {
+
+    const { data: newConv } =
+      await supabaseClient
+        .from("conversations")
+        .insert([
+          {
+            participant_1: currentUser.id,
+            participant_2: otherUserId,
+            trip_id: tripId,
+            request_id: requestId
+          }
+        ])
+        .select()
+        .single();
+
+    conversationId = newConv.id;
+
+    // Attiva realtime
+    subscribeToMessages(conversationId);
+  }
+
+  // Invia messaggio
   await supabaseClient
     .from("messages")
     .insert([
@@ -4073,6 +4100,8 @@ async function sendMessage(conversationId) {
 
   loadMessages(conversationId);
 }
+
+
 function showNotificationBadge(button) {
   if (!button.querySelector(".notify-badge")) {
     const badge = document.createElement("span");
@@ -4140,7 +4169,6 @@ async function openConversation(otherUserId, tripId = null, requestId = null) {
     return;
   }
 
-  // Recupera il nome del destinatario
   const otherUserName = await getUserName(otherUserId);
 
   // Cerca conversazione esistente
@@ -4153,30 +4181,10 @@ async function openConversation(otherUserId, tripId = null, requestId = null) {
       .eq("trip_id", tripId)
       .eq("request_id", requestId);
 
-  let conversation;
+  let conversation = existing && existing.length > 0 ? existing[0] : null;
 
-  if (existing && existing.length > 0) {
-    conversation = existing[0];
-  } else {
-    const { data: created } =
-      await supabaseClient
-        .from("conversations")
-        .insert([
-          {
-            participant_1: currentUser.id,
-            participant_2: otherUserId,
-            trip_id: tripId,
-            request_id: requestId
-          }
-        ])
-        .select()
-        .single();
-
-    conversation = created;
-  }
-
-  // Apri la chat con il NOME (non UUID)
-  openChatModal(conversation.id, otherUserName);
+  // Apri la chat SENZA creare conversazione
+  openChatModal(conversation ? conversation.id : null, otherUserName, otherUserId, tripId, requestId);
 }
 
 
