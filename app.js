@@ -8353,24 +8353,306 @@ window.rejectTravelTicket = function(ticketId) {
   }
 
 };
-function openChat(
+async function openChat(
   conversationId,
   otherUserId
 ) {
 
-  console.log(
-    "Conversazione aperta:",
-    conversationId
+  const oldChat =
+    document.getElementById(
+      "chatModal"
+    );
+
+  if (oldChat) {
+    oldChat.remove();
+  }
+
+
+  const modal =
+    document.createElement(
+      "div"
+    );
+
+  modal.id =
+    "chatModal";
+
+
+  modal.innerHTML = `
+
+    <div class="auth-overlay">
+
+      <div class="auth-box chat-box">
+
+
+        <button
+          class="auth-close"
+          onclick="closeChat()">
+
+          ×
+
+        </button>
+
+
+        <h2>
+          💬 Chat
+        </h2>
+
+
+        <div
+          id="chatMessages"
+          class="chat-messages">
+
+          <div class="loading">
+            Caricamento messaggi...
+          </div>
+
+        </div>
+
+
+        <div class="chat-input-area">
+
+          <textarea
+            id="chatInput"
+            placeholder="Scrivi un messaggio..."
+            rows="2"
+          ></textarea>
+
+
+          <button
+            class="primary"
+            onclick="sendMessage(
+              ${conversationId},
+              '${otherUserId}'
+            )">
+
+            Invia
+
+          </button>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.body.appendChild(
+    modal
   );
 
-  console.log(
-    "Altro utente:",
+
+  await loadMessages(
+    conversationId,
     otherUserId
   );
 
-  alert(
-    "Chat creata correttamente! ID conversazione: " +
-    conversationId
+}
+function closeChat() {
+
+  const modal =
+    document.getElementById(
+      "chatModal"
+    );
+
+  if (modal) {
+
+    modal.remove();
+
+  }
+
+}
+async function loadMessages(
+  conversationId,
+  otherUserId
+) {
+
+  const container =
+    document.getElementById(
+      "chatMessages"
+    );
+
+  if (!container) return;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("messages")
+      .select("*")
+      .eq(
+        "conversation_id",
+        conversationId
+      )
+      .order(
+        "created_at",
+        {
+          ascending: true
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      error
+    );
+
+    container.innerHTML =
+      `
+      <div class="auth-error">
+        Errore caricamento messaggi:
+        ${escapeHtml(
+          error.message
+        )}
+      </div>
+      `;
+
+    return;
+
+  }
+
+
+  if (!data.length) {
+
+    container.innerHTML =
+      `
+      <div class="empty-chat">
+
+        👋
+
+        <p>
+          Inizia la conversazione.
+        </p>
+
+      </div>
+      `;
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    data
+      .map(
+        message => {
+
+          const isMine =
+            message.sender_id ===
+            currentUser.id;
+
+
+          return `
+
+            <div
+              class="chat-message
+              ${
+                isMine
+                  ? "chat-message-mine"
+                  : "chat-message-other"
+              }">
+
+              ${escapeHtml(
+                message.message
+              )}
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+
+  container.scrollTop =
+    container.scrollHeight;
+
+}
+async function sendMessage(
+  conversationId,
+  otherUserId
+) {
+
+  if (!currentUser) {
+
+    openAuth("login");
+
+    return;
+
+  }
+
+
+  const input =
+    document.getElementById(
+      "chatInput"
+    );
+
+  if (!input) return;
+
+
+  const text =
+    input.value.trim();
+
+
+  if (!text) return;
+
+
+  input.disabled =
+    true;
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("messages")
+      .insert({
+
+        conversation_id:
+          conversationId,
+
+        sender_id:
+          currentUser.id,
+
+        message:
+          text
+
+      });
+
+
+  input.disabled =
+    false;
+
+
+  if (error) {
+
+    console.error(
+      error
+    );
+
+    alert(
+      "Errore invio messaggio: " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  input.value =
+    "";
+
+
+  await loadMessages(
+    conversationId,
+    otherUserId
   );
 
 }
