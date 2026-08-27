@@ -3877,12 +3877,12 @@ function requestCard(request) {
       <h3>
 
         ${escapeHtml(
-          request.profiles?.full_name ||
+          requests.profiles?.full_name ||
           "Hez Maak"
         )}
 
         ${
-          request.profiles?.is_verified
+          requests.profiles?.is_verified
 
             ? `
               <span class="verified">
@@ -3899,21 +3899,21 @@ function requestCard(request) {
       <p>
 
         ${flag(
-          request.departure_country
+          requests.departure_country
         )}
 
         ${escapeHtml(
-          request.departure_city
+          requests.departure_city
         )}
 
         →
 
         ${flag(
-          request.arrival_country
+          requests.arrival_country
         )}
 
         ${escapeHtml(
-          request.arrival_city
+          requests.arrival_city
         )}
 
       </p>
@@ -3922,18 +3922,18 @@ function requestCard(request) {
       <p>
 
         ${escapeHtml(
-          request.item_description
+          requests.item_description
         )}
 
       </p>
 
 
       ${
-        request.weight_kg
+        requests.weight_kg
 
           ? `
             <p>
-              📦 ${request.weight_kg} ${t("kg")}
+              📦 ${requests.weight_kg} ${t("kg")}
             </p>
           `
 
@@ -3942,11 +3942,11 @@ function requestCard(request) {
 
 
       ${
-        request.budget
+        requests.budget
 
           ? `
             <strong>
-              ${t("budget")} €${request.budget}
+              ${t("budget")} €${requests.budget}
             </strong>
           `
 
@@ -3954,11 +3954,11 @@ function requestCard(request) {
       }
 
 ${
-  !currentUser || currentUser.id !== request.user_id
+  !currentUser || currentUser.id !== requests.user_id
     ? `
       <button
         class="primary"
-        onclick="contactUser('${request.user_id}')">
+        onclick="contactUser('${requests.user_id}')">
 
         💬 Contatta
 
@@ -5456,19 +5456,19 @@ async function showMyRequests() {
 }
 function myRequestCard(request) {
 
-  const date = request.needed_date
+  const date = requests.needed_date
     ? new Date(
-        request.needed_date + "T12:00:00"
+        requests.needed_date + "T12:00:00"
       ).toLocaleDateString("it-IT")
     : "Non specificata";
 
   let statusLabel = "Aperta";
 
-  if (request.status === "open") {
+  if (requests.status === "open") {
     statusLabel = "🟢 Aperta";
-  } else if (request.status === "closed") {
+  } else if (requests.status === "closed") {
     statusLabel = "⚪ Chiusa";
-  } else if (request.status === "cancelled") {
+  } else if (requests.status === "cancelled") {
     statusLabel = "🔴 Annullata";
   }
 
@@ -5476,7 +5476,7 @@ function myRequestCard(request) {
 
     <div
       class="profile-card activity-card"
-      id="my-request-${request.id}">
+      id="my-request-${requests.id}">
 
       <div class="activity-card-header">
 
@@ -5488,15 +5488,15 @@ function myRequestCard(request) {
 
           <h3>
 
-            ${flag(request.departure_country)}
+            ${flag(requests.departure_country)}
 
-            ${escapeHtml(request.departure_city)}
+            ${escapeHtml(requests.departure_city)}
 
             →
 
-            ${flag(request.arrival_country)}
+            ${flag(requests.arrival_country)}
 
-            ${escapeHtml(request.arrival_city)}
+            ${escapeHtml(requests.arrival_city)}
 
           </h3>
 
@@ -5532,7 +5532,7 @@ function myRequestCard(request) {
 
           <strong>
             ${escapeHtml(
-              request.item_description || "-"
+              requests.item_description || "-"
             )}
           </strong>
 
@@ -5547,8 +5547,8 @@ function myRequestCard(request) {
 
           <strong>
             ${
-              request.weight_kg
-                ? request.weight_kg + " kg"
+              requests.weight_kg
+                ? requests.weight_kg + " kg"
                 : "-"
             }
           </strong>
@@ -5564,8 +5564,8 @@ function myRequestCard(request) {
 
           <strong>
             ${
-              request.budget
-                ? "€" + request.budget
+              requests.budget
+                ? "€" + requests.budget
                 : "-"
             }
           </strong>
@@ -5578,13 +5578,13 @@ function myRequestCard(request) {
       <div class="activity-actions">
 
         ${
-          request.status === "open"
+          requests.status === "open"
 
             ? `
 
               <button
                 class="danger-button"
-                onclick="deleteMyRequest('${request.id}')">
+                onclick="deleteMyRequest('${requests.id}')">
 
                 🗑 Elimina richiesta
 
@@ -7346,7 +7346,7 @@ function adminRequestHTML(
 ) {
 
   const type =
-    request.document_type ===
+    requests.document_type ===
     "passport"
 
       ? t("passport")
@@ -7356,7 +7356,7 @@ function adminRequestHTML(
 
   const date =
     new Date(
-      request.created_at
+      requests.created_at
     )
     .toLocaleString(
       currentLanguage === "fr"
@@ -7371,7 +7371,7 @@ function adminRequestHTML(
 
     <div
       class="profile-card admin-request"
-      id="request-${request.id}"
+      id="request-${requests.id}"
     >
 
 
@@ -7395,7 +7395,7 @@ function adminRequestHTML(
 
           <code>
             ${escapeHtml(
-              request.user_id
+              requests.user_id
             )}
           </code>
 
@@ -7415,7 +7415,7 @@ function adminRequestHTML(
 
         <button
           class="secondary"
-          onclick="viewVerificationDocument('${request.document_path}')">
+          onclick="viewVerificationDocument('${requests.document_path}')">
 
           ${t("viewDocument")}
 
@@ -7424,7 +7424,7 @@ function adminRequestHTML(
 
         <button
           class="primary"
-          onclick="approveVerification('${request.id}', '${request.user_id}')">
+          onclick="approveVerification('${requests.id}', '${requests.user_id}')">
 
           ${t("approve")}
 
@@ -7433,7 +7433,7 @@ function adminRequestHTML(
 
         <button
           class="danger-button"
-          onclick="rejectVerification('${request.id}')">
+          onclick="rejectVerification('${requests.id}')">
 
           ${t("reject")}
 
