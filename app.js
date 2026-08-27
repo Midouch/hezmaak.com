@@ -3985,6 +3985,47 @@ async function getUserName(userId) {
 
 /* ====================================================  CONTACT    
   =====================================================*/ 
+async function openConversation(otherUserId, tripId = null, requestId = null) {
+
+  if (tripId === "null") tripId = null;
+  if (requestId === "null") requestId = null;
+
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const otherUserName = await getUserName(otherUserId);
+
+  let query = supabaseClient
+    .from("conversations")
+    .select("*")
+    .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
+    .or(`participant_1.eq.${otherUserId},participant_2.eq.${otherUserId}`);
+
+  if (tripId !== null) query = query.eq("trip_id", tripId);
+  else query = query.is("trip_id", null);
+
+  if (requestId !== null) query = query.eq("request_id", requestId);
+  else query = query.is("request_id", null);
+
+  const { data: existing, error } = await query;
+
+  if (error) {
+    console.error("Errore Supabase:", error);
+    return;
+  }
+
+  let conversation = existing && existing.length > 0 ? existing[0] : null;
+
+  openChatModal(
+    conversation ? conversation.id : null,
+    otherUserName,
+    otherUserId,
+    tripId,
+    requestId
+  );
+}
 
 
 /* =====================================================
