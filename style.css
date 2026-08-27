@@ -2010,3 +2010,16 @@ html[dir="rtl"] select {
   display: flex;
   flex-direction: column;
 }
+/* Animazione arrivo messaggi */
+@keyframes msgPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.msg {
+  animation: msgPop 0.15s ease-out;
+}
+.msg-unread {
+  background: #ffe48a !important;
+  border-left: 4px solid #ffb300;
+}
