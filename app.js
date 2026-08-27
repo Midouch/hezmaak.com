@@ -3398,7 +3398,7 @@ function tripCard(trip) {
       }
 
 
- ${
+${
   (
     !currentUser ||
     currentUser.id !== trip.user_id
@@ -3407,7 +3407,11 @@ function tripCard(trip) {
     ? `
       <button
         class="primary"
-        onclick="contactUser('${trip.user_id}')">
+        onclick="contactUser(
+          '${trip.user_id}',
+          ${trip.id},
+          null
+        )">
 
         💬 Contatta
 
@@ -3948,21 +3952,28 @@ function requestCard(request) {
           : ""
       }
 
-      ${
-        canContact
+ ${
+  (
+    !currentUser ||
+    currentUser.id !== request.user_id
+  )
 
-          ? `
-            <button
-              class="primary"
-              onclick="contactUser('${request.user_id}')">
+    ? `
+      <button
+        class="primary"
+        onclick="contactUser(
+          '${request.user_id}',
+          null,
+          ${request.id}
+        )">
 
-              💬 Contatta
+        💬 Contatta
 
-            </button>
-          `
+      </button>
+    `
 
-          : ""
-      }
+    : ""
+}
 
     </article>
 
@@ -3973,25 +3984,173 @@ function requestCard(request) {
 
 /* ====================================================  CONTACT    
   =====================================================*/ 
-function contactUser(userId) {
+async function contactUser(
+  userId,
+  tripId = null,
+  requestId = null
+) {
 
   if (!currentUser) {
+
     openAuth("login");
+
     return;
+
   }
+
 
   if (!userId) {
-    alert("Impossibile identificare l'utente.");
+
+    alert(
+      "Impossibile identificare l'utente."
+    );
+
     return;
+
   }
+
 
   if (userId === currentUser.id) {
-    alert("Non puoi contattare te stesso.");
+
+    alert(
+      "Non puoi contattare te stesso."
+    );
+
     return;
+
   }
 
-  alert("Chat in preparazione.");
-  
+
+  const participant1 =
+    currentUser.id < userId
+      ? currentUser.id
+      : userId;
+
+
+  const participant2 =
+    currentUser.id < userId
+      ? userId
+      : currentUser.id;
+
+
+  let query =
+    supabaseClient
+      .from("conversations")
+      .select("*")
+      .eq(
+        "participant_1",
+        participant1
+      )
+      .eq(
+        "participant_2",
+        participant2
+      );
+
+
+  if (tripId) {
+
+    query =
+      query.eq(
+        "trip_id",
+        tripId
+      );
+
+  }
+
+
+  if (requestId) {
+
+    query =
+      query.eq(
+        "request_id",
+        requestId
+      );
+
+  }
+
+
+  const {
+    data: existingConversation,
+    error: searchError
+  } =
+    await query
+      .maybeSingle();
+
+
+  if (searchError) {
+
+    console.error(
+      searchError
+    );
+
+    alert(
+      "Errore nella ricerca della conversazione: " +
+      searchError.message
+    );
+
+    return;
+
+  }
+
+
+  let conversation =
+    existingConversation;
+
+
+  if (!conversation) {
+
+    const {
+      data: newConversation,
+      error: createError
+    } =
+      await supabaseClient
+        .from("conversations")
+        .insert({
+
+          participant_1:
+            participant1,
+
+          participant_2:
+            participant2,
+
+          trip_id:
+            tripId,
+
+          request_id:
+            requestId
+
+        })
+        .select()
+        .single();
+
+
+    if (createError) {
+
+      console.error(
+        createError
+      );
+
+      alert(
+        "Errore nella creazione della conversazione: " +
+        createError.message
+      );
+
+      return;
+
+    }
+
+
+    conversation =
+      newConversation;
+
+  }
+
+
+  openChat(
+    conversation.id,
+    userId
+  );
+
 }
 /* =====================================================
    MESSAGGING
@@ -8194,3 +8353,24 @@ window.rejectTravelTicket = function(ticketId) {
   }
 
 };
+function openChat(
+  conversationId,
+  otherUserId
+) {
+
+  console.log(
+    "Conversazione aperta:",
+    conversationId
+  );
+
+  console.log(
+    "Altro utente:",
+    otherUserId
+  );
+
+  alert(
+    "Chat creata correttamente! ID conversazione: " +
+    conversationId
+  );
+
+}
