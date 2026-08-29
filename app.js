@@ -4597,6 +4597,16 @@ async function loadMessages(conversationId) {
   });
 
   box.scrollTop = box.scrollHeight;
+
+await supabaseClient
+  .from("messages")
+  .update({ read_at: new Date().toISOString() })
+  .eq("conversation_id", conversationId)
+  .is("read_at", null)
+  .neq("sender_id", currentUser.id);
+
+
+
 }
 
 /*===========================*/
@@ -8948,13 +8958,21 @@ function closeChat() {
   setTimeout(() => modal.remove(), 250);
 }
 async function updateUnreadCount() {
-  const { data } = await supabaseClient
+
+  const { data, error } = await supabaseClient
     .from("messages")
     .select("*")
     .is("read_at", null)
     .neq("sender_id", currentUser.id);
 
+  if (error || !data) {
+    console.warn("Errore unreadCount:", error);
+    document.getElementById("unreadCount").textContent = "";
+    return;
+  }
+
   const count = data.length;
+
   document.getElementById("unreadCount").textContent =
     count > 0 ? `(${count})` : "";
 }
