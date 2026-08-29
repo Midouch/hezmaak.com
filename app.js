@@ -8822,3 +8822,22 @@ async function markMessagesAsRead(conversationId) {
     console.error("Errore nel segnare i messaggi come letti:", error);
   }
 }
+function minimizeChat() {
+  const chatModal = document.getElementById("chatModal");
+  const minimizedButton = document.getElementById("chatMinimized");
+
+  if (!chatModal || !minimizedButton) return;
+
+  chatModal.classList.add("minimized");
+  minimizedButton.classList.add("show");
+}
+
+function restoreChat() {
+  const chatModal = document.getElementById("chatModal");
+  const minimizedButton = document.getElementById("chatMinimized");
+
+  if (!chatModal || !minimizedButton) return;
+
+  chatModal.classList.remove("minimized");
+  minimizedButton.classList.remove("show");
+}
