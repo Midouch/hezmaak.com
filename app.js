@@ -2698,7 +2698,7 @@ async function showProfile() {
 
             </section>
 
-              updateUnreadCount();
+             
 
             <section class="profile-card">
 
@@ -2709,7 +2709,7 @@ async function showProfile() {
 
 
               <div class="profile-menu-grid">
-
+                updateUnreadCount();
               <button onclick="openMessages()" class="profile-button">
                  💬 Messaggi <span id="unreadCount"></span>
               </button>
