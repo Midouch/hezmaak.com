@@ -4270,85 +4270,208 @@ openChatModal(
    MESSAGGING
 ===================================================== */
 async function openChatModal(
-  conversationId,
-  otherUserName,
-  otherUserId,
-  tripId,
-  requestId
+conversationId,
+otherUserName,
+otherUserId,
+tripId,
+requestId
 ) {
 
-  const modal = document.createElement("div");
-  modal.id = "chatModal";
-  modal.className = "chat-modal";
+// Se esiste già una chat aperta, la rimuove
+const oldModal = document.getElementById("chatModal");
+if (oldModal) {
+oldModal.remove();
+}
 
-  modal.innerHTML = `
-    <div class="chat-box">
+const oldMinimized = document.getElementById("chatMinimizedButton");
+if (oldMinimized) {
+oldMinimized.remove();
+}
 
+const modal = document.createElement("div");
+modal.id = "chatModal";
+modal.className = "chat-modal";
+
+modal.innerHTML = ` <div class="chat-box">
+
+```
   <div class="chat-header">
-  <span>${otherUserName}</span>
 
-  <div>
-    <button
-      class="chat-minimize"
-      onclick="minimizeChat()"
-      title="Minimizza"
-    >−</button>
+    <span>${otherUserName}</span>
 
-    <button
-      class="chat-close"
-      onclick="closeChat()"
-      title="Chiudi"
-    >×</button>
-  </div>
-</div>
+    <div class="chat-header-buttons">
 
-      <div id="chatMessages" class="chat-messages"></div>
+      <button
+        type="button"
+        class="chat-minimize"
+        onclick="minimizeChat()"
+        title="Minimizza"
+      >−</button>
 
-      <div id="typingIndicator" class="typing"></div>
-
-      <div class="chat-input">
-        <input
-          id="chatText"
-          type="text"
-          placeholder="Scrivi un messaggio..."
-        >
-
-        <button onclick="sendMessage(
-          '${conversationId}',
-          '${otherUserId}',
-          '${tripId}',
-          '${requestId}'
-        )">
-          Invia
-        </button>
-      </div>
+      <button
+        type="button"
+        class="chat-close"
+        onclick="closeChat()"
+        title="Chiudi"
+      >×</button>
 
     </div>
-  `;
 
-  document.body.appendChild(modal);
+  </div>
 
-  if (conversationId) {
+  <div id="chatMessages" class="chat-messages"></div>
 
-    loadMessages(conversationId);
-    subscribeToMessages(conversationId);
+  <div id="typingIndicator" class="typing"></div>
 
-    // Segna come letti i messaggi ricevuti
-    await markMessagesAsRead(conversationId);
+  <div class="chat-input">
 
-    // Aggiorna il numero nel profilo
-    await updateUnreadCount();
-  }
+    <input
+      id="chatText"
+      type="text"
+      placeholder="Scrivi un messaggio..."
+    >
 
-  document
-    .querySelectorAll(".notify-badge")
-    .forEach(b => b.remove());
+    <button
+      type="button"
+      onclick="sendMessage(
+        '${conversationId}',
+        '${otherUserId}',
+        '${tripId}',
+        '${requestId}'
+      )"
+    >
+      Invia
+    </button>
 
-  setupTyping(
-    conversationId,
-    otherUserName
-  );
+  </div>
+
+</div>
+```
+
+`;
+
+document.body.appendChild(modal);
+
+if (conversationId) {
+
+```
+loadMessages(conversationId);
+
+subscribeToMessages(conversationId);
+
+// Segna come letti i messaggi ricevuti
+await markMessagesAsRead(conversationId);
+
+// Aggiorna il numero nel profilo
+await updateUnreadCount();
+```
+
 }
+
+document
+.querySelectorAll(".notify-badge")
+.forEach(b => b.remove());
+
+setupTyping(
+conversationId,
+otherUserName
+);
+}
+
+/* =====================================================
+MINIMIZZA CHAT
+===================================================== */
+
+function minimizeChat() {
+
+const chat = document.getElementById("chatModal");
+
+if (!chat) {
+return;
+}
+
+// Nasconde la chat
+chat.style.display = "none";
+
+// Crea il pulsante della chat minimizzata
+let minimizedButton =
+document.getElementById("chatMinimizedButton");
+
+if (!minimizedButton) {
+
+```
+minimizedButton = document.createElement("button");
+
+minimizedButton.id = "chatMinimizedButton";
+
+minimizedButton.className = "chat-minimized-button";
+
+minimizedButton.type = "button";
+
+minimizedButton.title = "Apri chat";
+
+minimizedButton.innerHTML = "💬";
+
+minimizedButton.onclick = function () {
+  restoreChat();
+};
+
+document.body.appendChild(minimizedButton);
+```
+
+}
+
+minimizedButton.style.display = "flex";
+}
+
+/* =====================================================
+RIAPRI CHAT
+===================================================== */
+
+function restoreChat() {
+
+const chat = document.getElementById("chatModal");
+
+const minimizedButton =
+document.getElementById("chatMinimizedButton");
+
+if (chat) {
+
+```
+chat.style.display = "flex";
+```
+
+}
+
+if (minimizedButton) {
+
+```
+minimizedButton.style.display = "none";
+```
+
+}
+}
+
+/* =====================================================
+CHIUDI CHAT
+===================================================== */
+
+function closeChat() {
+
+const chat = document.getElementById("chatModal");
+
+const minimizedButton =
+document.getElementById("chatMinimizedButton");
+
+if (chat) {
+chat.remove();
+}
+
+if (minimizedButton) {
+minimizedButton.remove();
+}
+}
+
 
 
 
@@ -8797,15 +8920,7 @@ window.rejectTravelTicket = function(ticketId) {
 
 };
 /*============================*/
-function closeChat() {
-  const modal = document.getElementById("chatModal");
-  if (!modal) return;
 
-  modal.style.opacity = "0";
-  modal.style.transition = "opacity 0.25s";
-
-  setTimeout(() => modal.remove(), 250);
-}
 async function updateUnreadCount() {
 
   const { data, error } = await supabaseClient
@@ -8837,51 +8952,5 @@ async function markMessagesAsRead(conversationId) {
 
   if (error) {
     console.error("Errore nel segnare i messaggi come letti:", error);
-  }
-}
-/*=======================*/
-function minimizeChat() {
-
-  const modal = document.getElementById("chatModal");
-
-  if (!modal) return;
-
-  modal.classList.add("minimized");
-
-  let minimizedButton = document.getElementById("chatMinimizedButton");
-
-  if (!minimizedButton) {
-
-    minimizedButton = document.createElement("button");
-
-    minimizedButton.id = "chatMinimizedButton";
-    minimizedButton.className = "chat-minimized-button";
-    minimizedButton.innerHTML = "💬";
-    minimizedButton.title = "Apri chat";
-
-    minimizedButton.onclick = function () {
-      restoreChat();
-    };
-
-    document.body.appendChild(minimizedButton);
-  }
-}
-
-
-
-/*=======================*/
-function restoreChat() {
-
-  const modal = document.getElementById("chatModal");
-
-  if (!modal) return;
-
-  modal.classList.remove("minimized");
-
-  const minimizedButton =
-    document.getElementById("chatMinimizedButton");
-
-  if (minimizedButton) {
-    minimizedButton.remove();
   }
 }
