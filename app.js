@@ -2698,7 +2698,7 @@ async function showProfile() {
 
             </section>
 
-
+              updateUnreadCount();
 
             <section class="profile-card">
 
@@ -4684,9 +4684,11 @@ function subscribeToMessages(conversationId) {
         }
 
         loadMessages(conversationId);
+        updateUnreadCount();
       }
     )
     .subscribe();
+
 }
 
 
