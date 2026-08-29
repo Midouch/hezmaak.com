@@ -2619,15 +2619,19 @@ async function openMessages() {
   modal.id = "messagesModal";
   modal.className = "chat-modal";
 
-  let html = `
+ let html = `
     <div class="chat-box">
       <div class="chat-header">
         <span>Messaggi</span>
-        <button class="chat-close" onclick="closeMessages()">×</button>
+
+        <div>
+          <button class="chat-minimize" onclick="minimizeChat()">−</button>
+          <button class="chat-close" onclick="closeMessages()">×</button>
+        </div>
       </div>
 
       <div class="chat-messages" style="height:400px; overflow-y:auto;">
-  `;
+`;
 
   for (const conv of conversations) {
 
@@ -2642,7 +2646,7 @@ async function openMessages() {
       .from("messages")
       .select("*")
       .eq("conversation_id", conv.id)
-      .is("read", false)
+      .is("read_at", false)
       .neq("sender_id", currentUser.id);
 
     const isUnread = unreadMessages && unreadMessages.length > 0;
@@ -4280,10 +4284,23 @@ async function openChatModal(
   modal.innerHTML = `
     <div class="chat-box">
 
-      <div class="chat-header">
-        <span>${otherUserName}</span>
-        <button class="chat-close" onclick="closeChat()">×</button>
-      </div>
+  <div class="chat-header">
+  <span>${otherUserName}</span>
+
+  <div>
+    <button
+      class="chat-minimize"
+      onclick="minimizeChat()"
+      title="Minimizza"
+    >−</button>
+
+    <button
+      class="chat-close"
+      onclick="closeChat()"
+      title="Chiudi"
+    >×</button>
+  </div>
+</div>
 
       <div id="chatMessages" class="chat-messages"></div>
 
@@ -4419,19 +4436,25 @@ async function loadMessages(conversationId) {
   const box = document.getElementById("chatMessages");
   box.innerHTML = "";
 
-  messages.forEach(msg => {
+ messages.forEach(msg => {
 
-    const div = document.createElement("div");
+  const div = document.createElement("div");
 
-    div.className =
-      msg.sender_id === currentUser.id
-        ? "msg msg-me"
-        : "msg msg-other";
+  const isMine = msg.sender_id === currentUser.id;
+  const isUnread = !isMine && msg.read_at === null;
 
-    div.textContent = msg.message;
+  if (isMine) {
+    div.className = "msg msg-me";
+  } else if (isUnread) {
+    div.className = "msg msg-other msg-unread";
+  } else {
+    div.className = "msg msg-other";
+  }
 
-    box.appendChild(div);
-  });
+  div.textContent = msg.message;
+
+  box.appendChild(div);
+});
 
   box.scrollTop = box.scrollHeight;
 }
@@ -8814,5 +8837,51 @@ async function markMessagesAsRead(conversationId) {
 
   if (error) {
     console.error("Errore nel segnare i messaggi come letti:", error);
+  }
+}
+/*=======================*/
+function minimizeChat() {
+
+  const modal = document.getElementById("chatModal");
+
+  if (!modal) return;
+
+  modal.classList.add("minimized");
+
+  let minimizedButton = document.getElementById("chatMinimizedButton");
+
+  if (!minimizedButton) {
+
+    minimizedButton = document.createElement("button");
+
+    minimizedButton.id = "chatMinimizedButton";
+    minimizedButton.className = "chat-minimized-button";
+    minimizedButton.innerHTML = "💬";
+    minimizedButton.title = "Apri chat";
+
+    minimizedButton.onclick = function () {
+      restoreChat();
+    };
+
+    document.body.appendChild(minimizedButton);
+  }
+}
+
+
+
+/*=======================*/
+function restoreChat() {
+
+  const modal = document.getElementById("chatModal");
+
+  if (!modal) return;
+
+  modal.classList.remove("minimized");
+
+  const minimizedButton =
+    document.getElementById("chatMinimizedButton");
+
+  if (minimizedButton) {
+    minimizedButton.remove();
   }
 }
