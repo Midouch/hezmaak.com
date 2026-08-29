@@ -2646,7 +2646,7 @@ async function openMessages() {
       .from("messages")
       .select("*")
       .eq("conversation_id", conv.id)
-      .is("read", false)
+      .is("read_at", false)
       .neq("sender_id", currentUser.id);
 
     const isUnread = unreadMessages && unreadMessages.length > 0;
@@ -4284,10 +4284,23 @@ async function openChatModal(
   modal.innerHTML = `
     <div class="chat-box">
 
-      <div class="chat-header">
-        <span>${otherUserName}</span>
-        <button class="chat-close" onclick="closeChat()">×</button>
-      </div>
+  <div class="chat-header">
+  <span>${otherUserName}</span>
+
+  <div>
+    <button
+      class="chat-minimize"
+      onclick="minimizeChat()"
+      title="Minimizza"
+    >−</button>
+
+    <button
+      class="chat-close"
+      onclick="closeChat()"
+      title="Chiudi"
+    >×</button>
+  </div>
+</div>
 
       <div id="chatMessages" class="chat-messages"></div>
 
