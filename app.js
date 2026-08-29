@@ -2619,15 +2619,19 @@ async function openMessages() {
   modal.id = "messagesModal";
   modal.className = "chat-modal";
 
-  let html = `
+ let html = `
     <div class="chat-box">
       <div class="chat-header">
         <span>Messaggi</span>
-        <button class="chat-close" onclick="closeMessages()">×</button>
+
+        <div>
+          <button class="chat-minimize" onclick="minimizeChat()">−</button>
+          <button class="chat-close" onclick="closeMessages()">×</button>
+        </div>
       </div>
 
       <div class="chat-messages" style="height:400px; overflow-y:auto;">
-  `;
+`;
 
   for (const conv of conversations) {
 
