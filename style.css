@@ -2020,8 +2020,9 @@ html[dir="rtl"] select {
   animation: msgPop 0.15s ease-out;
 }
 .msg-unread {
-  background: #ffe48a !important;
-  border-left: 4px solid #ffb300;
+  font-weight: 600;
+  background: #e8f1ff;
+  border-left: 4px solid #007bff;
 }
 /* Modal responsive */
 .chat-modal {
@@ -2073,8 +2074,9 @@ html[dir="rtl"] select {
   animation: msgPop 0.15s ease-out;
 }
 .msg-unread {
-  background: #ffe48a !important;
-  border-left: 4px solid #ffb300;
+  font-weight: 600;
+  background: #e8f1ff;
+  border-left: 4px solid #007bff;
 }
 .msg-status {
   font-size: 11px;
