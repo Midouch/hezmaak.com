@@ -2709,7 +2709,7 @@ async function showProfile() {
 
 
               <div class="profile-menu-grid">
-                updateUnreadCount();
+              
               <button onclick="openMessages()" class="profile-button">
                  💬 Messaggi <span id="unreadCount"></span>
               </button>
@@ -2803,7 +2803,7 @@ async function showProfile() {
 
   document.body.style.overflow =
     "hidden";
-
+updateUnreadCount();
 }
 
 /*=============================*/
@@ -4510,6 +4510,7 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
 
   // Attiva typing indicator
   setupTyping(conversationId, otherUserName);
+  updateUnreadCount();
 }
 /*=================*/
 let typingTimeout;
