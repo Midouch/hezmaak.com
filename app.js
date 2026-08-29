@@ -1467,221 +1467,9 @@ async function loadUser() {
 
   updateAdminButton();
 
-
-  if (currentUser) {
-
-    startMessageNotifications();
-
-    requestNotificationPermission();
-
-  }
-
 }
 
-/* =====================================================
-   NOTIFICHE NUOVI MESSAGGI
-===================================================== */
 
-let globalMessageChannel = null;
-
-function startMessageNotifications() {
-
-  if (!currentUser) {
-    return;
-  }
-
-  // Evita di creare più volte lo stesso canale
-  if (globalMessageChannel) {
-    return;
-  }
-
-  globalMessageChannel =
-    supabaseClient
-      .channel(
-        "global_messages_" +
-        currentUser.id
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages"
-        },
-        async (payload) => {
-
-          const message =
-            payload.new;
-
-          // Ignora i messaggi inviati da noi
-          if (
-            message.sender_id ===
-            currentUser.id
-          ) {
-            return;
-          }
-
-          // Controlla a quale conversazione appartiene
-          const {
-            data: conversation,
-            error
-          } =
-            await supabaseClient
-              .from("conversations")
-              .select(
-                "participant_1, participant_2"
-              )
-              .eq(
-                "id",
-                message.conversation_id
-              )
-              .single();
-
-          if (error) {
-
-            console.error(
-              "Errore verifica conversazione:",
-              error
-            );
-
-            return;
-
-          }
-
-          // Controlla che siamo realmente partecipanti
-          const isParticipant =
-            conversation.participant_1 ===
-              currentUser.id ||
-            conversation.participant_2 ===
-              currentUser.id;
-
-          if (!isParticipant) {
-            return;
-          }
-
-          /*
-             NOTIFICA NEL SITO
-          */
-
-          showToast(
-            "💬 Nuovo messaggio ricevuto"
-          );
-
-
-          /*
-             NOTIFICA DEL BROWSER
-          */
-
-          if (
-            "Notification" in window &&
-            Notification.permission ===
-              "granted"
-          ) {
-
-            new Notification(
-              "Hez Maak",
-              {
-                body:
-                  message.message,
-                icon:
-                  "/favicon.ico"
-              }
-            );
-
-          }
-
-
-          /*
-             BADGE NOTIFICA
-          */
-
-          const buttons =
-            document.querySelectorAll(
-              '[data-action="contact"]'
-            );
-
-          buttons.forEach(
-            button => {
-
-              showNotificationBadge(
-                button
-              );
-
-            }
-          );
-
-
-          /*
-             Se la chat è aperta,
-             aggiorna immediatamente
-          */
-
-          const chatMessages =
-            document.getElementById(
-              "chatMessages"
-            );
-
-          if (
-            chatMessages &&
-            typeof loadMessages ===
-              "function"
-          ) {
-
-            loadMessages(
-              message.conversation_id
-            );
-
-          }
-
-        }
-      )
-      .subscribe(
-        status => {
-
-          console.log(
-            "Notifiche messaggi:",
-            status
-          );
-
-        }
-      );
-
-}
-/* =====================================================
-   RICHIESTA NOTIFICHE BROWSER
-===================================================== */
-
-async function requestNotificationPermission() {
-
-  if (
-    !("Notification" in window)
-  ) {
-
-    return;
-
-  }
-
-  if (
-    Notification.permission ===
-    "default"
-  ) {
-
-    try {
-
-      await Notification.requestPermission();
-
-    } catch (error) {
-
-      console.error(
-        "Errore permesso notifiche:",
-        error
-      );
-
-    }
-
-  }
-
-}
 /* =====================================================
    HEADER
 ===================================================== */
@@ -2698,7 +2486,7 @@ async function showProfile() {
 
             </section>
 
-             
+
 
             <section class="profile-card">
 
@@ -2709,7 +2497,7 @@ async function showProfile() {
 
 
               <div class="profile-menu-grid">
-              
+
               <button onclick="openMessages()" class="profile-button">
                  💬 Messaggi <span id="unreadCount"></span>
               </button>
@@ -2803,7 +2591,7 @@ async function showProfile() {
 
   document.body.style.overflow =
     "hidden";
-updateUnreadCount();
+  updateUnreadCount();
 }
 
 /*=============================*/
@@ -2854,7 +2642,7 @@ async function openMessages() {
       .from("messages")
       .select("*")
       .eq("conversation_id", conv.id)
-      .is("read_at", null)
+      .is("read", false)
       .neq("sender_id", currentUser.id);
 
     const isUnread = unreadMessages && unreadMessages.length > 0;
@@ -4463,37 +4251,16 @@ async function contactUser(
   }
 
 
- const otherUserName = await getUserName(userId);
-
-openChatModal(
-  conversation.id,
-  otherUserName,
-  userId,
-  tripId,
-  requestId
-);
+  openChatModal(
+    conversation.id,
+    userId
+  );
 
 }
 /* =====================================================
    MESSAGGING
 ===================================================== */
-async function openChatModal(
-  conversationId,
-  otherUserName,
-  otherUserId,
-  tripId,
-  requestId
-) {
-
-  // Se per qualsiasi motivo arriva un UUID come nome,
-  // recupera il nome dal profilo Supabase.
-  if (
-    !otherUserName ||
-    otherUserName === otherUserId ||
-    /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(otherUserName)
-  ) {
-    otherUserName = await getUserName(otherUserId);
-  }
+function openChatModal(conversationId, otherUserName, otherUserId, tripId, requestId) {
 
   const modal = document.createElement("div");
   modal.id = "chatModal";
@@ -4503,7 +4270,7 @@ async function openChatModal(
     <div class="chat-box">
 
       <div class="chat-header">
-        <span>${escapeHtml(otherUserName)}</span>
+        <span>${otherUserName}</span>
         <button class="chat-close" onclick="closeChat()">×</button>
       </div>
 
@@ -4512,20 +4279,8 @@ async function openChatModal(
       <div id="typingIndicator" class="typing"></div>
 
       <div class="chat-input">
-        <input
-          id="chatText"
-          type="text"
-          placeholder="Scrivi un messaggio..."
-        >
-
-        <button onclick="sendMessage(
-          '${conversationId}',
-          '${otherUserId}',
-          '${tripId}',
-          '${requestId}'
-        )">
-          Invia
-        </button>
+        <input id="chatText" type="text" placeholder="Scrivi un messaggio...">
+        <button onclick="sendMessage('${conversationId}', '${otherUserId}', '${tripId}', '${requestId}')">Invia</button>
       </div>
 
     </div>
@@ -4538,16 +4293,11 @@ async function openChatModal(
     subscribeToMessages(conversationId);
   }
 
-  document
-    .querySelectorAll(".notify-badge")
-    .forEach(b => b.remove());
+  // Rimuove badge notifiche
+  document.querySelectorAll(".notify-badge").forEach(b => b.remove());
 
-  setupTyping(
-    conversationId,
-    otherUserName
-  );
-
-  updateUnreadCount();
+  // Attiva typing indicator
+  setupTyping(conversationId, otherUserName);
 }
 /*=================*/
 let typingTimeout;
@@ -4635,16 +4385,6 @@ async function loadMessages(conversationId) {
   });
 
   box.scrollTop = box.scrollHeight;
-
-await supabaseClient
-  .from("messages")
-  .update({ read_at: new Date().toISOString() })
-  .eq("conversation_id", conversationId)
-  .is("read_at", null)
-  .neq("sender_id", currentUser.id);
-
-
-
 }
 
 /*===========================*/
@@ -4732,11 +4472,9 @@ function subscribeToMessages(conversationId) {
         }
 
         loadMessages(conversationId);
-        updateUnreadCount();
       }
     )
     .subscribe();
-
 }
 
 
