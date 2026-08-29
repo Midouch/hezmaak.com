@@ -4477,9 +4477,7 @@ openChatModal(
 /* =====================================================
    MESSAGGING
 ===================================================== */
-function openChatModal(conversationId, otherUserName, otherUserId, tripId, requestId) {
-
-  async function openChatModal(
+async function openChatModal(
   conversationId,
   otherUserName,
   otherUserId,
@@ -4487,8 +4485,8 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
   requestId
 ) {
 
-  // Se per errore viene passato l'UUID come nome,
-  // recupera automaticamente il nome dal profilo.
+  // Se per qualsiasi motivo arriva un UUID come nome,
+  // recupera il nome dal profilo Supabase.
   if (
     !otherUserName ||
     otherUserName === otherUserId ||
@@ -4498,10 +4496,6 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
   }
 
   const modal = document.createElement("div");
-
-
-
-
   modal.id = "chatModal";
   modal.className = "chat-modal";
 
@@ -4509,7 +4503,7 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
     <div class="chat-box">
 
       <div class="chat-header">
-        <span>${otherUserName}</span>
+        <span>${escapeHtml(otherUserName)}</span>
         <button class="chat-close" onclick="closeChat()">×</button>
       </div>
 
@@ -4518,8 +4512,20 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
       <div id="typingIndicator" class="typing"></div>
 
       <div class="chat-input">
-        <input id="chatText" type="text" placeholder="Scrivi un messaggio...">
-        <button onclick="sendMessage('${conversationId}', '${otherUserId}', '${tripId}', '${requestId}')">Invia</button>
+        <input
+          id="chatText"
+          type="text"
+          placeholder="Scrivi un messaggio..."
+        >
+
+        <button onclick="sendMessage(
+          '${conversationId}',
+          '${otherUserId}',
+          '${tripId}',
+          '${requestId}'
+        )">
+          Invia
+        </button>
       </div>
 
     </div>
@@ -4532,11 +4538,15 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
     subscribeToMessages(conversationId);
   }
 
-  // Rimuove badge notifiche
-  document.querySelectorAll(".notify-badge").forEach(b => b.remove());
+  document
+    .querySelectorAll(".notify-badge")
+    .forEach(b => b.remove());
 
-  // Attiva typing indicator
-  setupTyping(conversationId, otherUserName);
+  setupTyping(
+    conversationId,
+    otherUserName
+  );
+
   updateUnreadCount();
 }
 /*=================*/
