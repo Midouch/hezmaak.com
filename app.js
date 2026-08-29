@@ -4251,10 +4251,15 @@ async function contactUser(
   }
 
 
-  openChatModal(
-    conversation.id,
-    userId
-  );
+  const otherUserName = await getUserName(userId);
+
+openChatModal(
+  conversation.id,
+  otherUserName,
+  userId,
+  tripId,
+  requestId
+);
 
 }
 /* =====================================================
