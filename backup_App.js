@@ -4479,7 +4479,29 @@ openChatModal(
 ===================================================== */
 function openChatModal(conversationId, otherUserName, otherUserId, tripId, requestId) {
 
+  async function openChatModal(
+  conversationId,
+  otherUserName,
+  otherUserId,
+  tripId,
+  requestId
+) {
+
+  // Se per errore viene passato l'UUID come nome,
+  // recupera automaticamente il nome dal profilo.
+  if (
+    !otherUserName ||
+    otherUserName === otherUserId ||
+    /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(otherUserName)
+  ) {
+    otherUserName = await getUserName(otherUserId);
+  }
+
   const modal = document.createElement("div");
+
+
+
+
   modal.id = "chatModal";
   modal.className = "chat-modal";
 
