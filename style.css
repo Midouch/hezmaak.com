@@ -1895,7 +1895,7 @@ html[dir="rtl"] select {
 
 .chat-header {
   padding: 14px;
-  background: #0066ff;
+  background: #00c8ff;
   color: #fff;
   font-weight: bold;
   display: flex;
@@ -2008,7 +2008,7 @@ html[dir="rtl"] select {
 
 /* Messaggi dell'altro utente (sinistra) */
 .msg-other {
-  background: #e6e6e6;
+  background: #e6e6e671;
   color: #333;
   margin-right: auto;
   text-align: left;
