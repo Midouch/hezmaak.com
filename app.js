@@ -4419,19 +4419,25 @@ async function loadMessages(conversationId) {
   const box = document.getElementById("chatMessages");
   box.innerHTML = "";
 
-  messages.forEach(msg => {
+ messages.forEach(msg => {
 
-    const div = document.createElement("div");
+  const div = document.createElement("div");
 
-    div.className =
-      msg.sender_id === currentUser.id
-        ? "msg msg-me"
-        : "msg msg-other";
+  const isMine = msg.sender_id === currentUser.id;
+  const isUnread = !isMine && msg.read_at === null;
 
-    div.textContent = msg.message;
+  if (isMine) {
+    div.className = "msg msg-me";
+  } else if (isUnread) {
+    div.className = "msg msg-other msg-unread";
+  } else {
+    div.className = "msg msg-other";
+  }
 
-    box.appendChild(div);
-  });
+  div.textContent = msg.message;
+
+  box.appendChild(div);
+});
 
   box.scrollTop = box.scrollHeight;
 }
