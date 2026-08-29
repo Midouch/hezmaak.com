@@ -4265,7 +4265,13 @@ openChatModal(
 /* =====================================================
    MESSAGGING
 ===================================================== */
-function openChatModal(conversationId, otherUserName, otherUserId, tripId, requestId) {
+async function openChatModal(
+  conversationId,
+  otherUserName,
+  otherUserId,
+  tripId,
+  requestId
+) {
 
   const modal = document.createElement("div");
   modal.id = "chatModal";
@@ -4284,8 +4290,20 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
       <div id="typingIndicator" class="typing"></div>
 
       <div class="chat-input">
-        <input id="chatText" type="text" placeholder="Scrivi un messaggio...">
-        <button onclick="sendMessage('${conversationId}', '${otherUserId}', '${tripId}', '${requestId}')">Invia</button>
+        <input
+          id="chatText"
+          type="text"
+          placeholder="Scrivi un messaggio..."
+        >
+
+        <button onclick="sendMessage(
+          '${conversationId}',
+          '${otherUserId}',
+          '${tripId}',
+          '${requestId}'
+        )">
+          Invia
+        </button>
       </div>
 
     </div>
@@ -4294,16 +4312,42 @@ function openChatModal(conversationId, otherUserName, otherUserId, tripId, reque
   document.body.appendChild(modal);
 
   if (conversationId) {
+
     loadMessages(conversationId);
     subscribeToMessages(conversationId);
+
+    // Segna come letti i messaggi ricevuti
+    await markMessagesAsRead(conversationId);
+
+    // Aggiorna il numero nel profilo
+    await updateUnreadCount();
   }
 
-  // Rimuove badge notifiche
-  document.querySelectorAll(".notify-badge").forEach(b => b.remove());
+  document
+    .querySelectorAll(".notify-badge")
+    .forEach(b => b.remove());
 
-  // Attiva typing indicator
-  setupTyping(conversationId, otherUserName);
+  setupTyping(
+    conversationId,
+    otherUserName
+  );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*=================*/
 let typingTimeout;
 
@@ -8729,6 +8773,7 @@ window.rejectTravelTicket = function(ticketId) {
   }
 
 };
+/*============================*/
 function closeChat() {
   const modal = document.getElementById("chatModal");
   if (!modal) return;
@@ -8756,4 +8801,18 @@ async function updateUnreadCount() {
 
   document.getElementById("unreadCount").textContent =
     count > 0 ? `(${count})` : "";
+}
+async function markMessagesAsRead(conversationId) {
+  const { error } = await supabaseClient
+    .from("messages")
+    .update({
+      read_at: new Date().toISOString()
+    })
+    .eq("conversation_id", conversationId)
+    .neq("sender_id", currentUser.id)
+    .is("read_at", null);
+
+  if (error) {
+    console.error("Errore nel segnare i messaggi come letti:", error);
+  }
 }
