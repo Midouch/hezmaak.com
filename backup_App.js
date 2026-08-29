@@ -1467,9 +1467,221 @@ async function loadUser() {
 
   updateAdminButton();
 
+
+  if (currentUser) {
+
+    startMessageNotifications();
+
+    requestNotificationPermission();
+
+  }
+
 }
 
+/* =====================================================
+   NOTIFICHE NUOVI MESSAGGI
+===================================================== */
 
+let globalMessageChannel = null;
+
+function startMessageNotifications() {
+
+  if (!currentUser) {
+    return;
+  }
+
+  // Evita di creare più volte lo stesso canale
+  if (globalMessageChannel) {
+    return;
+  }
+
+  globalMessageChannel =
+    supabaseClient
+      .channel(
+        "global_messages_" +
+        currentUser.id
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages"
+        },
+        async (payload) => {
+
+          const message =
+            payload.new;
+
+          // Ignora i messaggi inviati da noi
+          if (
+            message.sender_id ===
+            currentUser.id
+          ) {
+            return;
+          }
+
+          // Controlla a quale conversazione appartiene
+          const {
+            data: conversation,
+            error
+          } =
+            await supabaseClient
+              .from("conversations")
+              .select(
+                "participant_1, participant_2"
+              )
+              .eq(
+                "id",
+                message.conversation_id
+              )
+              .single();
+
+          if (error) {
+
+            console.error(
+              "Errore verifica conversazione:",
+              error
+            );
+
+            return;
+
+          }
+
+          // Controlla che siamo realmente partecipanti
+          const isParticipant =
+            conversation.participant_1 ===
+              currentUser.id ||
+            conversation.participant_2 ===
+              currentUser.id;
+
+          if (!isParticipant) {
+            return;
+          }
+
+          /*
+             NOTIFICA NEL SITO
+          */
+
+          showToast(
+            "💬 Nuovo messaggio ricevuto"
+          );
+
+
+          /*
+             NOTIFICA DEL BROWSER
+          */
+
+          if (
+            "Notification" in window &&
+            Notification.permission ===
+              "granted"
+          ) {
+
+            new Notification(
+              "Hez Maak",
+              {
+                body:
+                  message.message,
+                icon:
+                  "/favicon.ico"
+              }
+            );
+
+          }
+
+
+          /*
+             BADGE NOTIFICA
+          */
+
+          const buttons =
+            document.querySelectorAll(
+              '[data-action="contact"]'
+            );
+
+          buttons.forEach(
+            button => {
+
+              showNotificationBadge(
+                button
+              );
+
+            }
+          );
+
+
+          /*
+             Se la chat è aperta,
+             aggiorna immediatamente
+          */
+
+          const chatMessages =
+            document.getElementById(
+              "chatMessages"
+            );
+
+          if (
+            chatMessages &&
+            typeof loadMessages ===
+              "function"
+          ) {
+
+            loadMessages(
+              message.conversation_id
+            );
+
+          }
+
+        }
+      )
+      .subscribe(
+        status => {
+
+          console.log(
+            "Notifiche messaggi:",
+            status
+          );
+
+        }
+      );
+
+}
+/* =====================================================
+   RICHIESTA NOTIFICHE BROWSER
+===================================================== */
+
+async function requestNotificationPermission() {
+
+  if (
+    !("Notification" in window)
+  ) {
+
+    return;
+
+  }
+
+  if (
+    Notification.permission ===
+    "default"
+  ) {
+
+    try {
+
+      await Notification.requestPermission();
+
+    } catch (error) {
+
+      console.error(
+        "Errore permesso notifiche:",
+        error
+      );
+
+    }
+
+  }
+
+}
 /* =====================================================
    HEADER
 ===================================================== */
@@ -2486,7 +2698,7 @@ async function showProfile() {
 
             </section>
 
-
+             
 
             <section class="profile-card">
 
@@ -2497,6 +2709,10 @@ async function showProfile() {
 
 
               <div class="profile-menu-grid">
+              
+              <button onclick="openMessages()" class="profile-button">
+                 💬 Messaggi <span id="unreadCount"></span>
+              </button>
 
 
                 <button
@@ -2587,9 +2803,100 @@ async function showProfile() {
 
   document.body.style.overflow =
     "hidden";
-
+updateUnreadCount();
 }
 
+/*=============================*/
+async function openMessages() {
+
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const { data: conversations, error } =
+    await supabaseClient
+      .from("conversations")
+      .select("*")
+      .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
+      .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    alert("Errore nel caricamento dei messaggi.");
+    return;
+  }
+
+  const modal = document.createElement("div");
+  modal.id = "messagesModal";
+  modal.className = "chat-modal";
+
+  let html = `
+    <div class="chat-box">
+      <div class="chat-header">
+        <span>Messaggi</span>
+        <button class="chat-close" onclick="closeMessages()">×</button>
+      </div>
+
+      <div class="chat-messages" style="height:400px; overflow-y:auto;">
+  `;
+
+  for (const conv of conversations) {
+
+    const otherUserId =
+      conv.participant_1 === currentUser.id
+        ? conv.participant_2
+        : conv.participant_1;
+
+    const otherUserName = await getUserName(otherUserId);
+
+    const { data: unreadMessages } = await supabaseClient
+      .from("messages")
+      .select("*")
+      .eq("conversation_id", conv.id)
+      .is("read_at", null)
+      .neq("sender_id", currentUser.id);
+
+    const isUnread = unreadMessages && unreadMessages.length > 0;
+
+    const { data: lastMsg } =
+      await supabaseClient
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", conv.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    const preview =
+      lastMsg?.message
+        ? lastMsg.message.substring(0, 40) + "..."
+        : "Nessun messaggio";
+
+    html += `
+      <div class="conversation-item ${isUnread ? "unread" : ""}"
+           onclick="openConversation('${otherUserId}', '${conv.trip_id}', '${conv.request_id}')">
+
+        <strong>${otherUserName}</strong><br>
+        <span>${preview}</span>
+
+      </div>
+    `;
+  }
+
+  html += `
+      </div>
+    </div>
+  `;
+
+  modal.innerHTML = html;
+  document.body.appendChild(modal);
+
+  updateUnreadCount();
+}
+
+
+/*======================*/
 
 function closeProfilePage() {
 
@@ -3398,7 +3705,7 @@ function tripCard(trip) {
       }
 
 
- ${
+${
   (
     !currentUser ||
     currentUser.id !== trip.user_id
@@ -3407,7 +3714,11 @@ function tripCard(trip) {
     ? `
       <button
         class="primary"
-        onclick="contactUser('${trip.user_id}')">
+        onclick="contactUser(
+          '${trip.user_id}',
+          ${trip.id},
+          null
+        )">
 
         💬 Contatta
 
@@ -3948,54 +4259,498 @@ function requestCard(request) {
           : ""
       }
 
-      ${
-        canContact
+ ${
+  (
+    !currentUser ||
+    currentUser.id !== request.user_id
+  )
 
-          ? `
-            <button
-              class="primary"
-              onclick="contactUser('${request.user_id}')">
+    ? `
+      <button
+        class="primary"
+        onclick="contactUser(
+          '${request.user_id}',
+          null,
+          ${request.id}
+        )">
 
-              💬 Contatta
+        💬 Contatta
 
-            </button>
-          `
+      </button>
+    `
 
-          : ""
-      }
+    : ""
+}
 
     </article>
 
   `;
 
 }
+/* ================= RECUPERO NOME UTENTE=============*/
+async function getUserName(userId) {
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("full_name")
+    .eq("id", userId)
+    .single();
 
+  if (error || !data) return "Utente";
+  return data.full_name;
+}
 
 /* ====================================================  CONTACT    
   =====================================================*/ 
-function contactUser(userId) {
+async function contactUser(
+  userId,
+  tripId = null,
+  requestId = null
+) {
+
+  if (!currentUser) {
+
+    openAuth("login");
+
+    return;
+
+  }
+
+
+  if (!userId) {
+
+    alert(
+      "Impossibile identificare l'utente."
+    );
+
+    return;
+
+  }
+
+
+  if (userId === currentUser.id) {
+
+    alert(
+      "Non puoi contattare te stesso."
+    );
+
+    return;
+
+  }
+
+
+  const participant1 =
+    currentUser.id < userId
+      ? currentUser.id
+      : userId;
+
+
+  const participant2 =
+    currentUser.id < userId
+      ? userId
+      : currentUser.id;
+
+
+  let query =
+    supabaseClient
+      .from("conversations")
+      .select("*")
+      .eq(
+        "participant_1",
+        participant1
+      )
+      .eq(
+        "participant_2",
+        participant2
+      );
+
+
+  if (tripId) {
+
+    query =
+      query.eq(
+        "trip_id",
+        tripId
+      );
+
+  }
+
+
+  if (requestId) {
+
+    query =
+      query.eq(
+        "request_id",
+        requestId
+      );
+
+  }
+
+
+  const {
+    data: existingConversation,
+    error: searchError
+  } =
+    await query
+      .maybeSingle();
+
+
+  if (searchError) {
+
+    console.error(
+      searchError
+    );
+
+    alert(
+      "Errore nella ricerca della conversazione: " +
+      searchError.message
+    );
+
+    return;
+
+  }
+
+
+  let conversation =
+    existingConversation;
+
+
+  if (!conversation) {
+
+    const {
+      data: newConversation,
+      error: createError
+    } =
+      await supabaseClient
+        .from("conversations")
+        .insert({
+
+          participant_1:
+            participant1,
+
+          participant_2:
+            participant2,
+
+          trip_id:
+            tripId,
+
+          request_id:
+            requestId
+
+        })
+        .select()
+        .single();
+
+
+    if (createError) {
+
+      console.error(
+        createError
+      );
+
+      alert(
+        "Errore nella creazione della conversazione: " +
+        createError.message
+      );
+
+      return;
+
+    }
+
+
+    conversation =
+      newConversation;
+
+  }
+
+
+  openChatModal(
+    conversation.id,
+    userId
+  );
+
+}
+/* =====================================================
+   MESSAGGING
+===================================================== */
+function openChatModal(conversationId, otherUserName, otherUserId, tripId, requestId) {
+
+  const modal = document.createElement("div");
+  modal.id = "chatModal";
+  modal.className = "chat-modal";
+
+  modal.innerHTML = `
+    <div class="chat-box">
+
+      <div class="chat-header">
+        <span>${otherUserName}</span>
+        <button class="chat-close" onclick="closeChat()">×</button>
+      </div>
+
+      <div id="chatMessages" class="chat-messages"></div>
+
+      <div id="typingIndicator" class="typing"></div>
+
+      <div class="chat-input">
+        <input id="chatText" type="text" placeholder="Scrivi un messaggio...">
+        <button onclick="sendMessage('${conversationId}', '${otherUserId}', '${tripId}', '${requestId}')">Invia</button>
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  if (conversationId) {
+    loadMessages(conversationId);
+    subscribeToMessages(conversationId);
+  }
+
+  // Rimuove badge notifiche
+  document.querySelectorAll(".notify-badge").forEach(b => b.remove());
+
+  // Attiva typing indicator
+  setupTyping(conversationId, otherUserName);
+  updateUnreadCount();
+}
+/*=================*/
+let typingTimeout;
+
+function setupTyping(conversationId, otherUserName) {
+
+  const input = document.getElementById("chatText");
+
+  input.addEventListener("input", () => {
+
+    supabaseClient
+      .from("typing")
+      .insert({ conversation_id: conversationId, user_id: currentUser.id })
+      .then(() => {});
+
+    clearTimeout(typingTimeout);
+
+    typingTimeout = setTimeout(() => {
+      supabaseClient
+        .from("typing")
+        .delete()
+        .eq("conversation_id", conversationId)
+        .eq("user_id", currentUser.id);
+    }, 2000);
+  });
+
+  supabaseClient
+    .channel(`typing_${conversationId}`)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "typing" },
+      payload => {
+
+        const typingBox = document.getElementById("typingIndicator");
+
+        if (payload.eventType === "INSERT" && payload.new.user_id !== currentUser.id) {
+          typingBox.textContent = `${otherUserName} sta scrivendo…`;
+        } else {
+          typingBox.textContent = "";
+        }
+      }
+    )
+    .subscribe();
+}
+
+/*=================*/
+
+
+/*=================*/
+function closeMessages() {
+  const modal = document.getElementById("messagesModal");
+  if (modal) modal.remove();
+}
+/*=================*/
+
+
+
+
+
+/*=================*/
+async function loadMessages(conversationId) {
+
+  const { data: messages } =
+    await supabaseClient
+      .from("messages")
+      .select("*")
+      .eq("conversation_id", conversationId)
+      .order("created_at", { ascending: true });
+
+  const box = document.getElementById("chatMessages");
+  box.innerHTML = "";
+
+  messages.forEach(msg => {
+
+    const div = document.createElement("div");
+
+    div.className =
+      msg.sender_id === currentUser.id
+        ? "msg msg-me"
+        : "msg msg-other";
+
+    div.textContent = msg.message;
+
+    box.appendChild(div);
+  });
+
+  box.scrollTop = box.scrollHeight;
+
+await supabaseClient
+  .from("messages")
+  .update({ read_at: new Date().toISOString() })
+  .eq("conversation_id", conversationId)
+  .is("read_at", null)
+  .neq("sender_id", currentUser.id);
+
+
+
+}
+
+/*===========================*/
+async function sendMessage(conversationId) {
+
+  const input = document.getElementById("chatText");
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  await supabaseClient
+    .from("messages")
+    .insert([
+      {
+        conversation_id: conversationId,
+        sender_id: currentUser.id,
+        message: text
+      }
+    ]);
+
+  input.value = "";
+
+  loadMessages(conversationId);
+}
+function showNotificationBadge(button) {
+  if (!button.querySelector(".notify-badge")) {
+    const badge = document.createElement("span");
+    badge.className = "notify-badge";
+    badge.textContent = "1";
+    button.appendChild(badge);
+  }
+}
+function showToast(message) {
+  const toast = document.createElement("div");
+  toast.style.position = "fixed";
+  toast.style.bottom = "20px";
+  toast.style.left = "50%";
+  toast.style.transform = "translateX(-50%)";
+  toast.style.background = "#0066ff";
+  toast.style.color = "#fff";
+  toast.style.padding = "12px 18px";
+  toast.style.borderRadius = "10px";
+  toast.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+  toast.style.zIndex = "999999";
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.remove(), 3000);
+}
+/*===================================*/
+function subscribeToMessages(conversationId) {
+
+  supabaseClient
+    .channel(`conversation_${conversationId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "messages",
+        filter: `conversation_id=eq.${conversationId}`
+      },
+      payload => {
+
+        const msg = payload.new;
+
+        if (msg.sender_id !== currentUser.id) {
+
+          showToast("Nuovo messaggio ricevuto");
+
+          const buttons = document.querySelectorAll('[data-action="contact"]');
+          buttons.forEach(btn => showNotificationBadge(btn));
+
+          const box = document.getElementById("chatMessages");
+
+          if (box) {
+            const div = document.createElement("div");
+            div.className = "msg msg-other msg-unread";
+            div.textContent = msg.message;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+            return;
+          }
+        }
+
+        loadMessages(conversationId);
+        updateUnreadCount();
+      }
+    )
+    .subscribe();
+
+}
+
+
+/*===================================*/
+async function openConversation(otherUserId, tripId = null, requestId = null) {
+
+  if (tripId === "null") tripId = null;
+  if (requestId === "null") requestId = null;
 
   if (!currentUser) {
     openAuth("login");
     return;
   }
 
-  if (!userId) {
-    alert("Impossibile identificare l'utente.");
+  const otherUserName = await getUserName(otherUserId);
+
+  let query = supabaseClient
+    .from("conversations")
+    .select("*")
+    .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
+    .or(`participant_1.eq.${otherUserId},participant_2.eq.${otherUserId}`);
+
+  if (tripId !== null) query = query.eq("trip_id", tripId);
+  else query = query.is("trip_id", null);
+
+  if (requestId !== null) query = query.eq("request_id", requestId);
+  else query = query.is("request_id", null);
+
+  const { data: existing, error } = await query;
+
+  if (error) {
+    console.error("Errore Supabase:", error);
     return;
   }
 
-  if (userId === currentUser.id) {
-    alert("Non puoi contattare te stesso.");
-    return;
-  }
+  let conversation = existing && existing.length > 0 ? existing[0] : null;
 
-  alert("Chat in preparazione.");
-  
+  openChatModal(
+    conversation ? conversation.id : null,
+    otherUserName,
+    otherUserId,
+    tripId,
+    requestId
+  );
 }
-/* =====================================================
-   MESSAGGING
-===================================================== */
+
+
+
+
+
+
 
 
 /* =====================================================
@@ -8194,3 +8949,31 @@ window.rejectTravelTicket = function(ticketId) {
   }
 
 };
+function closeChat() {
+  const modal = document.getElementById("chatModal");
+  if (!modal) return;
+
+  modal.style.opacity = "0";
+  modal.style.transition = "opacity 0.25s";
+
+  setTimeout(() => modal.remove(), 250);
+}
+async function updateUnreadCount() {
+
+  const { data, error } = await supabaseClient
+    .from("messages")
+    .select("*")
+    .is("read_at", null)
+    .neq("sender_id", currentUser.id);
+
+  if (error || !data) {
+    console.warn("Errore unreadCount:", error);
+    document.getElementById("unreadCount").textContent = "";
+    return;
+  }
+
+  const count = data.length;
+
+  document.getElementById("unreadCount").textContent =
+    count > 0 ? `(${count})` : "";
+}
