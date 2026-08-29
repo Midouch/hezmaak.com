@@ -2854,7 +2854,7 @@ async function openMessages() {
       .from("messages")
       .select("*")
       .eq("conversation_id", conv.id)
-      .is("read", false)
+      .is("read_at", null)
       .neq("sender_id", currentUser.id);
 
     const isUnread = unreadMessages && unreadMessages.length > 0;
@@ -8951,7 +8951,7 @@ async function updateUnreadCount() {
   const { data } = await supabaseClient
     .from("messages")
     .select("*")
-    .is("read", false)
+    .is("read_at", null)
     .neq("sender_id", currentUser.id);
 
   const count = data.length;
