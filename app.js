@@ -8839,22 +8839,49 @@ async function markMessagesAsRead(conversationId) {
     console.error("Errore nel segnare i messaggi come letti:", error);
   }
 }
+/*=======================*/
 function minimizeChat() {
-  const chatModal = document.getElementById("chatModal");
-  const minimizedButton = document.getElementById("chatMinimized");
 
-  if (!chatModal || !minimizedButton) return;
+  const modal = document.getElementById("chatModal");
 
-  chatModal.classList.add("minimized");
-  minimizedButton.classList.add("show");
+  if (!modal) return;
+
+  modal.classList.add("minimized");
+
+  let minimizedButton = document.getElementById("chatMinimizedButton");
+
+  if (!minimizedButton) {
+
+    minimizedButton = document.createElement("button");
+
+    minimizedButton.id = "chatMinimizedButton";
+    minimizedButton.className = "chat-minimized-button";
+    minimizedButton.innerHTML = "💬";
+    minimizedButton.title = "Apri chat";
+
+    minimizedButton.onclick = function () {
+      restoreChat();
+    };
+
+    document.body.appendChild(minimizedButton);
+  }
 }
 
+
+
+/*=======================*/
 function restoreChat() {
-  const chatModal = document.getElementById("chatModal");
-  const minimizedButton = document.getElementById("chatMinimized");
 
-  if (!chatModal || !minimizedButton) return;
+  const modal = document.getElementById("chatModal");
 
-  chatModal.classList.remove("minimized");
-  minimizedButton.classList.remove("show");
+  if (!modal) return;
+
+  modal.classList.remove("minimized");
+
+  const minimizedButton =
+    document.getElementById("chatMinimizedButton");
+
+  if (minimizedButton) {
+    minimizedButton.remove();
+  }
 }
