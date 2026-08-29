@@ -4269,224 +4269,224 @@ openChatModal(
 /* =====================================================
    MESSAGGING
 ===================================================== */
+``
 async function openChatModal(
-conversationId,
-otherUserName,
-otherUserId,
-tripId,
-requestId
+  conversationId,
+  otherUserName,
+  otherUserId,
+  tripId,
+  requestId
 ) {
 
-// Se esiste già una chat aperta, la rimuove
-const oldModal = document.getElementById("chatModal");
-if (oldModal) {
-oldModal.remove();
-}
+  // Elimina eventuale chat già aperta
+  const oldModal = document.getElementById("chatModal");
 
-const oldMinimized = document.getElementById("chatMinimizedButton");
-if (oldMinimized) {
-oldMinimized.remove();
-}
+  if (oldModal) {
+    oldModal.remove();
+  }
 
-const modal = document.createElement("div");
-modal.id = "chatModal";
-modal.className = "chat-modal";
+  // Elimina eventuale pulsante minimizzato
+  const oldButton = document.getElementById("chatMinimizedButton");
 
-modal.innerHTML = ` <div class="chat-box">
+  if (oldButton) {
+    oldButton.remove();
+  }
 
-```
-  <div class="chat-header">
+  // Crea la finestra chat
+  const modal = document.createElement("div");
 
-    <span>${otherUserName}</span>
+  modal.id = "chatModal";
+  modal.className = "chat-modal";
 
-    <div class="chat-header-buttons">
+  modal.innerHTML = `
+    <div class="chat-box">
 
-      <button
-        type="button"
-        class="chat-minimize"
-        onclick="minimizeChat()"
-        title="Minimizza"
-      >−</button>
+      <div class="chat-header">
 
-      <button
-        type="button"
-        class="chat-close"
-        onclick="closeChat()"
-        title="Chiudi"
-      >×</button>
+        <span>${otherUserName || "Chat"}</span>
+
+        <div>
+
+          <button
+            type="button"
+            class="chat-minimize"
+            onclick="minimizeChat()"
+            title="Minimizza"
+          >−</button>
+
+          <button
+            type="button"
+            class="chat-close"
+            onclick="closeChat()"
+            title="Chiudi"
+          >×</button>
+
+        </div>
+
+      </div>
+
+      <div
+        id="chatMessages"
+        class="chat-messages"
+      ></div>
+
+      <div
+        id="typingIndicator"
+        class="typing"
+      ></div>
+
+      <div class="chat-input">
+
+        <input
+          id="chatText"
+          type="text"
+          placeholder="Scrivi un messaggio..."
+        >
+
+        <button
+          type="button"
+          onclick="sendMessage(
+            '${conversationId}',
+            '${otherUserId}',
+            '${tripId || ""}',
+            '${requestId || ""}'
+          )"
+        >
+          Invia
+        </button>
+
+      </div>
 
     </div>
+  `;
 
-  </div>
+  document.body.appendChild(modal);
 
-  <div id="chatMessages" class="chat-messages"></div>
+  // Carica i messaggi
+  if (conversationId) {
 
-  <div id="typingIndicator" class="typing"></div>
+    loadMessages(conversationId);
 
-  <div class="chat-input">
+    subscribeToMessages(conversationId);
 
-    <input
-      id="chatText"
-      type="text"
-      placeholder="Scrivi un messaggio..."
-    >
+    if (typeof markMessagesAsRead === "function") {
+      await markMessagesAsRead(conversationId);
+    }
 
-    <button
-      type="button"
-      onclick="sendMessage(
-        '${conversationId}',
-        '${otherUserId}',
-        '${tripId}',
-        '${requestId}'
-      )"
-    >
-      Invia
-    </button>
+    if (typeof updateUnreadCount === "function") {
+      await updateUnreadCount();
+    }
+  }
 
-  </div>
+  // Rimuove i badge delle notifiche
+  document
+    .querySelectorAll(".notify-badge")
+    .forEach(function(badge) {
+      badge.remove();
+    });
 
-</div>
-```
+  // Attiva il sistema "sta scrivendo"
+  if (typeof setupTyping === "function") {
 
-`;
+    setupTyping(
+      conversationId,
+      otherUserName || "Utente"
+    );
 
-document.body.appendChild(modal);
-
-if (conversationId) {
-
-```
-loadMessages(conversationId);
-
-subscribeToMessages(conversationId);
-
-// Segna come letti i messaggi ricevuti
-await markMessagesAsRead(conversationId);
-
-// Aggiorna il numero nel profilo
-await updateUnreadCount();
-```
-
+  }
 }
 
-document
-.querySelectorAll(".notify-badge")
-.forEach(b => b.remove());
-
-setupTyping(
-conversationId,
-otherUserName
-);
-}
 
 /* =====================================================
-MINIMIZZA CHAT
+   MINIMIZZA CHAT
 ===================================================== */
 
 function minimizeChat() {
 
-const chat = document.getElementById("chatModal");
+  const modal = document.getElementById("chatModal");
 
-if (!chat) {
-return;
+  if (!modal) {
+    return;
+  }
+
+  // Nasconde la chat
+  modal.style.display = "none";
+
+  // Controlla se esiste già il pulsante
+  let button = document.getElementById("chatMinimizedButton");
+
+  if (!button) {
+
+    button = document.createElement("button");
+
+    button.id = "chatMinimizedButton";
+
+    button.className = "chat-minimized-button";
+
+    button.type = "button";
+
+    button.title = "Apri chat";
+
+    button.innerHTML = "💬";
+
+    button.onclick = function() {
+      restoreChat();
+    };
+
+    document.body.appendChild(button);
+  }
+
+  // Mostra il pulsante
+  button.style.display = "flex";
 }
 
-// Nasconde la chat
-chat.style.display = "none";
-
-// Crea il pulsante della chat minimizzata
-let minimizedButton =
-document.getElementById("chatMinimizedButton");
-
-if (!minimizedButton) {
-
-```
-minimizedButton = document.createElement("button");
-
-minimizedButton.id = "chatMinimizedButton";
-
-minimizedButton.className = "chat-minimized-button";
-
-minimizedButton.type = "button";
-
-minimizedButton.title = "Apri chat";
-
-minimizedButton.innerHTML = "💬";
-
-minimizedButton.onclick = function () {
-  restoreChat();
-};
-
-document.body.appendChild(minimizedButton);
-```
-
-}
-
-minimizedButton.style.display = "flex";
-}
 
 /* =====================================================
-RIAPRI CHAT
+   RIAPRI CHAT
 ===================================================== */
 
 function restoreChat() {
 
-const chat = document.getElementById("chatModal");
+  const modal = document.getElementById("chatModal");
 
-const minimizedButton =
-document.getElementById("chatMinimizedButton");
+  const button = document.getElementById("chatMinimizedButton");
 
-if (chat) {
+  if (modal) {
 
-```
-chat.style.display = "flex";
-```
+    modal.style.display = "flex";
 
+  }
+
+  if (button) {
+
+    button.remove();
+
+  }
 }
 
-if (minimizedButton) {
-
-```
-minimizedButton.style.display = "none";
-```
-
-}
-}
 
 /* =====================================================
-CHIUDI CHAT
+   CHIUDI CHAT
 ===================================================== */
 
 function closeChat() {
 
-const chat = document.getElementById("chatModal");
+  const modal = document.getElementById("chatModal");
 
-const minimizedButton =
-document.getElementById("chatMinimizedButton");
+  if (modal) {
 
-if (chat) {
-chat.remove();
+    modal.remove();
+
+  }
+
+  const button = document.getElementById("chatMinimizedButton");
+
+  if (button) {
+
+    button.remove();
+
+  }
 }
-
-if (minimizedButton) {
-minimizedButton.remove();
-}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*=================*/
 let typingTimeout;
