@@ -1984,12 +1984,22 @@ html[dir="rtl"] select {
   margin-bottom: 10px;
   font-size: 15px;
   line-height: 1.4;
-  display: inline-block;
+  display: block;
+  width: fit-content;
+}
+.msg-me {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.msg-other {
+  margin-left: 0;
+  margin-right: auto;
 }
 
 /* Messaggi dell'utente (destra) */
 .msg-me {
-  background: #0084ff;
+  background: #00ff91;
   color: white;
   margin-left: auto;
   text-align: right;
@@ -2019,7 +2029,11 @@ html[dir="rtl"] select {
 .msg {
   animation: msgPop 0.15s ease-out;
 }
-
+.msg-unread {
+  font-weight: 600;
+  background: #e8f1ff;
+  border-left: 4px solid #007bff;
+}
 /* Modal responsive */
 .chat-modal {
   position: fixed;
@@ -2069,7 +2083,11 @@ html[dir="rtl"] select {
 .msg {
   animation: msgPop 0.15s ease-out;
 }
-
+.msg-unread {
+  font-weight: 600;
+  background: #e8f1ff;
+  border-left: 4px solid #007bff;
+}
 .msg-status {
   font-size: 11px;
   color: #999;
@@ -2216,26 +2234,15 @@ group.appendChild(status);
   font-weight: 600;
   position: relative;
 }
-/* ================================
-   MESSAGGI NON LETTI
-================================ */
-
-.msg-unread {
-  position: relative;
-  font-weight: 700 !important;
-  background: #e8f1ff !important;
-  border-left: 4px solid #0066ff !important;
-  box-shadow: 0 2px 8px rgba(0, 102, 255, 0.15);
-}
 
 .msg-unread::before {
   content: "";
-  position: absolute;
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   background: #0066ff;
   border-radius: 50%;
-  left: -15px;
+  position: absolute;
+  left: -12px;
   top: 50%;
   transform: translateY(-50%);
 }
