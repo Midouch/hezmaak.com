@@ -2283,7 +2283,7 @@ html[dir="rtl"] select {
    ma NON viene eliminata dal DOM.
 */
 
-.chat-modal.minimized {
+.messages-modal.minimized {
   display: none !important;
 }
 
@@ -2293,7 +2293,7 @@ html[dir="rtl"] select {
    viene minimizzata.
 */
 
-.chat-minimized-button {
+.messages-minimized-button {
   position: fixed;
 
   right: 20px;
@@ -2329,7 +2329,7 @@ html[dir="rtl"] select {
   transition: transform .2s ease;
 }
 
-.chat-minimized-button:hover {
+.messages-minimized-button:hover {
   transform: scale(1.08);
 }
 
@@ -2407,7 +2407,7 @@ body.dark .typing {
     font-size: 16px;
   }
 
-  .chat-minimized-button {
+  .messages-minimized-button {
     right: 15px;
 
     bottom: 15px;
