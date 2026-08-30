@@ -2820,11 +2820,7 @@ async function refreshChatActionButtons(conversationId) {
   const { data: conv, error } =
     await supabaseClient
       .from("conversations")
-      .select(`
-        *,
-        trips(travel_date),
-        requests(needed_date)
-      `)
+      .select("*")
       .eq("id", conversationId)
       .single();
 
@@ -2837,16 +2833,6 @@ async function refreshChatActionButtons(conversationId) {
     document.getElementById("chatActions");
 
   if (!container) return;
-
-  const relevantDate =
-    conv.trips?.travel_date ||
-    conv.requests?.needed_date ||
-    null;
-
-  const dateHasPassed =
-    relevantDate
-      ? new Date(relevantDate + "T00:00:00") < new Date()
-      : true;
 
   const bothConfirmed =
     conv.confirmed_by_1 && conv.confirmed_by_2;
@@ -2864,7 +2850,7 @@ async function refreshChatActionButtons(conversationId) {
 
   let html = "";
 
-  if (bothConfirmed && dateHasPassed) {
+  if (bothConfirmed) {
 
     if (!alreadyReviewed) {
 
@@ -2889,48 +2875,7 @@ async function refreshChatActionButtons(conversationId) {
         <div class="chat-action-banner done">
           <div class="chat-action-icon">✓</div>
           <div class="chat-action-text">
-            <strong>Recensione inviata</strong>
-            <span>Grazie per il tuo feedback</span>
-          </div>
-        </div>
-      `;
-
-    }
-
-  } else if (myConfirmation) {
-
-    html = `
-      <div class="chat-action-banner pending">
-        <div class="chat-action-icon">⏳</div>
-        <div class="chat-action-text">
-          <strong>Conferma inviata</strong>
-          <span>In attesa dell'altra parte</span>
-        </div>
-      </div>
-    `;
-
-  } else {
-
-    html = `
-      <div class="chat-action-banner neutral">
-        <div class="chat-action-icon">📦</div>
-        <div class="chat-action-text">
-          <strong>Consegna avvenuta?</strong>
-          <span>Conferma quando l'oggetto è arrivato</span>
-        </div>
-        <button
-          class="chat-action-button secondary"
-          onclick="confirmDelivery('${conversationId}')">
-          Conferma
-        </button>
-      </div>
-    `;
-
-  }
-
-  container.innerHTML = html;
-
-}
+            <strong>Recensione
 
 
 async function hasAlreadyReviewed(conversationId) {
