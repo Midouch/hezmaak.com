@@ -2418,7 +2418,128 @@ body.dark .typing {
   }
 
 }
-```
+.chat-actions {
+  padding: 10px 12px;
+}
+
+.chat-action-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #e5e5e5);
+  background: #fafafa;
+}
+
+.chat-action-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  background: #eee;
+}
+
+.chat-action-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.chat-action-text strong {
+  font-size: 13.5px;
+  color: #1a1a1a;
+}
+
+.chat-action-text span {
+  font-size: 12.5px;
+  color: #777;
+}
+
+.chat-action-button {
+  flex-shrink: 0;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chat-action-button.primary {
+  background: #0066ff;
+  color: #fff;
+}
+
+.chat-action-button.secondary {
+  background: #111;
+  color: #fff;
+}
+
+/* Stati colorati */
+.chat-action-banner.success {
+  background: #eafbf1;
+  border-color: #b7ecd0;
+}
+
+.chat-action-banner.success .chat-action-icon {
+  background: #22c55e;
+  color: #fff;
+}
+
+.chat-action-banner.done {
+  background: #f4f4f5;
+  border-color: #e4e4e7;
+}
+
+.chat-action-banner.pending {
+  background: #fff8e6;
+  border-color: #ffe3a3;
+}
+
+.chat-action-banner.pending .chat-action-icon {
+  background: #f5a623;
+  color: #fff;
+}
+
+.chat-action-banner.neutral {
+  background: #f0f6ff;
+  border-color: #cfe3ff;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 480px) {
+
+  .chat-action-banner {
+    flex-wrap: wrap;
+    padding: 12px;
+  }
+
+  .chat-action-text {
+    flex-basis: 100%;
+    order: 2;
+  }
+
+  .chat-action-icon {
+    order: 1;
+  }
+
+  .chat-action-button {
+    order: 3;
+    flex-basis: 100%;
+    margin-top: 6px;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+}
 .chat-actions {
   padding: 8px 12px;
   border-top: 1px solid var(--border-color, #eee);
