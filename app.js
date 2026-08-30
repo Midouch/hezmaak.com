@@ -2829,7 +2829,7 @@ async function refreshChatActionButtons(conversationId) {
   const dateHasPassed =
     relevantDate
       ? new Date(relevantDate + "T00:00:00") < new Date()
-      : true; // se non c'è nessuna data collegata, non blocchiamo
+      : true;
 
   const bothConfirmed =
     conv.confirmed_by_1 && conv.confirmed_by_2;
@@ -2852,21 +2852,30 @@ async function refreshChatActionButtons(conversationId) {
     if (!alreadyReviewed) {
 
       html = `
-        <button
-          class="primary"
-          onclick="openReviewForm('${conversationId}')">
-
-          ⭐ Lascia una recensione
-
-        </button>
+        <div class="chat-action-banner success">
+          <div class="chat-action-icon">✓</div>
+          <div class="chat-action-text">
+            <strong>Consegna confermata</strong>
+            <span>Com'è andata? Lascia una recensione.</span>
+          </div>
+          <button
+            class="chat-action-button primary"
+            onclick="openReviewForm('${conversationId}')">
+            ⭐ Recensisci
+          </button>
+        </div>
       `;
 
     } else {
 
       html = `
-        <span class="chat-completed-label">
-          ✓ Recensione già lasciata
-        </span>
+        <div class="chat-action-banner done">
+          <div class="chat-action-icon">✓</div>
+          <div class="chat-action-text">
+            <strong>Recensione inviata</strong>
+            <span>Grazie per il tuo feedback</span>
+          </div>
+        </div>
       `;
 
     }
@@ -2874,21 +2883,30 @@ async function refreshChatActionButtons(conversationId) {
   } else if (myConfirmation) {
 
     html = `
-      <span class="chat-pending-label">
-        ⏳ In attesa della conferma dell'altra parte
-      </span>
+      <div class="chat-action-banner pending">
+        <div class="chat-action-icon">⏳</div>
+        <div class="chat-action-text">
+          <strong>Conferma inviata</strong>
+          <span>In attesa dell'altra parte</span>
+        </div>
+      </div>
     `;
 
   } else {
 
     html = `
-      <button
-        class="secondary"
-        onclick="confirmDelivery('${conversationId}')">
-
-        ✓ Conferma consegna
-
-      </button>
+      <div class="chat-action-banner neutral">
+        <div class="chat-action-icon">📦</div>
+        <div class="chat-action-text">
+          <strong>Consegna avvenuta?</strong>
+          <span>Conferma quando l'oggetto è arrivato</span>
+        </div>
+        <button
+          class="chat-action-button secondary"
+          onclick="confirmDelivery('${conversationId}')">
+          Conferma
+        </button>
+      </div>
     `;
 
   }
