@@ -2732,9 +2732,190 @@ function closeMessages() {
   }
 
 }
+/*==============*/
+ /* =====================================================
+   CONFERMA CONSEGNA
+===================================================== */
 
- 
+async function confirmDelivery(conversationId) {
 
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const { data: conv, error: fetchError } =
+    await supabaseClient
+      .from("conversations")
+      .select("*")
+      .eq("id", conversationId)
+      .single();
+
+  if (fetchError) {
+    alert("Errore: " + fetchError.message);
+    return;
+  }
+
+  const isParticipant1 = conv.participant_1 === currentUser.id;
+
+  const updateField =
+    isParticipant1
+      ? { confirmed_by_1: true }
+      : { confirmed_by_2: true };
+
+  // Controlla se con questa conferma sono entrambe true
+  const bothConfirmed =
+    isParticipant1
+      ? true && conv.confirmed_by_2
+      : conv.confirmed_by_1 && true;
+
+  if (bothConfirmed) {
+    updateField.completed_at = new Date().toISOString();
+  }
+
+  const { error: updateError } =
+    await supabaseClient
+      .from("conversations")
+      .update(updateField)
+      .eq("id", conversationId);
+
+  if (updateError) {
+    alert("Errore: " + updateError.message);
+    return;
+  }
+
+  if (bothConfirmed) {
+    showToast("✓ Consegna confermata da entrambe le parti!");
+  } else {
+    showToast("✓ Conferma registrata. In attesa dell'altra parte.");
+  }
+
+  // Ricarica lo stato della chat per aggiornare i bottoni
+  await refreshChatActionButtons(conversationId);
+
+}
+/* =====================================================
+   AGGIORNA BOTTONI AZIONE CHAT
+===================================================== */
+
+async function refreshChatActionButtons(conversationId) {
+
+  const { data: conv, error } =
+    await supabaseClient
+      .from("conversations")
+      .select(`
+        *,
+        trips(travel_date),
+        requests(needed_date)
+      `)
+      .eq("id", conversationId)
+      .single();
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const container =
+    document.getElementById("chatActions");
+
+  if (!container) return;
+
+  const relevantDate =
+    conv.trips?.travel_date ||
+    conv.requests?.needed_date ||
+    null;
+
+  const dateHasPassed =
+    relevantDate
+      ? new Date(relevantDate + "T00:00:00") < new Date()
+      : true; // se non c'è nessuna data collegata, non blocchiamo
+
+  const bothConfirmed =
+    conv.confirmed_by_1 && conv.confirmed_by_2;
+
+  const isParticipant1 =
+    conv.participant_1 === currentUser.id;
+
+  const myConfirmation =
+    isParticipant1
+      ? conv.confirmed_by_1
+      : conv.confirmed_by_2;
+
+  const alreadyReviewed =
+    await hasAlreadyReviewed(conversationId);
+
+  let html = "";
+
+  if (bothConfirmed && dateHasPassed) {
+
+    if (!alreadyReviewed) {
+
+      html = `
+        <button
+          class="primary"
+          onclick="openReviewForm('${conversationId}')">
+
+          ⭐ Lascia una recensione
+
+        </button>
+      `;
+
+    } else {
+
+      html = `
+        <span class="chat-completed-label">
+          ✓ Recensione già lasciata
+        </span>
+      `;
+
+    }
+
+  } else if (myConfirmation) {
+
+    html = `
+      <span class="chat-pending-label">
+        ⏳ In attesa della conferma dell'altra parte
+      </span>
+    `;
+
+  } else {
+
+    html = `
+      <button
+        class="secondary"
+        onclick="confirmDelivery('${conversationId}')">
+
+        ✓ Conferma consegna
+
+      </button>
+    `;
+
+  }
+
+  container.innerHTML = html;
+
+}
+
+
+async function hasAlreadyReviewed(conversationId) {
+
+  const { data, error } =
+    await supabaseClient
+      .from("reviews")
+      .select("id")
+      .eq("conversation_id", conversationId)
+      .eq("reviewer_id", currentUser.id)
+      .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    return false;
+  }
+
+  return !!data;
+
+}
 
 /*======================*/
 
@@ -4382,6 +4563,11 @@ async function openChatModal(
         class="typing"
       ></div>
 
+      <div
+        id="chatActions"
+        class="chat-actions"
+      ></div>
+
       <div class="chat-input">
 
         <input
@@ -4587,8 +4773,27 @@ async function openChatModal(
 
   }
 
-}
 
+  /* -----------------------------------------
+     Bottoni conferma/recensione
+  ----------------------------------------- */
+
+  try {
+
+    await refreshChatActionButtons(
+      conversationId
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Errore bottoni azione chat:",
+      error
+    );
+
+  }
+
+}
 
 
 /* =====================================================
