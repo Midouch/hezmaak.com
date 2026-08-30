@@ -9624,3 +9624,21 @@ async function submitReview(conversationId, otherUserId) {
   }, 1000);
 
 }
+async function hasAlreadyReviewed(conversationId) {
+
+  const { data, error } =
+    await supabaseClient
+      .from("reviews")
+      .select("id")
+      .eq("conversation_id", conversationId)
+      .eq("reviewer_id", currentUser.id)
+      .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    return false;
+  }
+
+  return !!data;
+
+}
