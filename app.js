@@ -4278,96 +4278,62 @@ async function openChatModal(
   requestId
 ) {
 
-  if (!conversationId) {
-    console.error("conversationId mancante");
-    return;
+  // Elimina eventuale chat già aperta
+  const oldModal = document.getElementById("chatModal");
+
+  if (oldModal) {
+    oldModal.remove();
   }
 
-  /* -----------------------------------------
-     Rimuove eventuale chat singola precedente
-  ----------------------------------------- */
+  // Elimina eventuale pulsante minimizzato
+  const oldButton = document.getElementById("chatMinimizedButton");
 
-  const oldChat =
-    document.getElementById("chatModal");
-
-  if (oldChat) {
-    oldChat.remove();
+  if (oldButton) {
+    oldButton.remove();
   }
 
+  // Crea la finestra chat
+  const modal = document.createElement("div");
 
-  /* -----------------------------------------
-     Rimuove eventuale pulsante chat minimizzata
-  ----------------------------------------- */
-
-  const oldChatButton =
-    document.getElementById("chatMinimizedButton");
-
-  if (oldChatButton) {
-    oldChatButton.remove();
-  }
-
-
-  /* -----------------------------------------
-     Crea modal chat
-  ----------------------------------------- */
-
-  const modal =
-    document.createElement("div");
-
-  modal.id =
-    "chatModal";
-
-  modal.className =
-    "chat-modal";
-
+  modal.id = "chatModal";
+  modal.className = "chat-modal";
 
   modal.innerHTML = `
     <div class="chat-box">
 
       <div class="chat-header">
 
-        <span>
-          ${escapeHtml(
-            otherUserName || "Chat"
-          )}
-        </span>
+        <span>${otherUserName || "Chat"}</span>
 
         <div>
 
           <button
             type="button"
             class="chat-minimize"
-            onclick="minimizeMessages()"
+            onclick="minimizeChat()"
             title="Minimizza"
-          >
-            −
-          </button>
+          >−</button>
 
           <button
             type="button"
             class="chat-close"
-            onclick="closeMessages()"
+            onclick="closeChat()"
             title="Chiudi"
-          >
-            ×
-          </button>
+          >×</button>
 
         </div>
 
       </div>
-
 
       <div
         id="chatMessages"
         class="chat-messages"
       ></div>
 
-
       <div
         id="typingIndicator"
         class="typing"
       ></div>
-
 
       <div class="chat-input">
 
@@ -4375,12 +4341,16 @@ async function openChatModal(
           id="chatText"
           type="text"
           placeholder="Scrivi un messaggio..."
-          autocomplete="off"
         >
 
         <button
           type="button"
-          id="sendMessageButton"
+          onclick="sendMessage(
+            '${conversationId}',
+            '${otherUserId}',
+            '${tripId || ""}',
+            '${requestId || ""}'
+          )"
         >
           Invia
         </button>
@@ -4390,204 +4360,40 @@ async function openChatModal(
     </div>
   `;
 
-
   document.body.appendChild(modal);
 
+  // Carica i messaggi
+  if (conversationId) {
 
-  /* -----------------------------------------
-     Pulsante INVIA
-  ----------------------------------------- */
+    loadMessages(conversationId);
 
-  const sendButton =
-    document.getElementById(
-      "sendMessageButton"
-    );
+    subscribeToMessages(conversationId);
 
-
-  if (sendButton) {
-
-    sendButton.onclick =
-      function() {
-
-        sendMessage(
-          conversationId,
-          otherUserId,
-          tripId || "",
-          requestId || ""
-        );
-
-      };
-
-  }
-
-
-  /* -----------------------------------------
-     Invio con ENTER
-  ----------------------------------------- */
-
-  const chatInput =
-    document.getElementById(
-      "chatText"
-    );
-
-
-  if (chatInput) {
-
-    chatInput.addEventListener(
-      "keydown",
-      function(event) {
-
-        if (
-          event.key === "Enter" &&
-          !event.shiftKey
-        ) {
-
-          event.preventDefault();
-
-          if (sendButton) {
-            sendButton.click();
-          }
-
-        }
-
-      }
-    );
-
-  }
-
-
-  /* -----------------------------------------
-     Carica messaggi
-  ----------------------------------------- */
-
-  try {
-
-    await loadMessages(
-      conversationId
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Errore caricamento messaggi:",
-      error
-    );
-
-  }
-
-
-  /* -----------------------------------------
-     Realtime
-  ----------------------------------------- */
-
-  try {
-
-    subscribeToMessages(
-      conversationId
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Errore realtime:",
-      error
-    );
-
-  }
-
-
-  /* -----------------------------------------
-     Segna messaggi come letti
-  ----------------------------------------- */
-
-  if (
-    typeof markMessagesAsRead ===
-    "function"
-  ) {
-
-    try {
-
-      await markMessagesAsRead(
-        conversationId
-      );
-
-    } catch (error) {
-
-      console.error(
-        "Errore marcatura messaggi letti:",
-        error
-      );
-
+    if (typeof markMessagesAsRead === "function") {
+      await markMessagesAsRead(conversationId);
     }
 
-  }
-
-
-  /* -----------------------------------------
-     Aggiorna contatore
-  ----------------------------------------- */
-
-  if (
-    typeof updateUnreadCount ===
-    "function"
-  ) {
-
-    try {
-
+    if (typeof updateUnreadCount === "function") {
       await updateUnreadCount();
-
-    } catch (error) {
-
-      console.error(
-        "Errore aggiornamento notifiche:",
-        error
-      );
-
     }
-
   }
 
-
-  /* -----------------------------------------
-     Rimuove badge visuali
-  ----------------------------------------- */
-
+  // Rimuove i badge delle notifiche
   document
     .querySelectorAll(".notify-badge")
-    .forEach(
-      function(badge) {
-        badge.remove();
-      }
+    .forEach(function(badge) {
+      badge.remove();
+    });
+
+  // Attiva il sistema "sta scrivendo"
+  if (typeof setupTyping === "function") {
+
+    setupTyping(
+      conversationId,
+      otherUserName || "Utente"
     );
 
-
-  /* -----------------------------------------
-     Typing
-  ----------------------------------------- */
-
-  if (
-    typeof setupTyping ===
-    "function"
-  ) {
-
-    try {
-
-      setupTyping(
-        conversationId,
-        otherUserName || "Utente"
-      );
-
-    } catch (error) {
-
-      console.error(
-        "Errore typing:",
-        error
-      );
-
-    }
-
   }
-
 }
 
 
