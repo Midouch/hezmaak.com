@@ -4308,6 +4308,7 @@ async function openChatModal(
 
 
 /* =====================================================*/
+
 async function openMessages() {
 
   if (!currentUser) {
@@ -4325,7 +4326,7 @@ async function openMessages() {
       .order("created_at", { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error("Errore caricamento conversazioni:", error);
     alert("Errore nel caricamento dei messaggi.");
     return;
   }
@@ -4345,6 +4346,7 @@ async function openMessages() {
     oldButton.remove();
   }
 
+  // Crea la finestra della lista messaggi
   const modal = document.createElement("div");
 
   modal.id = "messagesModal";
@@ -4387,6 +4389,7 @@ async function openMessages() {
       >
   `;
 
+  // Crea la lista delle conversazioni
   for (const conv of conversations) {
 
     const otherUserId =
@@ -4397,6 +4400,7 @@ async function openMessages() {
     const otherUserName =
       await getUserName(otherUserId);
 
+    // Messaggi non letti
     const { data: unreadMessages } =
       await supabaseClient
         .from("messages")
@@ -4409,6 +4413,7 @@ async function openMessages() {
       unreadMessages &&
       unreadMessages.length > 0;
 
+    // Ultimo messaggio
     const { data: lastMsg } =
       await supabaseClient
         .from("messages")
@@ -4422,26 +4427,77 @@ async function openMessages() {
 
     const preview =
       lastMsg?.message
-        ? lastMsg.message.substring(0, 40) +
-          (lastMsg.message.length > 40 ? "..." : "")
+        ? (
+            lastMsg.message.length > 40
+              ? lastMsg.message.substring(0, 40) + "..."
+              : lastMsg.message
+          )
         : "Nessun messaggio";
 
     html += `
       <div
         class="conversation-item ${isUnread ? "unread" : ""}"
-        onclick="openConversation(
-          '${otherUserId}',
-          '${conv.trip_id || ""}',
-          '${conv.request_id || ""}'
-        )"
+        data-conversation-id="${conv.id}"
+        data-other-user-id="${otherUserId}"
+        data-other-user-name="${String(
+          otherUserName || "Utente"
+        ).replace(/"/g, "&quot;")}"
+        data-trip-id="${conv.trip_id || ""}"
+        data-request-id="${conv.request_id || ""}"
       >
 
-        <strong>${otherUserName}</strong>
+        <div class="conversation-avatar">
+          👤
+        </div>
 
-        <br>
+        <div class="conversation-content">
 
-        <span>${preview}</span>
+          <div class="conversation-top">
 
+            <strong>
+              ${otherUserName || "Utente"}
+            </strong>
+
+          </div>
+
+          <div
+            class="conversation-preview ${
+              isUnread
+                ? "conversation-preview-unread"
+                : ""
+            }"
+          >
+            ${preview}
+          </div>
+
+        </div>
+
+        ${
+          isUnread
+            ? `
+              <div class="conversation-unread-count">
+                ${unreadMessages.length}
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+    `;
+  }
+
+  // Se non ci sono conversazioni
+  if (!conversations || conversations.length === 0) {
+
+    html += `
+      <div
+        style="
+          text-align:center;
+          padding:40px 20px;
+          color:#777;
+        "
+      >
+        Nessun messaggio
       </div>
     `;
   }
@@ -4452,10 +4508,54 @@ async function openMessages() {
     </div>
   `;
 
+  // Inserisce HTML nella finestra
   modal.innerHTML = html;
 
+  // Inserisce la finestra nella pagina
   document.body.appendChild(modal);
 
+  // =====================================================
+  /* APERTURA DELLA CHAT SINGOLA*/
+  /* =====================================================*/
+
+  modal
+    .querySelectorAll(".conversation-item")
+    .forEach(function(item) {
+
+      item.addEventListener("click", function() {
+
+        const conversationId =
+          item.dataset.conversationId;
+
+        const otherUserId =
+          item.dataset.otherUserId;
+
+        const otherUserName =
+          item.dataset.otherUserName;
+
+        const tripId =
+          item.dataset.tripId || null;
+
+        const requestId =
+          item.dataset.requestId || null;
+
+        // Chiude la lista
+        modal.remove();
+
+        // Apre la conversazione singola
+        openChatModal(
+          conversationId,
+          otherUserName,
+          otherUserId,
+          tripId,
+          requestId
+        );
+
+      });
+
+    });
+
+  // Aggiorna il contatore notifiche
   if (typeof updateUnreadCount === "function") {
     updateUnreadCount();
   }
@@ -4478,7 +4578,7 @@ function minimizeMessages() {
   // Nasconde la lista
   modal.style.display = "none";
 
-  // Controlla se esiste già il pulsante
+  // Crea il pulsante se non esiste
   let button =
     document.getElementById(
       "messagesMinimizedButton"
@@ -4558,7 +4658,6 @@ function closeMessages() {
     button.remove();
   }
 }
-
 
 
 
