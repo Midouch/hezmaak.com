@@ -4317,7 +4317,6 @@ openChatModal(
 /* =====================================================
    MESSAGGING
 ===================================================== */
-``
 async function openChatModal(
   conversationId,
   otherUserName,
@@ -4393,6 +4392,7 @@ async function openChatModal(
 
         <button
           type="button"
+          id="sendMessageButton"
           onclick="sendMessage(
             '${conversationId}',
             '${otherUserId}',
@@ -4419,23 +4419,6 @@ async function openChatModal(
     document.getElementById(
       "sendMessageButton"
     );
-
-
-  if (sendButton) {
-
-    sendButton.onclick =
-      function() {
-
-        sendMessage(
-          conversationId,
-          otherUserId,
-          tripId || "",
-          requestId || ""
-        );
-
-      };
-
-  }
 
 
   /* -----------------------------------------
@@ -4606,8 +4589,6 @@ async function openChatModal(
 
 }
 
-
-  
 
 
 /* =====================================================
