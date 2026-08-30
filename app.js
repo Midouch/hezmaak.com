@@ -2733,6 +2733,118 @@ function closeMessages() {
 
 }
 /*==============*/
+/* =====================================================
+   CONFERMA ACCORDO (chiude viaggio/richiesta dalla lista pubblica)
+===================================================== */
+
+async function confirmAgreement(conversationId) {
+
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const { data: conv, error: fetchError } =
+    await supabaseClient
+      .from("conversations")
+      .select("*")
+      .eq("id", conversationId)
+      .single();
+
+  if (fetchError) {
+    alert("Errore: " + fetchError.message);
+    return;
+  }
+
+  const isParticipant1 = conv.participant_1 === currentUser.id;
+
+  const updateField =
+    isParticipant1
+      ? { agreement_confirmed_by_1: true }
+      : { agreement_confirmed_by_2: true };
+
+  const bothConfirmed =
+    isParticipant1
+      ? true && conv.agreement_confirmed_by_2
+      : conv.agreement_confirmed_by_1 && true;
+
+  if (bothConfirmed) {
+    updateField.agreement_reached_at = new Date().toISOString();
+  }
+
+  const { error: updateError } =
+    await supabaseClient
+      .from("conversations")
+      .update(updateField)
+      .eq("id", conversationId);
+
+  if (updateError) {
+    alert("Errore: " + updateError.message);
+    return;
+  }
+
+  // Se entrambi hanno confermato, chiudi viaggio/richiesta dalla lista pubblica
+  if (bothConfirmed) {
+
+    if (conv.trip_id) {
+
+      await supabaseClient
+        .from("trips")
+        .update({ status: "in_progress" })
+        .eq("id", conv.trip_id);
+
+    }
+
+    if (conv.request_id) {
+
+      await supabaseClient
+        .from("requests")
+        .update({ status: "closed" })
+        .eq("id", conv.request_id);
+
+    }
+
+    // Aggiorna le liste pubbliche se sono a schermo
+    if (typeof loadTrips === "function") loadTrips();
+    if (typeof loadRequests === "function") loadRequests();
+
+  }
+
+  // Messaggio di sistema per notificare l'altra parte
+  const myName = await getUserName(currentUser.id);
+
+  const systemText =
+    bothConfirmed
+      ? `🤝 ${myName} ha confermato l'accordo. Accordo raggiunto! Il viaggio/richiesta non è più visibile pubblicamente.`
+      : `🤝 ${myName} ha confermato l'accordo. In attesa della tua conferma.`;
+
+  await supabaseClient
+    .from("messages")
+    .insert([
+      {
+        conversation_id: conversationId,
+        sender_id: currentUser.id,
+        message: systemText,
+        is_system: true
+      }
+    ]);
+
+  if (bothConfirmed) {
+    showToast("🤝 Accordo confermato da entrambe le parti!");
+  } else {
+    showToast("🤝 Conferma registrata. In attesa dell'altra parte.");
+  }
+
+  await refreshChatActionButtons(conversationId);
+
+}
+
+
+
+
+
+
+
  /* =====================================================
    CONFERMA CONSEGNA
 ===================================================== */
@@ -2833,13 +2945,21 @@ async function refreshChatActionButtons(conversationId) {
 
   if (!container) return;
 
-  const bothConfirmed =
-    conv.confirmed_by_1 && conv.confirmed_by_2;
-
   const isParticipant1 =
     conv.participant_1 === currentUser.id;
 
-  const myConfirmation =
+  const agreementReached =
+    conv.agreement_confirmed_by_1 && conv.agreement_confirmed_by_2;
+
+  const myAgreementConfirmation =
+    isParticipant1
+      ? conv.agreement_confirmed_by_1
+      : conv.agreement_confirmed_by_2;
+
+  const bothConfirmedDelivery =
+    conv.confirmed_by_1 && conv.confirmed_by_2;
+
+  const myDeliveryConfirmation =
     isParticipant1
       ? conv.confirmed_by_1
       : conv.confirmed_by_2;
@@ -2849,7 +2969,50 @@ async function refreshChatActionButtons(conversationId) {
 
   let html = "";
 
-  if (bothConfirmed) {
+
+  /* -------------------------------------------
+     STADIO 1: Accordo non ancora raggiunto
+  ------------------------------------------- */
+
+  if (!agreementReached) {
+
+    if (myAgreementConfirmation) {
+
+      html = `
+        <div class="chat-action-banner pending">
+          <div class="chat-action-icon">⏳</div>
+          <div class="chat-action-text">
+            <strong>Accordo confermato</strong>
+            <span>In attesa dell'altra parte</span>
+          </div>
+        </div>
+      `;
+
+    } else {
+
+      html = `
+        <div class="chat-action-banner neutral">
+          <div class="chat-action-icon">🤝</div>
+          <div class="chat-action-text">
+            <strong>Vi siete messi d'accordo?</strong>
+            <span>Conferma per chiudere l'annuncio pubblico</span>
+          </div>
+          <button
+            class="chat-action-button secondary"
+            onclick="confirmAgreement('${conversationId}')">
+            Conferma accordo
+          </button>
+        </div>
+      `;
+
+    }
+
+
+  /* -------------------------------------------
+     STADIO 2: Accordo raggiunto, in attesa consegna
+  ------------------------------------------- */
+
+  } else if (bothConfirmedDelivery) {
 
     if (!alreadyReviewed) {
 
@@ -2882,7 +3045,7 @@ async function refreshChatActionButtons(conversationId) {
 
     }
 
-  } else if (myConfirmation) {
+  } else if (myDeliveryConfirmation) {
 
     html = `
       <div class="chat-action-banner pending">
@@ -2916,8 +3079,6 @@ async function refreshChatActionButtons(conversationId) {
   container.innerHTML = html;
 
 }
-
-
 
 
 /*======================*/
@@ -6185,23 +6346,25 @@ function myTripHTML(trip) {
         </div>
 
 
-        <div>
+<div>
 
-          <span>
-            📌 Stato
-          </span>
+  <span>
+    📌 Stato
+  </span>
 
-          <strong>
+  <strong>
 
-            ${
-              trip.status === "active"
-                ? "🟢 Attivo"
-                : "⚪ Chiuso"
-            }
+    ${
+      trip.status === "active"
+        ? "🟢 Attivo"
+        : trip.status === "in_progress"
+          ? "🤝 Accordo raggiunto"
+          : "⚪ Chiuso"
+    }
 
-          </strong>
+  </strong>
 
-        </div>
+</div>
 
       </div>
 
@@ -6620,15 +6783,17 @@ function myRequestCard(request) {
       ).toLocaleDateString("it-IT")
     : "Non specificata";
 
-  let statusLabel = "Aperta";
 
-  if (request.status === "open") {
-    statusLabel = "🟢 Aperta";
-  } else if (request.status === "closed") {
-    statusLabel = "⚪ Chiusa";
-  } else if (request.status === "cancelled") {
-    statusLabel = "🔴 Annullata";
-  }
+
+let statusLabel = "Aperta";
+
+if (request.status === "open") {
+  statusLabel = "🟢 Aperta";
+} else if (request.status === "closed") {
+  statusLabel = "🤝 Accordo raggiunto";
+} else if (request.status === "cancelled") {
+  statusLabel = "🔴 Annullata";
+}
 
   return `
 
