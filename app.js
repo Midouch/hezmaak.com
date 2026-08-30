@@ -4220,7 +4220,7 @@ async function openChatModal(
           <button
             type="button"
             class="chat-minimize"
-            onclick="minimizeChat()"
+            onclick="minimizeMessages()"
             title="Minimizza"
           >−</button>
 
@@ -4377,7 +4377,7 @@ async function openChatModal(
           <button
             type="button"
             class="chat-minimize"
-            onclick="minimizeChat()"
+            onclick="minimizeMessages()"
             title="Minimizza"
           >
             −
