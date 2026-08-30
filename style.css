@@ -2419,3 +2419,8 @@ body.dark .typing {
 
 }
 ```
+.chat-actions {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border-color, #eee);
+  text-align: center;
+}
