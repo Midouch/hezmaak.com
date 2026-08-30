@@ -4227,7 +4227,7 @@ async function openChatModal(
           <button
             type="button"
             class="chat-close"
-            onclick="closeChat()"
+            onclick="closeMessages()"
             title="Chiudi"
           >×</button>
 
@@ -4386,7 +4386,7 @@ async function openChatModal(
           <button
             type="button"
             class="chat-close"
-            onclick="closeChat()"
+            onclick="closeMessages()"
             title="Chiudi"
           >
             ×
