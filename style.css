@@ -1796,7 +1796,7 @@ html[dir="rtl"] select {
 
 /* Pulsante minimizza */
 
-.chat-minimize {
+.messages-minimize {
   background: transparent;
 
   border: none;
@@ -1816,14 +1816,14 @@ html[dir="rtl"] select {
   transition: .2s;
 }
 
-.chat-minimize:hover {
+.messages-minimize:hover {
   background: rgba(255,255,255,.15);
 }
 
 
 /* Pulsante chiudi */
 
-.chat-close {
+.messages-close {
   background: none;
 
   border: none;
@@ -1841,7 +1841,7 @@ html[dir="rtl"] select {
   transition: .2s;
 }
 
-.chat-close:hover {
+.messages-close:hover {
   background: rgba(255,255,255,.15);
 }
 
