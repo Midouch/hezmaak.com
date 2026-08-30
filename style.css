@@ -2545,3 +2545,14 @@ body.dark .typing {
   border-top: 1px solid var(--border-color, #eee);
   text-align: center;
 }
+.msg-system {
+  align-self: center;
+  text-align: center;
+  max-width: 90%;
+  margin: 8px auto;
+  padding: 6px 12px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 12px;
+  border-radius: 16px;
+}
