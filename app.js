@@ -4309,9 +4309,6 @@ async function openChatModal(
 
 /* =====================================================*/
 
-/* =====================================================
-   CHAT SINGOLA
-===================================================== */
 
 async function openChatModal(
   conversationId,
@@ -4912,14 +4909,9 @@ async function openMessages() {
 
           data-other-user-id="${otherUserId}"
 
-          data-other-user-name="${String(
-            otherUserName ||
-            "Utente"
-          )
-            .replace(
-              /"/g,
-              "&quot;"
-            )}
+           data-other-user-name="${encodeURIComponent(
+               otherUserName || "Utente"
+                  )}"
 
           data-trip-id="${
             conv.trip_id || ""
@@ -5044,9 +5036,9 @@ async function openMessages() {
 
 
             const otherUserName =
-              item.dataset
-                .otherUserName ||
-              "Utente";
+  decodeURIComponent(
+    item.dataset.otherUserName || "Utente"
+  );
 
 
             const tripId =
@@ -5115,98 +5107,74 @@ async function openMessages() {
 
 
 /* =====================================================
-   MINIMIZZA LISTA MESSAGGI
+   MINIMIZZA CHAT SINGOLA
 ===================================================== */
 
-function minimizeMessages() {
+function minimizeChat() {
 
   const modal =
-    document.getElementById(
-      "messagesModal"
-    );
-
+    document.getElementById("chatModal");
 
   if (!modal) {
     return;
   }
 
-
-  modal.style.display =
-    "none";
-
+  modal.style.display = "none";
 
   let button =
     document.getElementById(
-      "messagesMinimizedButton"
+      "chatMinimizedButton"
     );
-
 
   if (!button) {
 
     button =
-      document.createElement(
-        "button"
-      );
-
+      document.createElement("button");
 
     button.id =
-      "messagesMinimizedButton";
-
+      "chatMinimizedButton";
 
     button.className =
       "chat-minimized-button";
 
-
     button.type =
       "button";
 
-
     button.title =
-      "Apri messaggi";
-
+      "Apri chat";
 
     button.innerHTML =
       "💬";
 
-
     button.onclick =
       function() {
 
-        restoreMessages();
+        restoreChat();
 
       };
-
 
     document.body.appendChild(
       button
     );
-
   }
 
-
-  button.style.display =
-    "flex";
-
+  button.style.display = "flex";
 }
 
 
 /* =====================================================
-   RIPRISTINA LISTA MESSAGGI
+   RIPRISTINA CHAT SINGOLA
 ===================================================== */
 
-function restoreMessages() {
+function restoreChat() {
 
   const modal =
-    document.getElementById(
-      "messagesModal"
-    );
-
+    document.getElementById("chatModal");
 
   const button =
     document.getElementById(
-      "messagesMinimizedButton"
+      "chatMinimizedButton"
     );
-
 
   if (modal) {
 
@@ -5215,7 +5183,6 @@ function restoreMessages() {
 
   }
 
-
   if (button) {
 
     button.remove();
@@ -5226,16 +5193,13 @@ function restoreMessages() {
 
 
 /* =====================================================
-   CHIUDI LISTA MESSAGGI
+   CHIUDI CHAT SINGOLA
 ===================================================== */
 
-function closeMessages() {
+function closeChat() {
 
   const modal =
-    document.getElementById(
-      "messagesModal"
-    );
-
+    document.getElementById("chatModal");
 
   if (modal) {
 
@@ -5243,12 +5207,10 @@ function closeMessages() {
 
   }
 
-
   const button =
     document.getElementById(
-      "messagesMinimizedButton"
+      "chatMinimizedButton"
     );
-
 
   if (button) {
 
@@ -5257,6 +5219,7 @@ function closeMessages() {
   }
 
 }
+
 
 
 
