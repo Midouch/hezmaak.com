@@ -5105,76 +5105,94 @@ async function openMessages() {
 
 }
 
-
 /* =====================================================
-   MINIMIZZA CHAT SINGOLA
+   MINIMIZZA LISTA MESSAGGI
 ===================================================== */
 
-function minimizeChat() {
+function minimizeMessages() {
 
   const modal =
-    document.getElementById("chatModal");
+    document.getElementById("messagesModal");
 
   if (!modal) {
     return;
   }
 
+  /* Nasconde la lista */
   modal.style.display = "none";
 
+
+  /* Cerca eventuale pulsante */
   let button =
     document.getElementById(
-      "chatMinimizedButton"
+      "messagesMinimizedButton"
     );
 
+
+  /* Se non esiste, lo crea */
   if (!button) {
 
     button =
       document.createElement("button");
 
     button.id =
-      "chatMinimizedButton";
-
-    button.className =
-      "chat-minimized-button";
+      "messagesMinimizedButton";
 
     button.type =
       "button";
 
+    button.className =
+      "chat-minimized-button";
+
     button.title =
-      "Apri chat";
+      "Apri messaggi";
 
     button.innerHTML =
       "💬";
 
-    button.onclick =
-      function() {
 
-        restoreChat();
+    button.addEventListener(
+      "click",
+      function(event) {
 
-      };
+        event.preventDefault();
+        event.stopPropagation();
+
+        restoreMessages();
+
+      }
+    );
+
 
     document.body.appendChild(
       button
     );
+
   }
 
-  button.style.display = "flex";
+
+  button.style.display =
+    "flex";
+
 }
 
 
 /* =====================================================
-   RIPRISTINA CHAT SINGOLA
+   RIPRISTINA LISTA MESSAGGI
 ===================================================== */
 
-function restoreChat() {
+function restoreMessages() {
 
   const modal =
-    document.getElementById("chatModal");
+    document.getElementById(
+      "messagesModal"
+    );
 
   const button =
     document.getElementById(
-      "chatMinimizedButton"
+      "messagesMinimizedButton"
     );
+
 
   if (modal) {
 
@@ -5183,6 +5201,7 @@ function restoreChat() {
 
   }
 
+
   if (button) {
 
     button.remove();
@@ -5193,13 +5212,16 @@ function restoreChat() {
 
 
 /* =====================================================
-   CHIUDI CHAT SINGOLA
+   CHIUDI LISTA MESSAGGI
 ===================================================== */
 
-function closeChat() {
+function closeMessages() {
 
   const modal =
-    document.getElementById("chatModal");
+    document.getElementById(
+      "messagesModal"
+    );
+
 
   if (modal) {
 
@@ -5207,10 +5229,12 @@ function closeChat() {
 
   }
 
+
   const button =
     document.getElementById(
-      "chatMinimizedButton"
+      "messagesMinimizedButton"
     );
+
 
   if (button) {
 
@@ -5219,8 +5243,6 @@ function closeChat() {
   }
 
 }
-
-
 
 
 
