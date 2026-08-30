@@ -2814,7 +2814,6 @@ async function confirmDelivery(conversationId) {
 /* =====================================================
    AGGIORNA BOTTONI AZIONE CHAT
 ===================================================== */
-
 async function refreshChatActionButtons(conversationId) {
 
   const { data: conv, error } =
@@ -2875,27 +2874,51 @@ async function refreshChatActionButtons(conversationId) {
         <div class="chat-action-banner done">
           <div class="chat-action-icon">✓</div>
           <div class="chat-action-text">
-            <strong>Recensione
+            <strong>Recensione inviata</strong>
+            <span>Grazie per il tuo feedback</span>
+          </div>
+        </div>
+      `;
 
+    }
 
-async function hasAlreadyReviewed(conversationId) {
+  } else if (myConfirmation) {
 
-  const { data, error } =
-    await supabaseClient
-      .from("reviews")
-      .select("id")
-      .eq("conversation_id", conversationId)
-      .eq("reviewer_id", currentUser.id)
-      .maybeSingle();
+    html = `
+      <div class="chat-action-banner pending">
+        <div class="chat-action-icon">⏳</div>
+        <div class="chat-action-text">
+          <strong>Conferma inviata</strong>
+          <span>In attesa dell'altra parte</span>
+        </div>
+      </div>
+    `;
 
-  if (error) {
-    console.error(error);
-    return false;
+  } else {
+
+    html = `
+      <div class="chat-action-banner neutral">
+        <div class="chat-action-icon">📦</div>
+        <div class="chat-action-text">
+          <strong>Consegna avvenuta?</strong>
+          <span>Conferma quando l'oggetto è arrivato</span>
+        </div>
+        <button
+          class="chat-action-button secondary"
+          onclick="confirmDelivery('${conversationId}')">
+          Conferma
+        </button>
+      </div>
+    `;
+
   }
 
-  return !!data;
+  container.innerHTML = html;
 
 }
+
+
+
 
 /*======================*/
 
