@@ -4278,62 +4278,96 @@ async function openChatModal(
   requestId
 ) {
 
-  // Elimina eventuale chat già aperta
-  const oldModal = document.getElementById("chatModal");
-
-  if (oldModal) {
-    oldModal.remove();
+  if (!conversationId) {
+    console.error("conversationId mancante");
+    return;
   }
 
-  // Elimina eventuale pulsante minimizzato
-  const oldButton = document.getElementById("chatMinimizedButton");
+  /* -----------------------------------------
+     Rimuove eventuale chat singola precedente
+  ----------------------------------------- */
 
-  if (oldButton) {
-    oldButton.remove();
+  const oldChat =
+    document.getElementById("chatModal");
+
+  if (oldChat) {
+    oldChat.remove();
   }
 
-  // Crea la finestra chat
-  const modal = document.createElement("div");
 
-  modal.id = "chatModal";
-  modal.className = "chat-modal";
+  /* -----------------------------------------
+     Rimuove eventuale pulsante chat minimizzata
+  ----------------------------------------- */
+
+  const oldChatButton =
+    document.getElementById("chatMinimizedButton");
+
+  if (oldChatButton) {
+    oldChatButton.remove();
+  }
+
+
+  /* -----------------------------------------
+     Crea modal chat
+  ----------------------------------------- */
+
+  const modal =
+    document.createElement("div");
+
+  modal.id =
+    "chatModal";
+
+  modal.className =
+    "chat-modal";
+
 
   modal.innerHTML = `
     <div class="chat-box">
 
       <div class="chat-header">
 
-        <span>${otherUserName || "Chat"}</span>
+        <span>
+          ${escapeHtml(
+            otherUserName || "Chat"
+          )}
+        </span>
 
         <div>
 
           <button
             type="button"
             class="chat-minimize"
-            onclick="minimizeChat()"
+            onclick="minimizeMessages()"
             title="Minimizza"
-          >−</button>
+          >
+            −
+          </button>
 
           <button
             type="button"
             class="chat-close"
-            onclick="closeChat()"
+            onclick="closeMessages()"
             title="Chiudi"
-          >×</button>
+          >
+            ×
+          </button>
 
         </div>
 
       </div>
+
 
       <div
         id="chatMessages"
         class="chat-messages"
       ></div>
 
+
       <div
         id="typingIndicator"
         class="typing"
       ></div>
+
 
       <div class="chat-input">
 
@@ -4341,16 +4375,12 @@ async function openChatModal(
           id="chatText"
           type="text"
           placeholder="Scrivi un messaggio..."
+          autocomplete="off"
         >
 
         <button
           type="button"
-          onclick="sendMessage(
-            '${conversationId}',
-            '${otherUserId}',
-            '${tripId || ""}',
-            '${requestId || ""}'
-          )"
+          id="sendMessageButton"
         >
           Invia
         </button>
@@ -4360,40 +4390,204 @@ async function openChatModal(
     </div>
   `;
 
+
   document.body.appendChild(modal);
 
-  // Carica i messaggi
-  if (conversationId) {
 
-    loadMessages(conversationId);
+  /* -----------------------------------------
+     Pulsante INVIA
+  ----------------------------------------- */
 
-    subscribeToMessages(conversationId);
+  const sendButton =
+    document.getElementById(
+      "sendMessageButton"
+    );
 
-    if (typeof markMessagesAsRead === "function") {
-      await markMessagesAsRead(conversationId);
-    }
 
-    if (typeof updateUnreadCount === "function") {
-      await updateUnreadCount();
-    }
+  if (sendButton) {
+
+    sendButton.onclick =
+      function() {
+
+        sendMessage(
+          conversationId,
+          otherUserId,
+          tripId || "",
+          requestId || ""
+        );
+
+      };
+
   }
 
-  // Rimuove i badge delle notifiche
-  document
-    .querySelectorAll(".notify-badge")
-    .forEach(function(badge) {
-      badge.remove();
-    });
 
-  // Attiva il sistema "sta scrivendo"
-  if (typeof setupTyping === "function") {
+  /* -----------------------------------------
+     Invio con ENTER
+  ----------------------------------------- */
 
-    setupTyping(
-      conversationId,
-      otherUserName || "Utente"
+  const chatInput =
+    document.getElementById(
+      "chatText"
+    );
+
+
+  if (chatInput) {
+
+    chatInput.addEventListener(
+      "keydown",
+      function(event) {
+
+        if (
+          event.key === "Enter" &&
+          !event.shiftKey
+        ) {
+
+          event.preventDefault();
+
+          if (sendButton) {
+            sendButton.click();
+          }
+
+        }
+
+      }
     );
 
   }
+
+
+  /* -----------------------------------------
+     Carica messaggi
+  ----------------------------------------- */
+
+  try {
+
+    await loadMessages(
+      conversationId
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Errore caricamento messaggi:",
+      error
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Realtime
+  ----------------------------------------- */
+
+  try {
+
+    subscribeToMessages(
+      conversationId
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Errore realtime:",
+      error
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Segna messaggi come letti
+  ----------------------------------------- */
+
+  if (
+    typeof markMessagesAsRead ===
+    "function"
+  ) {
+
+    try {
+
+      await markMessagesAsRead(
+        conversationId
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Errore marcatura messaggi letti:",
+        error
+      );
+
+    }
+
+  }
+
+
+  /* -----------------------------------------
+     Aggiorna contatore
+  ----------------------------------------- */
+
+  if (
+    typeof updateUnreadCount ===
+    "function"
+  ) {
+
+    try {
+
+      await updateUnreadCount();
+
+    } catch (error) {
+
+      console.error(
+        "Errore aggiornamento notifiche:",
+        error
+      );
+
+    }
+
+  }
+
+
+  /* -----------------------------------------
+     Rimuove badge visuali
+  ----------------------------------------- */
+
+  document
+    .querySelectorAll(".notify-badge")
+    .forEach(
+      function(badge) {
+        badge.remove();
+      }
+    );
+
+
+  /* -----------------------------------------
+     Typing
+  ----------------------------------------- */
+
+  if (
+    typeof setupTyping ===
+    "function"
+  ) {
+
+    try {
+
+      setupTyping(
+        conversationId,
+        otherUserName || "Utente"
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Errore typing:",
+        error
+      );
+
+    }
+
+  }
+
 }
 
 
