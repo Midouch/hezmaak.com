@@ -2732,9 +2732,225 @@ function closeMessages() {
   }
 
 }
+/*==============*/
+ /* =====================================================
+   CONFERMA CONSEGNA
+===================================================== */
+async function confirmDelivery(conversationId) {
 
- 
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
 
+  const { data: conv, error: fetchError } =
+    await supabaseClient
+      .from("conversations")
+      .select("*")
+      .eq("id", conversationId)
+      .single();
+
+  if (fetchError) {
+    alert("Errore: " + fetchError.message);
+    return;
+  }
+
+  const isParticipant1 = conv.participant_1 === currentUser.id;
+
+  const updateField =
+    isParticipant1
+      ? { confirmed_by_1: true }
+      : { confirmed_by_2: true };
+
+  const bothConfirmed =
+    isParticipant1
+      ? true && conv.confirmed_by_2
+      : conv.confirmed_by_1 && true;
+
+  if (bothConfirmed) {
+    updateField.completed_at = new Date().toISOString();
+  }
+
+  const { error: updateError } =
+    await supabaseClient
+      .from("conversations")
+      .update(updateField)
+      .eq("id", conversationId);
+
+  if (updateError) {
+    alert("Errore: " + updateError.message);
+    return;
+  }
+
+  // Messaggio di sistema per notificare l'altra parte
+  const myName = await getUserName(currentUser.id);
+
+  const systemText =
+    bothConfirmed
+      ? `✓ ${myName} ha confermato la consegna. Entrambe le parti hanno confermato!`
+      : `✓ ${myName} ha confermato la consegna. In attesa della tua conferma.`;
+
+  await supabaseClient
+    .from("messages")
+    .insert([
+      {
+        conversation_id: conversationId,
+        sender_id: currentUser.id,
+        message: systemText,
+        is_system: true
+      }
+    ]);
+
+  if (bothConfirmed) {
+    showToast("✓ Consegna confermata da entrambe le parti!");
+  } else {
+    showToast("✓ Conferma registrata. In attesa dell'altra parte.");
+  }
+
+  await refreshChatActionButtons(conversationId);
+
+}
+
+/* =====================================================
+   AGGIORNA BOTTONI AZIONE CHAT
+===================================================== */
+
+async function refreshChatActionButtons(conversationId) {
+
+  const { data: conv, error } =
+    await supabaseClient
+      .from("conversations")
+      .select(`
+        *,
+        trips(travel_date),
+        requests(needed_date)
+      `)
+      .eq("id", conversationId)
+      .single();
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const container =
+    document.getElementById("chatActions");
+
+  if (!container) return;
+
+  const relevantDate =
+    conv.trips?.travel_date ||
+    conv.requests?.needed_date ||
+    null;
+
+  const dateHasPassed =
+    relevantDate
+      ? new Date(relevantDate + "T00:00:00") < new Date()
+      : true;
+
+  const bothConfirmed =
+    conv.confirmed_by_1 && conv.confirmed_by_2;
+
+  const isParticipant1 =
+    conv.participant_1 === currentUser.id;
+
+  const myConfirmation =
+    isParticipant1
+      ? conv.confirmed_by_1
+      : conv.confirmed_by_2;
+
+  const alreadyReviewed =
+    await hasAlreadyReviewed(conversationId);
+
+  let html = "";
+
+  if (bothConfirmed && dateHasPassed) {
+
+    if (!alreadyReviewed) {
+
+      html = `
+        <div class="chat-action-banner success">
+          <div class="chat-action-icon">✓</div>
+          <div class="chat-action-text">
+            <strong>Consegna confermata</strong>
+            <span>Com'è andata? Lascia una recensione.</span>
+          </div>
+          <button
+            class="chat-action-button primary"
+            onclick="openReviewForm('${conversationId}')">
+            ⭐ Recensisci
+          </button>
+        </div>
+      `;
+
+    } else {
+
+      html = `
+        <div class="chat-action-banner done">
+          <div class="chat-action-icon">✓</div>
+          <div class="chat-action-text">
+            <strong>Recensione inviata</strong>
+            <span>Grazie per il tuo feedback</span>
+          </div>
+        </div>
+      `;
+
+    }
+
+  } else if (myConfirmation) {
+
+    html = `
+      <div class="chat-action-banner pending">
+        <div class="chat-action-icon">⏳</div>
+        <div class="chat-action-text">
+          <strong>Conferma inviata</strong>
+          <span>In attesa dell'altra parte</span>
+        </div>
+      </div>
+    `;
+
+  } else {
+
+    html = `
+      <div class="chat-action-banner neutral">
+        <div class="chat-action-icon">📦</div>
+        <div class="chat-action-text">
+          <strong>Consegna avvenuta?</strong>
+          <span>Conferma quando l'oggetto è arrivato</span>
+        </div>
+        <button
+          class="chat-action-button secondary"
+          onclick="confirmDelivery('${conversationId}')">
+          Conferma
+        </button>
+      </div>
+    `;
+
+  }
+
+  container.innerHTML = html;
+
+}
+
+
+async function hasAlreadyReviewed(conversationId) {
+
+  const { data, error } =
+    await supabaseClient
+      .from("reviews")
+      .select("id")
+      .eq("conversation_id", conversationId)
+      .eq("reviewer_id", currentUser.id)
+      .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    return false;
+  }
+
+  return !!data;
+
+}
 
 /*======================*/
 
@@ -4382,6 +4598,11 @@ async function openChatModal(
         class="typing"
       ></div>
 
+      <div
+        id="chatActions"
+        class="chat-actions"
+      ></div>
+
       <div class="chat-input">
 
         <input
@@ -4587,8 +4808,27 @@ async function openChatModal(
 
   }
 
-}
 
+  /* -----------------------------------------
+     Bottoni conferma/recensione
+  ----------------------------------------- */
+
+  try {
+
+    await refreshChatActionButtons(
+      conversationId
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Errore bottoni azione chat:",
+      error
+    );
+
+  }
+
+}
 
 
 /* =====================================================
@@ -4750,29 +4990,37 @@ async function loadMessages(conversationId) {
   const box = document.getElementById("chatMessages");
   box.innerHTML = "";
 
- messages.forEach(msg => {
+  messages.forEach(msg => {
 
-  const div = document.createElement("div");
+    const div = document.createElement("div");
 
-  const isMine = msg.sender_id === currentUser.id;
-  const isUnread = !isMine && msg.read_at === null;
+    if (msg.is_system) {
 
-  if (isMine) {
-    div.className = "msg msg-me";
-  } else if (isUnread) {
-    div.className = "msg msg-other msg-unread";
-  } else {
-    div.className = "msg msg-other";
-  }
+      div.className = "msg msg-system";
+      div.textContent = msg.message;
+      box.appendChild(div);
+      return;
 
-  div.textContent = msg.message;
+    }
 
-  box.appendChild(div);
-});
+    const isMine = msg.sender_id === currentUser.id;
+    const isUnread = !isMine && msg.read_at === null;
+
+    if (isMine) {
+      div.className = "msg msg-me";
+    } else if (isUnread) {
+      div.className = "msg msg-other msg-unread";
+    } else {
+      div.className = "msg msg-other";
+    }
+
+    div.textContent = msg.message;
+
+    box.appendChild(div);
+  });
 
   box.scrollTop = box.scrollHeight;
 }
-
 /*===========================*/
 async function sendMessage(conversationId) {
 
@@ -4837,6 +5085,31 @@ function subscribeToMessages(conversationId) {
       payload => {
 
         const msg = payload.new;
+
+        if (msg.is_system) {
+
+          if (msg.sender_id !== currentUser.id) {
+            showToast("📦 " + msg.message);
+          }
+
+          const box = document.getElementById("chatMessages");
+
+          if (box) {
+            const div = document.createElement("div");
+            div.className = "msg msg-system";
+            div.textContent = msg.message;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+          }
+
+          // Aggiorna i bottoni azione (es. sblocca recensione)
+          if (typeof refreshChatActionButtons === "function") {
+            refreshChatActionButtons(conversationId);
+          }
+
+          return;
+
+        }
 
         if (msg.sender_id !== currentUser.id) {
 
