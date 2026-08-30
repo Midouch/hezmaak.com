@@ -9418,3 +9418,241 @@ async function markMessagesAsRead(conversationId) {
     console.error("Errore nel segnare i messaggi come letti:", error);
   }
 }
+/*======================*/
+
+/* =====================================================
+   FORM RECENSIONE
+===================================================== */
+
+let selectedRating = 0;
+
+async function openReviewForm(conversationId) {
+
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const { data: conv, error } =
+    await supabaseClient
+      .from("conversations")
+      .select("*")
+      .eq("id", conversationId)
+      .single();
+
+  if (error) {
+    alert("Errore: " + error.message);
+    return;
+  }
+
+  const otherUserId =
+    conv.participant_1 === currentUser.id
+      ? conv.participant_2
+      : conv.participant_1;
+
+  const otherUserName = await getUserName(otherUserId);
+
+  selectedRating = 0;
+
+  const old = document.getElementById("reviewModal");
+  if (old) old.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "reviewModal";
+
+  modal.innerHTML = `
+
+    <div class="auth-overlay">
+
+      <div class="auth-box review-box">
+
+        <button
+          class="auth-close"
+          onclick="closeReviewForm()">
+
+          ×
+
+        </button>
+
+
+        <h2>
+          ⭐ Recensisci ${escapeHtml(otherUserName)}
+        </h2>
+
+
+        <p>
+          Com'è andata la spedizione?
+        </p>
+
+
+        <div id="starRating" class="star-rating">
+
+          <span class="star" data-value="1">★</span>
+          <span class="star" data-value="2">★</span>
+          <span class="star" data-value="3">★</span>
+          <span class="star" data-value="4">★</span>
+          <span class="star" data-value="5">★</span>
+
+        </div>
+
+
+        <textarea
+          id="reviewComment"
+          rows="4"
+          placeholder="Lascia un commento (opzionale)"
+        ></textarea>
+
+
+        <div id="reviewMessage"></div>
+
+
+        <button
+          class="primary auth-button"
+          onclick="submitReview('${conversationId}', '${otherUserId}')">
+
+          Invia recensione
+
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(modal);
+
+  setupStarRating();
+
+}
+
+
+function closeReviewForm() {
+
+  const modal = document.getElementById("reviewModal");
+  if (modal) modal.remove();
+
+}
+
+
+function setupStarRating() {
+
+  const stars = document.querySelectorAll("#starRating .star");
+
+  stars.forEach(star => {
+
+    star.addEventListener("click", () => {
+
+      selectedRating = parseInt(star.dataset.value);
+      highlightStars(selectedRating);
+
+    });
+
+    star.addEventListener("mouseenter", () => {
+      highlightStars(parseInt(star.dataset.value));
+    });
+
+  });
+
+  const container = document.getElementById("starRating");
+
+  container.addEventListener("mouseleave", () => {
+    highlightStars(selectedRating);
+  });
+
+}
+
+
+function highlightStars(count) {
+
+  const stars = document.querySelectorAll("#starRating .star");
+
+  stars.forEach(star => {
+
+    const value = parseInt(star.dataset.value);
+
+    star.classList.toggle("filled", value <= count);
+
+  });
+
+}
+
+
+async function submitReview(conversationId, otherUserId) {
+
+  const message = document.getElementById("reviewMessage");
+
+  if (!selectedRating || selectedRating < 1) {
+
+    message.innerHTML = `
+      <div class="auth-error">
+        Seleziona almeno una stella.
+      </div>
+    `;
+
+    return;
+
+  }
+
+  const comment =
+    document.getElementById("reviewComment").value.trim();
+
+  message.innerHTML = `
+    <div class="auth-success">
+      Invio in corso...
+    </div>
+  `;
+
+  const { error } =
+    await supabaseClient
+      .from("reviews")
+      .insert([
+        {
+          conversation_id: conversationId,
+          reviewer_id: currentUser.id,
+          reviewed_user_id: otherUserId,
+          rating: selectedRating,
+          comment: comment || null
+        }
+      ]);
+
+  if (error) {
+
+    // Codice 23505 = violazione vincolo UNIQUE (già recensito)
+    if (error.code === "23505") {
+
+      message.innerHTML = `
+        <div class="auth-error">
+          Hai già lasciato una recensione per questa conversazione.
+        </div>
+      `;
+
+    } else {
+
+      message.innerHTML = `
+        <div class="auth-error">
+          ${escapeHtml(error.message)}
+        </div>
+      `;
+
+    }
+
+    return;
+
+  }
+
+  message.innerHTML = `
+    <div class="auth-success">
+      ✓ Recensione inviata. Grazie!
+    </div>
+  `;
+
+  setTimeout(() => {
+
+    closeReviewForm();
+
+    refreshChatActionButtons(conversationId);
+
+  }, 1000);
+
+}
