@@ -2595,11 +2595,23 @@ async function showProfile() {
 }
 
 /*=============================*/
+/* =====================================================
+   MESSAGGISTICA - LISTA CONVERSAZIONI
+===================================================== */
+
+let messagesListChannel = null;
+
 async function openMessages() {
 
   if (!currentUser) {
     openAuth("login");
     return;
+  }
+
+  // Rimuove eventuale canale realtime precedente per evitare duplicati
+  if (messagesListChannel) {
+    supabaseClient.removeChannel(messagesListChannel);
+    messagesListChannel = null;
   }
 
   const { data: conversations, error } =
@@ -2615,11 +2627,17 @@ async function openMessages() {
     return;
   }
 
+  // Rimuove eventuale modale già aperto prima di ricrearlo
+  const oldModal = document.getElementById("messagesModal");
+  if (oldModal) {
+    oldModal.remove();
+  }
+
   const modal = document.createElement("div");
   modal.id = "messagesModal";
   modal.className = "chat-modal";
 
- let html = `
+  let html = `
     <div class="chat-box">
       <div class="chat-header">
         <span>Messaggi</span>
@@ -2646,7 +2664,7 @@ async function openMessages() {
       .from("messages")
       .select("*")
       .eq("conversation_id", conv.id)
-      .is("read_at", false)
+      .is("read_at", null)
       .neq("sender_id", currentUser.id);
 
     const isUnread = unreadMessages && unreadMessages.length > 0;
@@ -2685,7 +2703,37 @@ async function openMessages() {
   document.body.appendChild(modal);
 
   updateUnreadCount();
+
+  // Realtime: se arriva un nuovo messaggio mentre la lista è aperta, la ricarica
+  messagesListChannel = supabaseClient
+    .channel(`messages_list_${currentUser.id}`)
+    .on(
+      "postgres_changes",
+      { event: "INSERT", schema: "public", table: "messages" },
+      () => {
+        if (document.getElementById("messagesModal")) {
+          openMessages();
+        }
+      }
+    )
+    .subscribe();
+
 }
+/*========CloseMessages==============*/
+
+function closeMessages() {
+
+  const modal = document.getElementById("messagesModal");
+  if (modal) modal.remove();
+
+  if (messagesListChannel) {
+    supabaseClient.removeChannel(messagesListChannel);
+    messagesListChannel = null;
+  }
+
+}
+
+ 
 
 
 /*======================*/
@@ -4701,10 +4749,7 @@ function setupTyping(conversationId, otherUserName) {
 
 
 /*=================*/
-function closeMessages() {
-  const modal = document.getElementById("messagesModal");
-  if (modal) modal.remove();
-}
+
 /*=================*/
 
 
