@@ -4227,7 +4227,7 @@ async function openChatModal(
           <button
             type="button"
             class="chat-close"
-            onclick="closeMessages()"
+            onclick="closeChat()"
             title="Chiudi"
           >×</button>
 
@@ -4386,7 +4386,7 @@ async function openChatModal(
           <button
             type="button"
             class="chat-close"
-            onclick="closeMessages()"
+            onclick="closeChat()"
             title="Chiudi"
           >
             ×
@@ -4700,7 +4700,7 @@ async function openMessages() {
 
   /* -----------------------------------------
      Rimuove pulsante minimizzato lista
-  ----------------------------------------- */
+  ----------------------------------------- 
 
   const oldButton =
     document.getElementById(
@@ -4710,7 +4710,7 @@ async function openMessages() {
   if (oldButton) {
     oldButton.remove();
   }
-
+*/
 
   /* -----------------------------------------
      Crea lista
