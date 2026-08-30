@@ -4362,39 +4362,204 @@ async function openChatModal(
 
   document.body.appendChild(modal);
 
-  // Carica i messaggi
-  if (conversationId) {
+  
+  /* -----------------------------------------
+     Pulsante INVIA
+  ----------------------------------------- */
 
-    loadMessages(conversationId);
+  const sendButton =
+    document.getElementById(
+      "sendMessageButton"
+    );
 
-    subscribeToMessages(conversationId);
 
-    if (typeof markMessagesAsRead === "function") {
-      await markMessagesAsRead(conversationId);
-    }
+  if (sendButton) {
 
-    if (typeof updateUnreadCount === "function") {
-      await updateUnreadCount();
-    }
+    sendButton.onclick =
+      function() {
+
+        sendMessage(
+          conversationId,
+          otherUserId,
+          tripId || "",
+          requestId || ""
+        );
+
+      };
+
   }
 
-  // Rimuove i badge delle notifiche
-  document
-    .querySelectorAll(".notify-badge")
-    .forEach(function(badge) {
-      badge.remove();
-    });
 
-  // Attiva il sistema "sta scrivendo"
-  if (typeof setupTyping === "function") {
+  /* -----------------------------------------
+     Invio con ENTER
+  ----------------------------------------- */
 
-    setupTyping(
-      conversationId,
-      otherUserName || "Utente"
+  const chatInput =
+    document.getElementById(
+      "chatText"
+    );
+
+
+  if (chatInput) {
+
+    chatInput.addEventListener(
+      "keydown",
+      function(event) {
+
+        if (
+          event.key === "Enter" &&
+          !event.shiftKey
+        ) {
+
+          event.preventDefault();
+
+          if (sendButton) {
+            sendButton.click();
+          }
+
+        }
+
+      }
     );
 
   }
+
+
+  /* -----------------------------------------
+     Carica messaggi
+  ----------------------------------------- */
+
+  try {
+
+    await loadMessages(
+      conversationId
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Errore caricamento messaggi:",
+      error
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Realtime
+  ----------------------------------------- */
+
+  try {
+
+    subscribeToMessages(
+      conversationId
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Errore realtime:",
+      error
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Segna messaggi come letti
+  ----------------------------------------- */
+
+  if (
+    typeof markMessagesAsRead ===
+    "function"
+  ) {
+
+    try {
+
+      await markMessagesAsRead(
+        conversationId
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Errore marcatura messaggi letti:",
+        error
+      );
+
+    }
+
+  }
+
+
+  /* -----------------------------------------
+     Aggiorna contatore
+  ----------------------------------------- */
+
+  if (
+    typeof updateUnreadCount ===
+    "function"
+  ) {
+
+    try {
+
+      await updateUnreadCount();
+
+    } catch (error) {
+
+      console.error(
+        "Errore aggiornamento notifiche:",
+        error
+      );
+
+    }
+
+  }
+  
+  /* -----------------------------------------
+     Rimuove badge visuali
+  ----------------------------------------- */
+
+  document
+    .querySelectorAll(".notify-badge")
+    .forEach(
+      function(badge) {
+        badge.remove();
+      }
+    );
+
+
+  /* -----------------------------------------
+     Typing
+  ----------------------------------------- */
+
+  if (
+    typeof setupTyping ===
+    "function"
+  ) {
+
+    try {
+
+      setupTyping(
+        conversationId,
+        otherUserName || "Utente"
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Errore typing:",
+        error
+      );
+
+    }
+
+  }
+
 }
+
+
+  
 
 
 /* =====================================================
