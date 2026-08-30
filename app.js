@@ -2595,7 +2595,97 @@ async function showProfile() {
 }
 
 /*=============================*/
+async function openMessages() {
 
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const { data: conversations, error } =
+    await supabaseClient
+      .from("conversations")
+      .select("*")
+      .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
+      .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    alert("Errore nel caricamento dei messaggi.");
+    return;
+  }
+
+  const modal = document.createElement("div");
+  modal.id = "messagesModal";
+  modal.className = "chat-modal";
+
+ let html = `
+    <div class="chat-box">
+      <div class="chat-header">
+        <span>Messaggi</span>
+
+        <div>
+          <button class="chat-minimize" onclick="minimizeChat()">−</button>
+          <button class="chat-close" onclick="closeMessages()">×</button>
+        </div>
+      </div>
+
+      <div class="chat-messages" style="height:400px; overflow-y:auto;">
+`;
+
+  for (const conv of conversations) {
+
+    const otherUserId =
+      conv.participant_1 === currentUser.id
+        ? conv.participant_2
+        : conv.participant_1;
+
+    const otherUserName = await getUserName(otherUserId);
+
+    const { data: unreadMessages } = await supabaseClient
+      .from("messages")
+      .select("*")
+      .eq("conversation_id", conv.id)
+      .is("read_at", false)
+      .neq("sender_id", currentUser.id);
+
+    const isUnread = unreadMessages && unreadMessages.length > 0;
+
+    const { data: lastMsg } =
+      await supabaseClient
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", conv.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    const preview =
+      lastMsg?.message
+        ? lastMsg.message.substring(0, 40) + "..."
+        : "Nessun messaggio";
+
+    html += `
+      <div class="conversation-item ${isUnread ? "unread" : ""}"
+           onclick="openConversation('${otherUserId}', '${conv.trip_id}', '${conv.request_id}')">
+
+        <strong>${otherUserName}</strong><br>
+        <span>${preview}</span>
+
+      </div>
+    `;
+  }
+
+  html += `
+      </div>
+    </div>
+  `;
+
+  modal.innerHTML = html;
+  document.body.appendChild(modal);
+
+  updateUnreadCount();
+}
 
 
 /*======================*/
@@ -4179,7 +4269,7 @@ openChatModal(
 /* =====================================================
    MESSAGGING
 ===================================================== */
-
+``
 async function openChatModal(
   conversationId,
   otherUserName,
@@ -4220,14 +4310,14 @@ async function openChatModal(
           <button
             type="button"
             class="chat-minimize"
-            onclick="minimizeMessages()"
+            onclick="minimizeChat()"
             title="Minimizza"
           >−</button>
 
           <button
             type="button"
             class="chat-close"
-            onclick="closeMessages()"
+            onclick="closeChat()"
             title="Chiudi"
           >×</button>
 
@@ -4307,921 +4397,81 @@ async function openChatModal(
 }
 
 
-/* =====================================================*/
-
-
-async function openChatModal(
-  conversationId,
-  otherUserName,
-  otherUserId,
-  tripId,
-  requestId
-) {
-
-  if (!conversationId) {
-    console.error("conversationId mancante");
-    return;
-  }
-
-  /* -----------------------------------------
-     Rimuove eventuale chat singola precedente
-  ----------------------------------------- */
-
-  const oldChat =
-    document.getElementById("chatModal");
-
-  if (oldChat) {
-    oldChat.remove();
-  }
-
-
-  /* -----------------------------------------
-     Rimuove eventuale pulsante chat minimizzata
-  ----------------------------------------- */
-
-  const oldChatButton =
-    document.getElementById("chatMinimizedButton");
-
-  if (oldChatButton) {
-    oldChatButton.remove();
-  }
-
-
-  /* -----------------------------------------
-     Crea modal chat
-  ----------------------------------------- */
-
-  const modal =
-    document.createElement("div");
-
-  modal.id =
-    "chatModal";
-
-  modal.className =
-    "chat-modal";
-
-
-  modal.innerHTML = `
-    <div class="chat-box">
-
-      <div class="chat-header">
-
-        <span>
-          ${escapeHtml(
-            otherUserName || "Chat"
-          )}
-        </span>
-
-        <div>
-
-          <button
-            type="button"
-            class="chat-minimize"
-            onclick="minimizeMessages()"
-            title="Minimizza"
-          >
-            −
-          </button>
-
-          <button
-            type="button"
-            class="chat-close"
-            onclick="closeMessages()"
-            title="Chiudi"
-          >
-            ×
-          </button>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="chatMessages"
-        class="chat-messages"
-      ></div>
-
-
-      <div
-        id="typingIndicator"
-        class="typing"
-      ></div>
-
-
-      <div class="chat-input">
-
-        <input
-          id="chatText"
-          type="text"
-          placeholder="Scrivi un messaggio..."
-          autocomplete="off"
-        >
-
-        <button
-          type="button"
-          id="sendMessageButton"
-        >
-          Invia
-        </button>
-
-      </div>
-
-    </div>
-  `;
-
-
-  document.body.appendChild(modal);
-
-
-  /* -----------------------------------------
-     Pulsante INVIA
-  ----------------------------------------- */
-
-  const sendButton =
-    document.getElementById(
-      "sendMessageButton"
-    );
-
-
-  if (sendButton) {
-
-    sendButton.onclick =
-      function() {
-
-        sendMessage(
-          conversationId,
-          otherUserId,
-          tripId || "",
-          requestId || ""
-        );
-
-      };
-
-  }
-
-
-  /* -----------------------------------------
-     Invio con ENTER
-  ----------------------------------------- */
-
-  const chatInput =
-    document.getElementById(
-      "chatText"
-    );
-
-
-  if (chatInput) {
-
-    chatInput.addEventListener(
-      "keydown",
-      function(event) {
-
-        if (
-          event.key === "Enter" &&
-          !event.shiftKey
-        ) {
-
-          event.preventDefault();
-
-          if (sendButton) {
-            sendButton.click();
-          }
-
-        }
-
-      }
-    );
-
-  }
-
-
-  /* -----------------------------------------
-     Carica messaggi
-  ----------------------------------------- */
-
-  try {
-
-    await loadMessages(
-      conversationId
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Errore caricamento messaggi:",
-      error
-    );
-
-  }
-
-
-  /* -----------------------------------------
-     Realtime
-  ----------------------------------------- */
-
-  try {
-
-    subscribeToMessages(
-      conversationId
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Errore realtime:",
-      error
-    );
-
-  }
-
-
-  /* -----------------------------------------
-     Segna messaggi come letti
-  ----------------------------------------- */
-
-  if (
-    typeof markMessagesAsRead ===
-    "function"
-  ) {
-
-    try {
-
-      await markMessagesAsRead(
-        conversationId
-      );
-
-    } catch (error) {
-
-      console.error(
-        "Errore marcatura messaggi letti:",
-        error
-      );
-
-    }
-
-  }
-
-
-  /* -----------------------------------------
-     Aggiorna contatore
-  ----------------------------------------- */
-
-  if (
-    typeof updateUnreadCount ===
-    "function"
-  ) {
-
-    try {
-
-      await updateUnreadCount();
-
-    } catch (error) {
-
-      console.error(
-        "Errore aggiornamento notifiche:",
-        error
-      );
-
-    }
-
-  }
-
-
-  /* -----------------------------------------
-     Rimuove badge visuali
-  ----------------------------------------- */
-
-  document
-    .querySelectorAll(".notify-badge")
-    .forEach(
-      function(badge) {
-        badge.remove();
-      }
-    );
-
-
-  /* -----------------------------------------
-     Typing
-  ----------------------------------------- */
-
-  if (
-    typeof setupTyping ===
-    "function"
-  ) {
-
-    try {
-
-      setupTyping(
-        conversationId,
-        otherUserName || "Utente"
-      );
-
-    } catch (error) {
-
-      console.error(
-        "Errore typing:",
-        error
-      );
-
-    }
-
-  }
-
-}
-
-
 /* =====================================================
-   LISTA MESSAGGI
+   MINIMIZZA CHAT
 ===================================================== */
 
-async function openMessages() {
+function minimizeChat() {
 
-  if (!currentUser) {
-
-    openAuth("login");
-
-    return;
-
-  }
-
-
-  /* -----------------------------------------
-     Recupera conversazioni
-  ----------------------------------------- */
-
-  const {
-    data: conversations,
-    error
-  } =
-    await supabaseClient
-      .from("conversations")
-      .select("*")
-      .or(
-        `participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Errore caricamento conversazioni:",
-      error
-    );
-
-    alert(
-      "Errore nel caricamento dei messaggi."
-    );
-
-    return;
-
-  }
-
-
-  /* -----------------------------------------
-     Rimuove vecchia lista
-  ----------------------------------------- */
-
-  const oldModal =
-    document.getElementById(
-      "messagesModal"
-    );
-
-  if (oldModal) {
-    oldModal.remove();
-  }
-
-
-  /* -----------------------------------------
-     Rimuove pulsante minimizzato lista
-  ----------------------------------------- 
-
-  const oldButton =
-    document.getElementById(
-      "messagesMinimizedButton"
-    );
-
-  if (oldButton) {
-    oldButton.remove();
-  }
-*/
-
-  /* -----------------------------------------
-     Crea lista
-  ----------------------------------------- */
-
-  const modal =
-    document.createElement("div");
-
-  modal.id =
-    "messagesModal";
-
-  modal.className =
-    "chat-modal";
-
-
-  let html = `
-
-    <div class="chat-box">
-
-      <div class="chat-header">
-
-        <span>
-          Messaggi
-        </span>
-
-        <div>
-
-          <button
-            type="button"
-            class="chat-minimize"
-            onclick="minimizeMessages()"
-            title="Minimizza"
-          >
-            −
-          </button>
-
-          <button
-            type="button"
-            class="chat-close"
-            onclick="closeMessages()"
-            title="Chiudi"
-          >
-            ×
-          </button>
-
-        </div>
-
-      </div>
-
-
-      <div
-        class="chat-messages"
-        style="
-          height:400px;
-          overflow-y:auto;
-        "
-      >
-  `;
-
-
-  /* -----------------------------------------
-     Nessuna conversazione
-  ----------------------------------------- */
-
-  if (
-    !conversations ||
-    conversations.length === 0
-  ) {
-
-    html += `
-
-      <div
-        style="
-          text-align:center;
-          padding:40px 20px;
-          color:#777;
-        "
-      >
-        Nessun messaggio
-      </div>
-
-    `;
-
-  }
-
-
-  /* -----------------------------------------
-     Conversazioni
-  ----------------------------------------- */
-
-  else {
-
-    for (
-      const conv of conversations
-    ) {
-
-      const otherUserId =
-        conv.participant_1 ===
-        currentUser.id
-
-          ? conv.participant_2
-
-          : conv.participant_1;
-
-
-      const otherUserName =
-        await getUserName(
-          otherUserId
-        );
-
-
-      /* -----------------------------------
-         Messaggi non letti
-      ----------------------------------- */
-
-      const {
-        data: unreadMessages
-      } =
-        await supabaseClient
-          .from("messages")
-          .select("id")
-          .eq(
-            "conversation_id",
-            conv.id
-          )
-          .is(
-            "read_at",
-            null
-          )
-          .neq(
-            "sender_id",
-            currentUser.id
-          );
-
-
-      const isUnread =
-        unreadMessages &&
-        unreadMessages.length > 0;
-
-
-      /* -----------------------------------
-         Ultimo messaggio
-      ----------------------------------- */
-
-      const {
-        data: lastMsg
-      } =
-        await supabaseClient
-          .from("messages")
-          .select(
-            "message, created_at"
-          )
-          .eq(
-            "conversation_id",
-            conv.id
-          )
-          .order(
-            "created_at",
-            {
-              ascending: false
-            }
-          )
-          .limit(1)
-          .maybeSingle();
-
-
-      let preview =
-        "Nessun messaggio";
-
-
-      if (lastMsg?.message) {
-
-        preview =
-          lastMsg.message.length > 40
-
-            ? lastMsg.message.substring(
-                0,
-                40
-              ) + "..."
-
-            : lastMsg.message;
-
-      }
-
-
-      html += `
-
-        <div
-          class="conversation-item ${
-            isUnread
-              ? "unread"
-              : ""
-          }"
-
-          data-conversation-id="${conv.id}"
-
-          data-other-user-id="${otherUserId}"
-
-           data-other-user-name="${encodeURIComponent(
-               otherUserName || "Utente"
-                  )}"
-
-          data-trip-id="${
-            conv.trip_id || ""
-          }"
-
-          data-request-id="${
-            conv.request_id || ""
-          }"
-        >
-
-          <div class="conversation-avatar">
-            👤
-          </div>
-
-
-          <div class="conversation-content">
-
-            <div class="conversation-top">
-
-              <strong>
-                ${escapeHtml(
-                  otherUserName ||
-                  "Utente"
-                )}
-              </strong>
-
-            </div>
-
-
-            <div
-              class="
-                conversation-preview
-                ${
-                  isUnread
-                    ? "conversation-preview-unread"
-                    : ""
-                }
-              "
-            >
-              ${escapeHtml(
-                preview
-              )}
-            </div>
-
-          </div>
-
-
-          ${
-            isUnread
-
-              ? `
-
-                <div
-                  class="conversation-unread-count"
-                >
-                  ${unreadMessages.length}
-                </div>
-
-              `
-
-              : ""
-          }
-
-        </div>
-
-      `;
-
-    }
-
-  }
-
-
-  html += `
-
-      </div>
-
-    </div>
-
-  `;
-
-
-  /* -----------------------------------------
-     Inserisce lista
-  ----------------------------------------- */
-
-  modal.innerHTML =
-    html;
-
-  document.body.appendChild(
-    modal
-  );
-
-
-  /* =================================================
-     CLICK SULLA CONVERSAZIONE
-  ================================================= */
-
-  modal
-    .querySelectorAll(
-      ".conversation-item"
-    )
-    .forEach(
-      function(item) {
-
-        item.addEventListener(
-          "click",
-          async function(event) {
-
-            event.preventDefault();
-
-            event.stopPropagation();
-
-
-            const conversationId =
-              item.dataset
-                .conversationId;
-
-
-            const otherUserId =
-              item.dataset
-                .otherUserId;
-
-
-            const otherUserName =
-  decodeURIComponent(
-    item.dataset.otherUserName || "Utente"
-  );
-
-
-            const tripId =
-              item.dataset
-                .tripId ||
-              null;
-
-
-            const requestId =
-              item.dataset
-                .requestId ||
-              null;
-
-
-            if (!conversationId) {
-
-              console.error(
-                "ID conversazione mancante"
-              );
-
-              return;
-
-            }
-
-
-            /* ---------------------------------
-               Chiude la lista
-            --------------------------------- */
-
-            modal.remove();
-
-
-            /* ---------------------------------
-               Apre chat singola
-            --------------------------------- */
-
-            await openChatModal(
-              conversationId,
-              otherUserName,
-              otherUserId,
-              tripId,
-              requestId
-            );
-
-          }
-        );
-
-      }
-    );
-
-
-  /* -----------------------------------------
-     Aggiorna contatore
-  ----------------------------------------- */
-
-  if (
-    typeof updateUnreadCount ===
-    "function"
-  ) {
-
-    updateUnreadCount();
-
-  }
-
-}
-
-/* =====================================================
-   MINIMIZZA LISTA MESSAGGI
-===================================================== */
-
-function minimizeMessages() {
-
-  const modal =
-    document.getElementById("messagesModal");
+  const modal = document.getElementById("chatModal");
 
   if (!modal) {
     return;
   }
 
-  /* Nasconde la lista */
+  // Nasconde la chat
   modal.style.display = "none";
 
+  // Controlla se esiste già il pulsante
+  let button = document.getElementById("chatMinimizedButton");
 
-  /* Cerca eventuale pulsante */
-  let button =
-    document.getElementById(
-      "messagesMinimizedButton"
-    );
-
-
-  /* Se non esiste, lo crea */
   if (!button) {
 
-    button =
-      document.createElement("button");
+    button = document.createElement("button");
 
-    button.id =
-      "messagesMinimizedButton";
+    button.id = "chatMinimizedButton";
 
-    button.type =
-      "button";
+    button.className = "chat-minimized-button";
 
-    button.className =
-      "chat-minimized-button";
+    button.type = "button";
 
-    button.title =
-      "Apri messaggi";
+    button.title = "Apri chat";
 
-    button.innerHTML =
-      "💬";
+    button.innerHTML = "💬";
 
+    button.onclick = function() {
+      restoreChat();
+    };
 
-    button.addEventListener(
-      "click",
-      function(event) {
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        restoreMessages();
-
-      }
-    );
-
-
-    document.body.appendChild(
-      button
-    );
-
+    document.body.appendChild(button);
   }
 
-
-  button.style.display =
-    "flex";
-
+  // Mostra il pulsante
+  button.style.display = "flex";
 }
 
 
 /* =====================================================
-   RIPRISTINA LISTA MESSAGGI
+   RIAPRI CHAT
 ===================================================== */
 
-function restoreMessages() {
+function restoreChat() {
 
-  const modal =
-    document.getElementById(
-      "messagesModal"
-    );
+  const modal = document.getElementById("chatModal");
 
-  const button =
-    document.getElementById(
-      "messagesMinimizedButton"
-    );
-
+  const button = document.getElementById("chatMinimizedButton");
 
   if (modal) {
 
-    modal.style.display =
-      "flex";
+    modal.style.display = "flex";
 
   }
-
 
   if (button) {
 
     button.remove();
 
   }
-
 }
 
 
 /* =====================================================
-   CHIUDI LISTA MESSAGGI
+   CHIUDI CHAT
 ===================================================== */
 
-function closeMessages() {
+function closeChat() {
 
-  const modal =
-    document.getElementById(
-      "messagesModal"
-    );
-
+  const modal = document.getElementById("chatModal");
 
   if (modal) {
 
@@ -5229,23 +4479,14 @@ function closeMessages() {
 
   }
 
-
-  const button =
-    document.getElementById(
-      "messagesMinimizedButton"
-    );
-
+  const button = document.getElementById("chatMinimizedButton");
 
   if (button) {
 
     button.remove();
 
   }
-
 }
-
-
-
 
 /*=================*/
 let typingTimeout;
@@ -5290,6 +4531,17 @@ function setupTyping(conversationId, otherUserName) {
     )
     .subscribe();
 }
+
+/*=================*/
+
+
+/*=================*/
+function closeMessages() {
+  const modal = document.getElementById("messagesModal");
+  if (modal) modal.remove();
+}
+/*=================*/
+
 
 
 
