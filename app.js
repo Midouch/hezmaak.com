@@ -2736,7 +2736,6 @@ function closeMessages() {
  /* =====================================================
    CONFERMA CONSEGNA
 ===================================================== */
-
 async function confirmDelivery(conversationId) {
 
   if (!currentUser) {
@@ -2763,7 +2762,6 @@ async function confirmDelivery(conversationId) {
       ? { confirmed_by_1: true }
       : { confirmed_by_2: true };
 
-  // Controlla se con questa conferma sono entrambe true
   const bothConfirmed =
     isParticipant1
       ? true && conv.confirmed_by_2
@@ -2784,16 +2782,35 @@ async function confirmDelivery(conversationId) {
     return;
   }
 
+  // Messaggio di sistema per notificare l'altra parte
+  const myName = await getUserName(currentUser.id);
+
+  const systemText =
+    bothConfirmed
+      ? `✓ ${myName} ha confermato la consegna. Entrambe le parti hanno confermato!`
+      : `✓ ${myName} ha confermato la consegna. In attesa della tua conferma.`;
+
+  await supabaseClient
+    .from("messages")
+    .insert([
+      {
+        conversation_id: conversationId,
+        sender_id: currentUser.id,
+        message: systemText,
+        is_system: true
+      }
+    ]);
+
   if (bothConfirmed) {
     showToast("✓ Consegna confermata da entrambe le parti!");
   } else {
     showToast("✓ Conferma registrata. In attesa dell'altra parte.");
   }
 
-  // Ricarica lo stato della chat per aggiornare i bottoni
   await refreshChatActionButtons(conversationId);
 
 }
+
 /* =====================================================
    AGGIORNA BOTTONI AZIONE CHAT
 ===================================================== */
@@ -4973,29 +4990,37 @@ async function loadMessages(conversationId) {
   const box = document.getElementById("chatMessages");
   box.innerHTML = "";
 
- messages.forEach(msg => {
+  messages.forEach(msg => {
 
-  const div = document.createElement("div");
+    const div = document.createElement("div");
 
-  const isMine = msg.sender_id === currentUser.id;
-  const isUnread = !isMine && msg.read_at === null;
+    if (msg.is_system) {
 
-  if (isMine) {
-    div.className = "msg msg-me";
-  } else if (isUnread) {
-    div.className = "msg msg-other msg-unread";
-  } else {
-    div.className = "msg msg-other";
-  }
+      div.className = "msg msg-system";
+      div.textContent = msg.message;
+      box.appendChild(div);
+      return;
 
-  div.textContent = msg.message;
+    }
 
-  box.appendChild(div);
-});
+    const isMine = msg.sender_id === currentUser.id;
+    const isUnread = !isMine && msg.read_at === null;
+
+    if (isMine) {
+      div.className = "msg msg-me";
+    } else if (isUnread) {
+      div.className = "msg msg-other msg-unread";
+    } else {
+      div.className = "msg msg-other";
+    }
+
+    div.textContent = msg.message;
+
+    box.appendChild(div);
+  });
 
   box.scrollTop = box.scrollHeight;
 }
-
 /*===========================*/
 async function sendMessage(conversationId) {
 
@@ -5060,6 +5085,31 @@ function subscribeToMessages(conversationId) {
       payload => {
 
         const msg = payload.new;
+
+        if (msg.is_system) {
+
+          if (msg.sender_id !== currentUser.id) {
+            showToast("📦 " + msg.message);
+          }
+
+          const box = document.getElementById("chatMessages");
+
+          if (box) {
+            const div = document.createElement("div");
+            div.className = "msg msg-system";
+            div.textContent = msg.message;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+          }
+
+          // Aggiorna i bottoni azione (es. sblocca recensione)
+          if (typeof refreshChatActionButtons === "function") {
+            refreshChatActionButtons(conversationId);
+          }
+
+          return;
+
+        }
 
         if (msg.sender_id !== currentUser.id) {
 
