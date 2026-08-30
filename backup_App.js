@@ -2733,6 +2733,118 @@ function closeMessages() {
 
 }
 /*==============*/
+/* =====================================================
+   CONFERMA ACCORDO (chiude viaggio/richiesta dalla lista pubblica)
+===================================================== */
+
+async function confirmAgreement(conversationId) {
+
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const { data: conv, error: fetchError } =
+    await supabaseClient
+      .from("conversations")
+      .select("*")
+      .eq("id", conversationId)
+      .single();
+
+  if (fetchError) {
+    alert("Errore: " + fetchError.message);
+    return;
+  }
+
+  const isParticipant1 = conv.participant_1 === currentUser.id;
+
+  const updateField =
+    isParticipant1
+      ? { agreement_confirmed_by_1: true }
+      : { agreement_confirmed_by_2: true };
+
+  const bothConfirmed =
+    isParticipant1
+      ? true && conv.agreement_confirmed_by_2
+      : conv.agreement_confirmed_by_1 && true;
+
+  if (bothConfirmed) {
+    updateField.agreement_reached_at = new Date().toISOString();
+  }
+
+  const { error: updateError } =
+    await supabaseClient
+      .from("conversations")
+      .update(updateField)
+      .eq("id", conversationId);
+
+  if (updateError) {
+    alert("Errore: " + updateError.message);
+    return;
+  }
+
+  // Se entrambi hanno confermato, chiudi viaggio/richiesta dalla lista pubblica
+  if (bothConfirmed) {
+
+    if (conv.trip_id) {
+
+      await supabaseClient
+        .from("trips")
+        .update({ status: "in_progress" })
+        .eq("id", conv.trip_id);
+
+    }
+
+    if (conv.request_id) {
+
+      await supabaseClient
+        .from("requests")
+        .update({ status: "closed" })
+        .eq("id", conv.request_id);
+
+    }
+
+    // Aggiorna le liste pubbliche se sono a schermo
+    if (typeof loadTrips === "function") loadTrips();
+    if (typeof loadRequests === "function") loadRequests();
+
+  }
+
+  // Messaggio di sistema per notificare l'altra parte
+  const myName = await getUserName(currentUser.id);
+
+  const systemText =
+    bothConfirmed
+      ? `🤝 ${myName} ha confermato l'accordo. Accordo raggiunto! Il viaggio/richiesta non è più visibile pubblicamente.`
+      : `🤝 ${myName} ha confermato l'accordo. In attesa della tua conferma.`;
+
+  await supabaseClient
+    .from("messages")
+    .insert([
+      {
+        conversation_id: conversationId,
+        sender_id: currentUser.id,
+        message: systemText,
+        is_system: true
+      }
+    ]);
+
+  if (bothConfirmed) {
+    showToast("🤝 Accordo confermato da entrambe le parti!");
+  } else {
+    showToast("🤝 Conferma registrata. In attesa dell'altra parte.");
+  }
+
+  await refreshChatActionButtons(conversationId);
+
+}
+
+
+
+
+
+
+
  /* =====================================================
    CONFERMA CONSEGNA
 ===================================================== */
@@ -2814,17 +2926,12 @@ async function confirmDelivery(conversationId) {
 /* =====================================================
    AGGIORNA BOTTONI AZIONE CHAT
 ===================================================== */
-
 async function refreshChatActionButtons(conversationId) {
 
   const { data: conv, error } =
     await supabaseClient
       .from("conversations")
-      .select(`
-        *,
-        trips(travel_date),
-        requests(needed_date)
-      `)
+      .select("*")
       .eq("id", conversationId)
       .single();
 
@@ -2838,23 +2945,21 @@ async function refreshChatActionButtons(conversationId) {
 
   if (!container) return;
 
-  const relevantDate =
-    conv.trips?.travel_date ||
-    conv.requests?.needed_date ||
-    null;
-
-  const dateHasPassed =
-    relevantDate
-      ? new Date(relevantDate + "T00:00:00") < new Date()
-      : true;
-
-  const bothConfirmed =
-    conv.confirmed_by_1 && conv.confirmed_by_2;
-
   const isParticipant1 =
     conv.participant_1 === currentUser.id;
 
-  const myConfirmation =
+  const agreementReached =
+    conv.agreement_confirmed_by_1 && conv.agreement_confirmed_by_2;
+
+  const myAgreementConfirmation =
+    isParticipant1
+      ? conv.agreement_confirmed_by_1
+      : conv.agreement_confirmed_by_2;
+
+  const bothConfirmedDelivery =
+    conv.confirmed_by_1 && conv.confirmed_by_2;
+
+  const myDeliveryConfirmation =
     isParticipant1
       ? conv.confirmed_by_1
       : conv.confirmed_by_2;
@@ -2864,7 +2969,50 @@ async function refreshChatActionButtons(conversationId) {
 
   let html = "";
 
-  if (bothConfirmed && dateHasPassed) {
+
+  /* -------------------------------------------
+     STADIO 1: Accordo non ancora raggiunto
+  ------------------------------------------- */
+
+  if (!agreementReached) {
+
+    if (myAgreementConfirmation) {
+
+      html = `
+        <div class="chat-action-banner pending">
+          <div class="chat-action-icon">⏳</div>
+          <div class="chat-action-text">
+            <strong>Accordo confermato</strong>
+            <span>In attesa dell'altra parte</span>
+          </div>
+        </div>
+      `;
+
+    } else {
+
+      html = `
+        <div class="chat-action-banner neutral">
+          <div class="chat-action-icon">🤝</div>
+          <div class="chat-action-text">
+            <strong>Vi siete messi d'accordo?</strong>
+            <span>Conferma per chiudere l'annuncio pubblico</span>
+          </div>
+          <button
+            class="chat-action-button secondary"
+            onclick="confirmAgreement('${conversationId}')">
+            Conferma accordo
+          </button>
+        </div>
+      `;
+
+    }
+
+
+  /* -------------------------------------------
+     STADIO 2: Accordo raggiunto, in attesa consegna
+  ------------------------------------------- */
+
+  } else if (bothConfirmedDelivery) {
 
     if (!alreadyReviewed) {
 
@@ -2897,7 +3045,7 @@ async function refreshChatActionButtons(conversationId) {
 
     }
 
-  } else if (myConfirmation) {
+  } else if (myDeliveryConfirmation) {
 
     html = `
       <div class="chat-action-banner pending">
@@ -2932,25 +3080,6 @@ async function refreshChatActionButtons(conversationId) {
 
 }
 
-
-async function hasAlreadyReviewed(conversationId) {
-
-  const { data, error } =
-    await supabaseClient
-      .from("reviews")
-      .select("id")
-      .eq("conversation_id", conversationId)
-      .eq("reviewer_id", currentUser.id)
-      .maybeSingle();
-
-  if (error) {
-    console.error(error);
-    return false;
-  }
-
-  return !!data;
-
-}
 
 /*======================*/
 
@@ -6217,23 +6346,25 @@ function myTripHTML(trip) {
         </div>
 
 
-        <div>
+<div>
 
-          <span>
-            📌 Stato
-          </span>
+  <span>
+    📌 Stato
+  </span>
 
-          <strong>
+  <strong>
 
-            ${
-              trip.status === "active"
-                ? "🟢 Attivo"
-                : "⚪ Chiuso"
-            }
+    ${
+      trip.status === "active"
+        ? "🟢 Attivo"
+        : trip.status === "in_progress"
+          ? "🤝 Accordo raggiunto"
+          : "⚪ Chiuso"
+    }
 
-          </strong>
+  </strong>
 
-        </div>
+</div>
 
       </div>
 
@@ -6652,15 +6783,17 @@ function myRequestCard(request) {
       ).toLocaleDateString("it-IT")
     : "Non specificata";
 
-  let statusLabel = "Aperta";
 
-  if (request.status === "open") {
-    statusLabel = "🟢 Aperta";
-  } else if (request.status === "closed") {
-    statusLabel = "⚪ Chiusa";
-  } else if (request.status === "cancelled") {
-    statusLabel = "🔴 Annullata";
-  }
+
+let statusLabel = "Aperta";
+
+if (request.status === "open") {
+  statusLabel = "🟢 Aperta";
+} else if (request.status === "closed") {
+  statusLabel = "🤝 Accordo raggiunto";
+} else if (request.status === "cancelled") {
+  statusLabel = "🔴 Annullata";
+}
 
   return `
 
@@ -9417,4 +9550,260 @@ async function markMessagesAsRead(conversationId) {
   if (error) {
     console.error("Errore nel segnare i messaggi come letti:", error);
   }
+}
+/*======================*/
+
+/* =====================================================
+   FORM RECENSIONE
+===================================================== */
+
+let selectedRating = 0;
+
+async function openReviewForm(conversationId) {
+
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  const { data: conv, error } =
+    await supabaseClient
+      .from("conversations")
+      .select("*")
+      .eq("id", conversationId)
+      .single();
+
+  if (error) {
+    alert("Errore: " + error.message);
+    return;
+  }
+
+  const otherUserId =
+    conv.participant_1 === currentUser.id
+      ? conv.participant_2
+      : conv.participant_1;
+
+  const otherUserName = await getUserName(otherUserId);
+
+  selectedRating = 0;
+
+  const old = document.getElementById("reviewModal");
+  if (old) old.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "reviewModal";
+
+  modal.innerHTML = `
+
+    <div class="auth-overlay">
+
+      <div class="auth-box review-box">
+
+        <button
+          class="auth-close"
+          onclick="closeReviewForm()">
+
+          ×
+
+        </button>
+
+
+        <h2>
+          ⭐ Recensisci ${escapeHtml(otherUserName)}
+        </h2>
+
+
+        <p>
+          Com'è andata la spedizione?
+        </p>
+
+
+        <div id="starRating" class="star-rating">
+
+          <span class="star" data-value="1">★</span>
+          <span class="star" data-value="2">★</span>
+          <span class="star" data-value="3">★</span>
+          <span class="star" data-value="4">★</span>
+          <span class="star" data-value="5">★</span>
+
+        </div>
+
+
+        <textarea
+          id="reviewComment"
+          rows="4"
+          placeholder="Lascia un commento (opzionale)"
+        ></textarea>
+
+
+        <div id="reviewMessage"></div>
+
+
+        <button
+          class="primary auth-button"
+          onclick="submitReview('${conversationId}', '${otherUserId}')">
+
+          Invia recensione
+
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(modal);
+
+  setupStarRating();
+
+}
+
+
+function closeReviewForm() {
+
+  const modal = document.getElementById("reviewModal");
+  if (modal) modal.remove();
+
+}
+
+
+function setupStarRating() {
+
+  const stars = document.querySelectorAll("#starRating .star");
+
+  stars.forEach(star => {
+
+    star.addEventListener("click", () => {
+
+      selectedRating = parseInt(star.dataset.value);
+      highlightStars(selectedRating);
+
+    });
+
+    star.addEventListener("mouseenter", () => {
+      highlightStars(parseInt(star.dataset.value));
+    });
+
+  });
+
+  const container = document.getElementById("starRating");
+
+  container.addEventListener("mouseleave", () => {
+    highlightStars(selectedRating);
+  });
+
+}
+
+
+function highlightStars(count) {
+
+  const stars = document.querySelectorAll("#starRating .star");
+
+  stars.forEach(star => {
+
+    const value = parseInt(star.dataset.value);
+
+    star.classList.toggle("filled", value <= count);
+
+  });
+
+}
+
+
+async function submitReview(conversationId, otherUserId) {
+
+  const message = document.getElementById("reviewMessage");
+
+  if (!selectedRating || selectedRating < 1) {
+
+    message.innerHTML = `
+      <div class="auth-error">
+        Seleziona almeno una stella.
+      </div>
+    `;
+
+    return;
+
+  }
+
+  const comment =
+    document.getElementById("reviewComment").value.trim();
+
+  message.innerHTML = `
+    <div class="auth-success">
+      Invio in corso...
+    </div>
+  `;
+
+  const { error } =
+    await supabaseClient
+      .from("reviews")
+      .insert([
+        {
+          conversation_id: conversationId,
+          reviewer_id: currentUser.id,
+          reviewed_user_id: otherUserId,
+          rating: selectedRating,
+          comment: comment || null
+        }
+      ]);
+
+  if (error) {
+
+    // Codice 23505 = violazione vincolo UNIQUE (già recensito)
+    if (error.code === "23505") {
+
+      message.innerHTML = `
+        <div class="auth-error">
+          Hai già lasciato una recensione per questa conversazione.
+        </div>
+      `;
+
+    } else {
+
+      message.innerHTML = `
+        <div class="auth-error">
+          ${escapeHtml(error.message)}
+        </div>
+      `;
+
+    }
+
+    return;
+
+  }
+
+  message.innerHTML = `
+    <div class="auth-success">
+      ✓ Recensione inviata. Grazie!
+    </div>
+  `;
+
+  setTimeout(() => {
+
+    closeReviewForm();
+
+    refreshChatActionButtons(conversationId);
+
+  }, 1000);
+
+}
+async function hasAlreadyReviewed(conversationId) {
+
+  const { data, error } =
+    await supabaseClient
+      .from("reviews")
+      .select("id")
+      .eq("conversation_id", conversationId)
+      .eq("reviewer_id", currentUser.id)
+      .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    return false;
+  }
+
+  return !!data;
+
 }
