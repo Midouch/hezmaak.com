@@ -1816,7 +1816,7 @@ html[dir="rtl"] select {
   transition: .2s;
 }
 
-.messages-minimize:hover {
+.chat-minimize:hover {
   background: rgba(255,255,255,.15);
 }
 
@@ -2283,7 +2283,7 @@ html[dir="rtl"] select {
    ma NON viene eliminata dal DOM.
 */
 
-.messages-modal.minimized {
+.chat-modal.minimized {
   display: none !important;
 }
 
@@ -2293,7 +2293,7 @@ html[dir="rtl"] select {
    viene minimizzata.
 */
 
-.messages-minimized-button {
+.chat-minimized-button {
   position: fixed;
 
   right: 20px;
@@ -2329,7 +2329,7 @@ html[dir="rtl"] select {
   transition: transform .2s ease;
 }
 
-.messages-minimized-button:hover {
+.chat-minimized-button:hover {
   transform: scale(1.08);
 }
 
@@ -2407,7 +2407,7 @@ body.dark .typing {
     font-size: 16px;
   }
 
-  .messages-minimized-button {
+  .chat-minimized-button {
     right: 15px;
 
     bottom: 15px;
